@@ -72,7 +72,8 @@ const useStyles = makeStyles({
   fullList: {
     width: 'auto',
   },
-  entryPadding: {
+  menuEntryItem: {
+    color: 'white',
     border: '1px solid transparent',
     borderRadius: 10,
     paddingTop: 8,
@@ -92,6 +93,7 @@ const useStyles = makeStyles({
     borderRadius: 10,
   },
   menuIcon: {
+    color: 'white',
     minWidth: 'auto',
     marginRight: 15,
   },
@@ -161,7 +163,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                     toggleOpenCollapseState(index)
                                   }
                                 }}
-                                className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.entryPadding].join(" ")}
+                                className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
                                 sx={{
                                   "&:hover": {
                                     backgroundColor: "transparent",
@@ -184,7 +186,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                 <List component="div" disablePadding>
                                   {item.children.map((child, childIndex) => 
                                       <div
-                                        className={(child.path && (pathMatch === child.path)) ? classes.currentSelection : "white"}
+                                        className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
                                       >
                                         <ListItemButton
                                           onClick={() => {
