@@ -12,10 +12,13 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
+import ExternalLinkIcon from '@mui/icons-material/Launch';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import { PropsFromRedux } from '../containers/NavigationLeftSideBarContainer';
+
+import LinkWrapper from './LinkWrapper';
 
 import useCurrentPath from '../hooks/useCurrentPath';
 
@@ -23,6 +26,7 @@ interface IMenuEntry {
   text: string
   path?: string
   icon: any
+  externalLink?: string
   children?: IMenuEntry[]
 }
 
@@ -39,12 +43,14 @@ const navigationMenu : IMenuEntry[] = [
   },
   {
     text: 'Governance',
-    path: '/governance', // todo external link
+    path: '/governance',
+    externalLink: 'https://snapshot.org/#/propy-gov.eth',
     icon: <GovernanceIcon />
   },
   {
     text: 'Liquidity',
-    path: '/liquidity', // todo external link
+    path: '/liquidity',
+    externalLink: 'https://info.uniswap.org/#/pools/0xc7cf089fb4bc91f1981df2285ca019ab09a5dd3b', // todo use unipilot link
     icon: <LiquidityIcon />
   },
   // {
@@ -154,32 +160,40 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                             <div
                               className={classes.entryContainerMargin}
                             >
-                              <ListItemButton
-                                onClick={() => {
-                                  if(item.path) {
-                                    navigate(item.path)
-                                    props.setShowLeftMenu(false)
-                                  } else if (item.children) {
-                                    toggleOpenCollapseState(index)
-                                  }
-                                }}
-                                className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
-                                sx={{
-                                  "&:hover": {
-                                    backgroundColor: "transparent",
-                                    border: '1px solid #333436'
-                                  }
-                                }}
-                                disableRipple
+                              <LinkWrapper 
+                                link={item.externalLink ? item.externalLink : undefined}
+                                external={item.externalLink ? true : undefined}
                               >
-                                  <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{item.icon}</ListItemIcon>
-                                  <ListItemText primary={item.text} />
-                                  {item.children &&
-                                    <>
-                                      {openCollapseSections.indexOf(index) > -1 ? <ExpandLess /> : <ExpandMore />}
-                                    </>
-                                  }
-                              </ListItemButton>
+                                <ListItemButton
+                                  onClick={() => {
+                                    if(item.path) {
+                                      navigate(item.path)
+                                      props.setShowLeftMenu(false)
+                                    } else if (item.children) {
+                                      toggleOpenCollapseState(index)
+                                    }
+                                  }}
+                                  className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
+                                  sx={{
+                                    "&:hover": {
+                                      backgroundColor: "transparent",
+                                      border: '1px solid #333436'
+                                    }
+                                  }}
+                                  disableRipple
+                                >
+                                    <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                    {item.externalLink &&
+                                      <ExternalLinkIcon style={{opacity: 0.5}} />
+                                    }
+                                    {item.children &&
+                                      <>
+                                        {openCollapseSections.indexOf(index) > -1 ? <ExpandLess /> : <ExpandMore />}
+                                      </>
+                                    }
+                                </ListItemButton>
+                              </LinkWrapper>
                             </div>
                             {item.children &&
                               <Collapse in={openCollapseSections.indexOf(index) > -1} timeout="auto" unmountOnExit>
@@ -201,6 +215,9 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                         >
                                           <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
                                           <ListItemText primary={child.text} />
+                                          {item.externalLink &&
+                                            <ExternalLinkIcon />
+                                          }
                                         </ListItemButton>
                                       </div>
                                   )}

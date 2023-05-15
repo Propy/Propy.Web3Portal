@@ -13,6 +13,14 @@
   color: white;
 }
 
+.inherit-color {
+  color: inherit;
+}
+
+.no-decorate {
+  text-decoration: none!important;
+}
+
 .disable-padding {
   padding: 0;
 }
