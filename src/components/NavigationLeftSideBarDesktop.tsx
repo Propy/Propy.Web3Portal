@@ -79,6 +79,7 @@ const useStyles = makeStyles({
     width: 'auto',
   },
   menuEntryItem: {
+    transition: 'all 0.2s ease-in-out',
     color: 'white',
     border: '1px solid transparent',
     borderRadius: 10,
@@ -99,6 +100,7 @@ const useStyles = makeStyles({
     borderRadius: 10,
   },
   menuIcon: {
+    transition: 'all 0.2s ease-in-out',
     color: 'white',
     minWidth: 'auto',
     marginRight: 15,

@@ -1,5 +1,10 @@
 import { connect, ConnectedProps } from 'react-redux';
 
+import {
+    setConsideredMobile,
+    setConsideredMedium,
+} from '../state/actions';
+
 import App from '../components/App';
 
 interface RootState {
@@ -10,7 +15,12 @@ const mapStateToProps = (state: RootState) => ({
     darkMode: state.darkMode
 })
 
-const connector = connect(mapStateToProps, {})
+const mapDispatchToProps = {
+    setConsideredMobile,
+    setConsideredMedium,
+}
+
+const connector = connect(mapStateToProps, mapDispatchToProps)
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 

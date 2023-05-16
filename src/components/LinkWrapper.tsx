@@ -24,7 +24,7 @@ const LinkWrapper = (props: ILinkWrapper) => {
   } = props;
   if(external && link) {
     return (
-      <ExternalLink className={className} href={link}>
+      <ExternalLink className={[className, 'no-decorate', 'inherit-color'].join(" ")} href={link}>
         {children}
       </ExternalLink>
     )
