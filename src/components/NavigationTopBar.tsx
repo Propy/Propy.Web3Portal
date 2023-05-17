@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
     appBar: {
       borderBottom: '3px solid #38A6FB',
       background: '#141618',
+      borderRadius: 0,
     }
   }),
 );

@@ -53,6 +53,26 @@ const App = (props: PropsFromRedux) => {
             }
           })
         },
+        components: {
+          MuiCardContent :{
+            styleOverrides: {
+              root:{
+                borderRadius: 15,
+                overflow: 'auto',
+                "&:last-child": {
+                  paddingBottom: '16px'
+                },
+              }
+            }
+          },
+          MuiPaper: {
+            styleOverrides: {
+              root:{
+                borderRadius: 15,
+              }
+            }
+          },
+        }
       }),
     [props.darkMode],
   );

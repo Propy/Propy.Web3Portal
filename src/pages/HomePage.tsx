@@ -4,14 +4,13 @@ import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 
 import { useEtherBalance, useEthers } from '@usedapp/core'
 import { formatEther } from '@ethersproject/units'
 
 import { STAKING_CONTRACT } from '../utils/constants'
+
+import GenericBannerPageContainer from '../containers/GenericBannerPageContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,46 +44,16 @@ const HomePage = () => {
     const stakingBalance = useEtherBalance(STAKING_CONTRACT)
 
     return (
-        <Container maxWidth="md">
-            <div>
-                {stakingBalance && (
-                    <Card className={classes.root}>
-                        <CardContent>
-                            <Typography className={classes.title} color="textSecondary" gutterBottom>
-                                ETH2 staking contract holds:
-                            </Typography>
-                            <Typography variant="h5" component="h2">
-                                {formatEther(stakingBalance)} ETH
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                )}
-                {account && (
-                    <Card className={classes.root}>
-                        <CardContent>
-                            <Typography className={classes.title} color="textSecondary" gutterBottom>
-                                Account:
-                            </Typography>
-                            <Typography variant="h5" component="h2">
-                                {account}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                )}
-                {userBalance && (
-                    <Card className={classes.root}>
-                        <CardContent>
-                            <Typography className={classes.title} color="textSecondary" gutterBottom>
-                                Ether balance:
-                            </Typography>
-                            <Typography variant="h5" component="h2">
-                                {formatEther(userBalance)} ETH
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
-        </Container>
+        <>
+            <GenericBannerPageContainer 
+                img="https://propy.com/home/static/media/phone-banner-background-newsletter.5fd9eb54d501e24b3281.webp"
+                title="Dashboard"
+            >
+                <Card
+                    style={{width: '100%', height: '300px'}}
+                />
+            </GenericBannerPageContainer>
+        </>
     )
 };
 

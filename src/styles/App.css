@@ -21,6 +21,10 @@
   text-decoration: none!important;
 }
 
+.text-shadow {
+  text-shadow: 2px 2px 8px #000000;
+}
+
 .disable-padding {
   padding: 0;
 }
