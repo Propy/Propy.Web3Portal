@@ -13,7 +13,7 @@ import DarkModeIcon from '@mui/icons-material/NightsStay';
 import LightModeIcon from '@mui/icons-material/WbSunny';
 
 import LogoDarkMode from '../assets/svg/propy-dark-mode.svg'
-import LogoLightMode from '../assets/svg/propy-dark-mode.svg'
+import LogoLightMode from '../assets/svg/propy-light-mode.svg'
 
 import { Web3ModalButton } from './Web3ModalButton';
 import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
@@ -36,26 +36,23 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     appBar: {
       borderBottom: '3px solid #38A6FB',
-      background: '#141618',
       borderRadius: 0,
     }
   }),
 );
 
 const NavigationTopBar = (props: PropsFromRedux) => {
-  const classes = useStyles()
+  const classes = useStyles();
+
+  let {
+    darkMode,
+  } = props;
 
   let navigate = useNavigate();
 
-  const [localDarkMode, setLocalDarkMode] = useState(props.darkMode)
-
-  useEffect(() => {
-    setLocalDarkMode(props.darkMode)
-  }, [props.darkMode])
-
   return (
     <div className={classes.root}>
-      <AppBar className={classes.appBar} position="fixed">
+      <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "black"}} className={classes.appBar} position="fixed">
         <Toolbar>
           {/* <IconButton
             onClick={() => props.setShowLeftMenu(!localShowLeftMenu)}
@@ -66,18 +63,18 @@ const NavigationTopBar = (props: PropsFromRedux) => {
             size="large">
             <MenuIcon />
           </IconButton> */}
-          <img onClick={() => navigate('/')} height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={localDarkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
+          <img onClick={() => navigate('/')} height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
             Web3 Portal
           </Typography>
           <Web3ModalButton/>
           <IconButton
             color="inherit"
-            onClick={() => props.setDarkMode(!localDarkMode)}
+            onClick={() => props.setDarkMode(!darkMode)}
             aria-label="delete"
             className={classes.margin}
             size="large">
-            {localDarkMode ? <LightModeIcon/> : <DarkModeIcon />}
+            {darkMode ? <LightModeIcon/> : <DarkModeIcon />}
           </IconButton>
         </Toolbar>
       </AppBar>

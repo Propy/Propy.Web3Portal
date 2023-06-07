@@ -11,6 +11,7 @@ import { formatEther } from '@ethersproject/units'
 import { STAKING_CONTRACT } from '../utils/constants'
 
 import GenericBannerPageContainer from '../containers/GenericBannerPageContainer';
+import MyTokensBannerContainer from '../containers/MyTokensBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,6 +53,9 @@ const HomePage = () => {
                 <Card
                     style={{width: '100%', height: '300px'}}
                 />
+                {account &&
+                    <MyTokensBannerContainer />
+                }
             </GenericBannerPageContainer>
         </>
     )

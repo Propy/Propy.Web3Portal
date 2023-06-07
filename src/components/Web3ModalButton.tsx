@@ -12,6 +12,7 @@ export const Web3ModalButton = () => {
   const { account, activate, deactivate, chainId } = useEthers()
   const [activateError, setActivateError] = useState('')
   const { error } = useEthers()
+
   useEffect(() => {
     if (error) {
       // Temp workaround to avoid network changed error message until useDapp handles this internally
@@ -25,6 +26,15 @@ export const Web3ModalButton = () => {
     // Can handle switches to unsupported chainId(s) here
     console.log("Current chainId", chainId);
   }, [chainId])
+
+  useEffect(() => {
+    console.log({account});
+    if(account) {
+      console.log("Run default account info scanning")
+    } else {
+      console.log("Clear account info from Redux")
+    }
+  }, [account])
 
   const activateProvider = async () => {
     const providerOptions = {

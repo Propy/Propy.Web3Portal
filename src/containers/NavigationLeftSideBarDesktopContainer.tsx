@@ -6,10 +6,12 @@ import NavigationLeftSideBarDesktop from '../components/NavigationLeftSideBarDes
 
 interface RootState {
     showLeftMenu: boolean
+    darkMode: boolean
 }
   
 const mapStateToProps = (state: RootState) => ({
-    showLeftMenu: state.showLeftMenu
+    showLeftMenu: state.showLeftMenu,
+    darkMode: state.darkMode,
 })
   
 const mapDispatchToProps = {

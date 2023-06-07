@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       fontWeight: 'bold',
+      color: 'white',
     }
   }),
 );

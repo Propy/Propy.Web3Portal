@@ -80,13 +80,19 @@ const useStyles = makeStyles({
   },
   menuEntryItem: {
     transition: 'all 0.2s ease-in-out',
-    color: 'white',
+    fontWeight: '500',
     border: '1px solid transparent',
     borderRadius: 10,
     paddingTop: 8,
     paddingBottom: 8,
     paddingLeft: 11,
     paddingRight: 11,
+  },
+  menuEntryItemDarkMode: {
+    color: 'white',
+  },
+  menuEntryItemLightMode: {
+    color: '#111111',
   },
   entryContainerMargin: {
     marginTop: 6,
@@ -95,15 +101,26 @@ const useStyles = makeStyles({
     marginRight: 11,
     borderRadius: 10,
   },
-  currentSelection: {
+  currentSelectionDarkMode: {
     backgroundColor: '#ffffff1a!important',
     borderRadius: 10,
+    boxShadow: '0px 0px 20px -1px rgba(0, 0, 0, 0.15)',
+  },
+  currentSelectionLightMode: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    boxShadow: '0px 0px 20px -1px rgba(0, 0, 0, 0.15)',
   },
   menuIcon: {
     transition: 'all 0.2s ease-in-out',
-    color: 'white',
     minWidth: 'auto',
     marginRight: 15,
+  },
+  menuIconLightMode: {
+    color: "#999999",
+  },
+  menuIconDarkMode: {
+    color: 'white',
   },
   selectedIcon: {
     color: '#38A6FB',
@@ -112,6 +129,10 @@ const useStyles = makeStyles({
 
 function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
   const classes = useStyles();
+
+  const {
+    darkMode,
+  } = props;
 
   let navigate = useNavigate();
 
@@ -135,6 +156,20 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
     }
   }
 
+  const currentSelectionClass = () => {
+    if(darkMode) {
+      return classes.currentSelectionDarkMode;
+    }
+    return classes.currentSelectionLightMode;
+  }
+
+  const menuEntryItemThemed = () => {
+    if(darkMode) {
+      return classes.menuEntryItemDarkMode;
+    }
+    return classes.menuEntryItemLightMode;
+  }
+
   return (
     <div>
         <React.Fragment key={'left'}>
@@ -146,9 +181,10 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 width: 250,
                 position: 'relative',
                 '& .MuiDrawer-paper': {
+                  borderRadius: 0,
                   zIndex: 1,
                   top: 61,
-                  backgroundColor: '#141618',
+                  backgroundColor: darkMode ? '#141618' : '#F3F3F3',
                 },
               }}
             >
@@ -175,17 +211,21 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                       toggleOpenCollapseState(index)
                                     }
                                   }}
-                                  className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
+                                  className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                   sx={{
                                     "&:hover": {
-                                      backgroundColor: "transparent",
-                                      border: '1px solid #333436'
+                                      backgroundColor: darkMode ? "transparent" : "#ffffff",
+                                      border: darkMode ? '1px solid #333436' : '1px solid #ffffff',
                                     }
                                   }}
                                   disableRipple
                                 >
-                                    <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{item.icon}</ListItemIcon>
-                                    <ListItemText primary={item.text} />
+                                    <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                    <ListItemText sx={{
+                                      "& .MuiTypography-root": {
+                                        fontWeight: 'inherit'
+                                      }
+                                    }} style={{fontWeight: 'inherit'}} primary={item.text} />
                                     {item.externalLink &&
                                       <ExternalLinkIcon style={{opacity: 0.5}} />
                                     }
@@ -202,7 +242,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                 <List component="div" disablePadding>
                                   {item.children.map((child, childIndex) => 
                                       <div
-                                        className={[(item.path && (pathMatch === item.path)) ? classes.currentSelection : "", classes.menuEntryItem].join(" ")}
+                                        className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
                                       >
                                         <ListItemButton
                                           onClick={() => {
