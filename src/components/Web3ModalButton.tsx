@@ -8,10 +8,18 @@ import Chip from '@mui/material/Chip';
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
-export const Web3ModalButton = () => {
+interface IWeb3ModalButtonProps {
+  darkMode: boolean
+}
+
+export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
   const { account, activate, deactivate, chainId } = useEthers()
   const [activateError, setActivateError] = useState('')
   const { error } = useEthers()
+
+  let {
+    darkMode
+  } = props;
 
   useEffect(() => {
     if (error) {
@@ -71,7 +79,7 @@ export const Web3ModalButton = () => {
       <ErrorWrapper>{activateError}</ErrorWrapper>
       {account ? (
         <>
-          <AccountChip label={account ? shortenAddress(account) : ""}/>
+          <AccountChip style={darkMode ? {} : { backgroundColor: "#171717" }} label={account ? shortenAddress(account) : ""}/>
           <Button color="inherit" onClick={() => deactivate()}>Disconnect</Button>
         </>
       ) : (

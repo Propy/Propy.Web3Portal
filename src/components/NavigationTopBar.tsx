@@ -67,7 +67,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
             Web3 Portal
           </Typography>
-          <Web3ModalButton/>
+          <Web3ModalButton darkMode={darkMode} />
           <IconButton
             color="inherit"
             onClick={() => props.setDarkMode(!darkMode)}

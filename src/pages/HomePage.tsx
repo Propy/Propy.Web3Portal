@@ -50,9 +50,6 @@ const HomePage = () => {
                 img="https://propy.com/home/static/media/phone-banner-background-newsletter.5fd9eb54d501e24b3281.webp"
                 title="Dashboard"
             >
-                <Card
-                    style={{width: '100%', height: '300px'}}
-                />
                 {account &&
                     <MyTokensBannerContainer />
                 }
