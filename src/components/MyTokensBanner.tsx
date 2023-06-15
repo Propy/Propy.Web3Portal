@@ -19,19 +19,19 @@ import {
   API_ENDPOINT,
 } from '../utils/constants';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-    },
-  }),
-);
+interface IMyTokensBanner {
+  maxRecords?: number
+}
 
-const MyTokensBanner = () => {
+const MyTokensBanner = (props: IMyTokensBanner) => {
 
   const [ownedTokens, setOwnedTokens] = useState<IBalanceRecord[]>([]);
 
   const { account } = useEthers();
+
+  let {
+    maxRecords,
+  } = props;
 
   useEffect(() => {
     let isMounted = true;
@@ -51,12 +51,7 @@ const MyTokensBanner = () => {
     }
   }, [account])
 
-  const classes = useStyles();
-
   return (
-    // <Card
-    //     style={{width: '100%', height: '300px', marginTop: '30px'}}
-    // />
     <>
       <Grid container spacing={2} columns={25}>
         {ownedTokens && ownedTokens.sort((a, b) => {
@@ -64,7 +59,7 @@ const MyTokensBanner = () => {
             return (a.asset.standard).localeCompare(b.asset.standard);
           }
           return 0;
-        }).slice(0,5).map((item, index) => 
+        }).slice(0,maxRecords ? maxRecords : ownedTokens.length).map((item, index) => 
           <Grid key={`single-token-card-${index}`} item xs={12} md={5}>
             <SingleTokenCard tokenRecord={item} />
           </Grid>

@@ -9,6 +9,7 @@ import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
 
 import { utils } from "ethers";
 
@@ -43,6 +44,23 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     collectionName: {
 
+    },
+    chipContainer: {
+      position: 'absolute',
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+      padding: theme.spacing(1),
+    },
+    leftChips: {
+
+    },
+    rightChips: {
+
+    },
+    chip: {
+      color: 'white',
+      fontWeight: 'bold',
     }
   }),
 );
@@ -59,16 +77,24 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
 
   const [tokenImage, setTokenImage] = useState('');
   const [tokenTitle, setTokenTitle] = useState('');
+  const [tokenId, setTokenId] = useState('');
   const [tokenCollectionName, setTokenCollectionName] = useState('');
+  const [tokenStandard, setTokenStandard] = useState('');
 
   useEffect(() => {
     let tokenRecordMetadata = JSON.parse(tokenRecord.metadata);
+    if(tokenRecord.asset?.standard) {
+      setTokenStandard(tokenRecord.asset.standard);
+    }
     if(tokenRecord.asset?.standard === "ERC-721") {
       if(tokenRecordMetadata?.image) {
         setTokenImage(getResolvableIpfsLink(tokenRecordMetadata?.image));
       }
       if(tokenRecordMetadata?.name) {
         setTokenTitle(tokenRecordMetadata?.name);
+      }
+      if(tokenRecord.token_id) {
+        setTokenId(`# ${tokenRecord.token_id}`);
       }
     } else if (tokenRecord.asset?.standard === "ERC-20") {
       let balance = priceFormat(Number(utils.formatUnits(tokenRecord.balance, tokenRecord.asset.decimals)), 2, "PRO", false);
@@ -89,7 +115,17 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
           height="200"
           image={tokenImage ? tokenImage : DefaultTokenImage}
           alt="featured property media"
-        />
+        >
+          
+        </CardMedia>
+        <div className={classes.chipContainer}>
+          <div className={classes.leftChips}>
+            {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
+          </div>
+          <div className={classes.rightChips}>
+            {tokenId && <Chip className={classes.chip} color="primary" label={tokenId} size="small" />}
+          </div>
+        </div>
         <div className={classes.typographyZone}>
           <Typography variant="h5" className={[classes.title].join(" ")}>
             {tokenTitle}

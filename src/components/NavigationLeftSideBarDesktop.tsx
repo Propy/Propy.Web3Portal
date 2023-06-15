@@ -38,7 +38,7 @@ const navigationMenu : IMenuEntry[] = [
   },
   {
     text: 'Token Browser',
-    path: '/example',
+    path: '/my-tokens',
     icon: <TokenIcon />
   },
   {
