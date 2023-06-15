@@ -2,7 +2,7 @@ import { matchRoutes, useLocation } from "react-router-dom"
 
 const routes = [
   { path: "/" },
-  { path: "/example" },
+  { path: "/my-tokens" },
   // { path: "/example/:exampleParam" },
 ]
 

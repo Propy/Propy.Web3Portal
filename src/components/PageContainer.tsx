@@ -9,7 +9,7 @@ import createStyles from '@mui/styles/createStyles';
 import Navigation from './Navigation';
 import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftSideBarDesktopContainer';
 import HomePage from '../pages/HomePage';
-import ExamplePage from '../pages/ExamplePage';
+import MyTokensPage from '../pages/MyTokensPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -44,7 +44,7 @@ const PageContainer = () => {
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
-                    <Route path="/example" element={<ExamplePage/>} />
+                    <Route path="/my-tokens" element={<MyTokensPage/>} />
                 </Routes>
             </div>
         </Navigation>

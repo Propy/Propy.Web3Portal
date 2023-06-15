@@ -51,7 +51,10 @@ const App = (props: PropsFromRedux) => {
               default: "#131313",
               paper: "#2b2b2b"
             }
-          })
+          }),
+          primary: {
+            main: "#37a6fa",
+          }
         },
         components: {
           MuiCardContent :{

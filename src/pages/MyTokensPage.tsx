@@ -3,7 +3,6 @@ import React from 'react';
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import Card from '@mui/material/Card';
 
 import { useEthers } from '@usedapp/core'
 
@@ -34,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const HomePage = () => {
+const MyTokensPage = () => {
     const classes = useStyles();
     const { account } = useEthers()
 
@@ -42,14 +41,14 @@ const HomePage = () => {
         <>
             <GenericBannerPageContainer 
                 img="https://propy.com/home/static/media/phone-banner-background-newsletter.5fd9eb54d501e24b3281.webp"
-                title="Dashboard"
+                title="My Tokens"
             >
                 {account &&
-                    <MyTokensBannerContainer maxRecords={5} />
+                    <MyTokensBannerContainer />
                 }
             </GenericBannerPageContainer>
         </>
     )
 };
 
-export default HomePage;
+export default MyTokensPage;
