@@ -156,5 +156,5 @@ export const priceFormat = (number: number, decimals = 2, currency = "$", prefix
 }
 
 export function getResolvableIpfsLink(ipfsUrl: string) {
-	return ipfsUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+	return ipfsUrl.replace('ipfs://', 'https://propy.mypinata.cloud/ipfs/');
 }

@@ -19,6 +19,7 @@ export interface IAssetRecord {
     volume_24hr_usd: string;
     change_24hr_usd_percent: string;
     coingecko_id: null | string;
+    balance_record?: IBalanceRecord;
   }
 
 export interface IBalanceRecord {
@@ -29,4 +30,15 @@ export interface IBalanceRecord {
     balance: string,
     metadata: string,
     asset?: IAssetRecord
+}
+
+export interface IAttribute {
+    trait_type: string;
+    value: string;
+}
+
+export interface ITokenMetadata {
+    name: string;
+    image: string;
+    attributes: IAttribute[];
 }

@@ -10,6 +10,7 @@ import Navigation from './Navigation';
 import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftSideBarDesktopContainer';
 import HomePage from '../pages/HomePage';
 import MyTokensPage from '../pages/MyTokensPage';
+import SingleTokenPage from '../pages/SingleTokenPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -45,6 +46,8 @@ const PageContainer = () => {
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
                     <Route path="/my-tokens" element={<MyTokensPage/>} />
+                    <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
+                    <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
                 </Routes>
             </div>
         </Navigation>

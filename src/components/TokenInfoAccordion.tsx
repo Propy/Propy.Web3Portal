@@ -1,0 +1,151 @@
+import React, { useState } from 'react';
+
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import createStyles from '@mui/styles/createStyles';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+
+import { PropsFromRedux } from '../containers/TokenInfoAccordionContainer';
+
+import {
+  IAssetRecord,
+  ITokenMetadata,
+} from '../interfaces';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+        position: 'relative',
+    },
+    content: {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    sectionItem: {
+      transition: 'all 0.2s ease-in-out',
+      backgroundColor: "#FFFFFF",
+      width: '100%',
+      padding: 0,
+      borderRadius: '20px!important',
+      marginBottom: theme.spacing(2),
+      marginTop: '0px!important',
+      boxShadow: 'none',
+      border: '2px solid #EFEFEF',
+      overflow: 'hidden',
+    },
+    sectionItemOpened: {
+      // backgroundColor: "#000000cc!important",
+    },
+    sectionItemSummary: {
+      margin: '0px!important',
+      minHeight: '0px!important',
+    },
+    sectionItemOpenedSummary: {
+      backgroundColor: "#EFEFEF!important",
+      minHeight: '0px!important',
+    },
+    summaryIcon: {
+      marginRight: theme.spacing(1),
+    },
+    attributeContainer: {
+      backgroundColor: "#EFEFEF",
+      padding: theme.spacing(1),
+      borderRadius: 12,
+    },
+  }),
+);
+
+let sections = [
+  {
+    sectionId: "attributes",
+    sectionTitle: "Token properties",
+  },
+]
+
+interface ITokenInfoAccordian {
+  tokenRecord: IAssetRecord | null
+  tokenMetadata: ITokenMetadata | null
+}
+
+const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
+    const classes = useStyles();
+
+    const { 
+      isConsideredMobile,
+      tokenRecord,
+      tokenMetadata,
+    } = props;
+
+    const [expandedSectionIndex, setExpandedSectionIndex] = useState<number | null>();
+
+    const toggleSectionIndexExpansion = (sectionIndex: number) => {
+      if(sectionIndex === expandedSectionIndex) {
+        setExpandedSectionIndex(null);
+      } else {
+        setExpandedSectionIndex(sectionIndex);
+      }
+    }
+
+    return (
+        <>
+          <div className={classes.root}>
+              <div className={classes.content}>
+                {sections && sections.map((item, index) => 
+                  <Accordion 
+                    expanded={expandedSectionIndex === index}
+                    onChange={() => toggleSectionIndexExpansion(index)}
+                    className={[classes.sectionItem, expandedSectionIndex === index ? classes.sectionItemOpened : ''].join(' ')}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`section-index-${index}`}
+                      id={`section-index-${index}`}
+                      className={[expandedSectionIndex === index ? classes.sectionItemOpenedSummary : '', classes.sectionItemSummary].join(' ')}
+                      sx={{
+                        '& .MuiAccordionSummary-content': {
+                          marginTop: '16px',
+                          marginBottom: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }
+                      }}
+                    >
+                      <FormatListBulletedIcon className={classes.summaryIcon}/> <Typography style={{fontWeight: 'bold'}} variant="h6">{item.sectionTitle}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails
+                      sx={{
+                        padding: '16px',
+                      }}
+                    >
+                      {item.sectionId === 'attributes' && tokenMetadata?.attributes && (tokenMetadata?.attributes.length > 0) && 
+                        <Grid container spacing={2} columns={12}>
+                          {tokenMetadata?.attributes.map((attributeEntry) => 
+                            <Grid item xs={12} sm={6} lg={6} xl={6}>
+                              <div className={classes.attributeContainer}>
+                                <Typography style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
+                                <Typography style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{attributeEntry.value}</Typography>
+                              </div>
+                            </Grid>
+                          )}
+                        </Grid>
+                      }
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+              </div>
+          </div>
+        </>
+    )
+};
+
+export default TokenInfoAccordion;

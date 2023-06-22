@@ -52,7 +52,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
 
   return (
     <div className={classes.root}>
-      <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "black"}} className={classes.appBar} position="fixed">
+      <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBar} position="fixed">
         <Toolbar>
           {/* <IconButton
             onClick={() => props.setShowLeftMenu(!localShowLeftMenu)}
