@@ -79,7 +79,7 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
       <ErrorWrapper>{activateError}</ErrorWrapper>
       {account ? (
         <>
-          <AccountChip style={darkMode ? {} : { backgroundColor: "#171717" }} label={account ? shortenAddress(account) : ""}/>
+          <AccountChip style={darkMode ? {} : { backgroundColor: "#414141" }} label={account ? shortenAddress(account) : ""}/>
           <Button color="inherit" onClick={() => deactivate()}>Disconnect</Button>
         </>
       ) : (

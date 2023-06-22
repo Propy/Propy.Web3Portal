@@ -24,6 +24,8 @@ import {
   priceFormat,
 } from '../utils';
 
+import LinkWrapper from './LinkWrapper';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -80,6 +82,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   const [tokenId, setTokenId] = useState('');
   const [tokenCollectionName, setTokenCollectionName] = useState('');
   const [tokenStandard, setTokenStandard] = useState('');
+  const [tokenLink, setTokenLink] = useState('');
 
   useEffect(() => {
     let tokenRecordMetadata = JSON.parse(tokenRecord.metadata);
@@ -96,9 +99,12 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
       if(tokenRecord.token_id) {
         setTokenId(`# ${tokenRecord.token_id}`);
       }
+      setTokenLink(`token/${tokenRecord.network_name}/${tokenRecord.asset_address}/${tokenRecord.token_id}`);
     } else if (tokenRecord.asset?.standard === "ERC-20") {
+      setTokenImage(DefaultTokenImage);
       let balance = priceFormat(Number(utils.formatUnits(tokenRecord.balance, tokenRecord.asset.decimals)), 2, "PRO", false);
       setTokenTitle(balance);
+      setTokenLink(`token/${tokenRecord.network_name}/${tokenRecord.asset_address}`);
     }
     if(tokenRecord?.asset?.name) {
       setTokenCollectionName(tokenRecord?.asset?.name);
@@ -109,34 +115,36 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
 
   return (
     <Card style={{width: '100%', height: '290px'}}>
-      <CardActionArea className={classes.actionArea}>
-        <CardMedia
-          component="img"
-          height="200"
-          image={tokenImage ? tokenImage : DefaultTokenImage}
-          alt="featured property media"
-        >
-          
-        </CardMedia>
-        <div className={classes.chipContainer}>
-          <div className={classes.leftChips}>
-            {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
-          </div>
-          <div className={classes.rightChips}>
-            {tokenId && <Chip className={classes.chip} color="primary" label={tokenId} size="small" />}
-          </div>
-        </div>
-        <div className={classes.typographyZone}>
-          <Typography variant="h5" className={[classes.title].join(" ")}>
-            {tokenTitle}
-          </Typography>
-          {tokenCollectionName &&
-            <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
-              {tokenCollectionName}
-            </Typography>
+      <LinkWrapper link={tokenLink ? tokenLink : `./`}>
+        <CardActionArea className={classes.actionArea}>
+          {tokenImage && 
+            <CardMedia
+              component="img"
+              height="200"
+              image={tokenImage}
+              alt="featured property media"
+            />
           }
-        </div>
-      </CardActionArea>
+          <div className={classes.chipContainer}>
+            <div className={classes.leftChips}>
+              {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
+            </div>
+            <div className={classes.rightChips}>
+              {tokenId && <Chip className={classes.chip} color="primary" label={tokenId} size="small" />}
+            </div>
+          </div>
+          <div className={classes.typographyZone}>
+            <Typography variant="h5" className={[classes.title].join(" ")}>
+              {tokenTitle}
+            </Typography>
+            {tokenCollectionName &&
+              <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
+                {tokenCollectionName}
+              </Typography>
+            }
+          </div>
+        </CardActionArea>
+      </LinkWrapper>
     </Card>
   )
 }

@@ -54,6 +54,9 @@ const App = (props: PropsFromRedux) => {
           }),
           primary: {
             main: "#37a6fa",
+          },
+          secondary: {
+            main: "#434343",
           }
         },
         components: {
@@ -75,6 +78,13 @@ const App = (props: PropsFromRedux) => {
               }
             }
           },
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                borderRadius: 30,
+              }
+            }
+          }
         }
       }),
     [props.darkMode],

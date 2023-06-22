@@ -6,7 +6,7 @@ import makeStyles from '@mui/styles/makeStyles';
 
 import { useEthers } from '@usedapp/core'
 
-import GenericBannerPageContainer from '../containers/GenericBannerPageContainer';
+import GenericPageContainer from '../containers/GenericPageContainer';
 import MyTokensBannerContainer from '../containers/MyTokensBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -39,14 +39,13 @@ const MyTokensPage = () => {
 
     return (
         <>
-            <GenericBannerPageContainer 
-                img="https://propy.com/home/static/media/phone-banner-background-newsletter.5fd9eb54d501e24b3281.webp"
+            <GenericPageContainer
                 title="My Tokens"
             >
                 {account &&
-                    <MyTokensBannerContainer />
+                  <MyTokensBannerContainer />
                 }
-            </GenericBannerPageContainer>
+            </GenericPageContainer>
         </>
     )
 };
