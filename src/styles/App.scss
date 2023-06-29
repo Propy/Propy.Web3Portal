@@ -28,3 +28,21 @@
 .disable-padding {
   padding: 0;
 }
+
+.secondary-text-light-mode {
+  color: #707070;
+}
+
+.clickable {
+  cursor: pointer;
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.disable-click {
+  opacity: 0.5;
+  pointer-events: none;
+}

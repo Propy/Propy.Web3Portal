@@ -2,10 +2,12 @@ import React, { useLayoutEffect } from 'react';
 
 import { HashRouter } from 'react-router-dom';
 
+import { Toaster } from 'sonner'
+
 import { createTheme, StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-import '../styles/App.css';
+import '../styles/App.scss';
 import { PropsFromRedux } from '../containers/AppContainer';
 
 import BlockNumberIndicator from './BlockNumberIndicator';
@@ -95,6 +97,7 @@ const App = (props: PropsFromRedux) => {
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
             <CssBaseline/>
+            <Toaster richColors position="bottom-right" />
             <PageContainer/>
             <BlockNumberIndicator/>
           </ThemeProvider>
