@@ -5,16 +5,25 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Grid from '@mui/material/Grid';
 
 import { useParams } from 'react-router-dom';
 
-import { useEthers } from '@usedapp/core'
+import { useEthers } from '@usedapp/core';
+
+import { toast } from 'sonner'
 
 import GenericPageContainer from '../containers/GenericPageContainer';
 import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
+
+import RefreshIcon from '@mui/icons-material/Refresh';
+
+import {
+  AssetService,
+} from '../services/api';
 
 import {
   IAssetRecord,
@@ -46,6 +55,22 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     sectionSpacer: {
       marginTop: theme.spacing(2),
+    },
+    actionInfoContainer: {
+
+    },
+    actionInfoEntry: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    actionInfoEntryIcon: {
+      marginRight: 4,
+    },
+    actionInfoProgressIcon: {
+      marginRight: 10,
+    },
+    actionInfoEntryText: {
+      fontWeight: 500,
     }
   }),
 );
@@ -55,7 +80,9 @@ const SingleTokenPage = () => {
     const { account } = useEthers();
 
     const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
-    const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null)
+    const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null);
+    const [fetchIndex, setFetchIndex] = useState<number>(0);
+    const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
 
     let { 
       network,
@@ -88,7 +115,24 @@ const SingleTokenPage = () => {
       return () => {
         isMounted = false;
       }
-    }, [network, tokenAddress, tokenId])
+    }, [network, tokenAddress, tokenId, fetchIndex])
+
+    const refreshTokenMetadata = async () => {
+      if(network && tokenAddress && tokenId) {
+        try {
+          setIsMetadataRefreshing(true);
+          let refreshMetadataResponse = await AssetService.refreshMetadata(network, tokenAddress, tokenId);
+          if(refreshMetadataResponse?.data?.message) {
+            await toast.success(refreshMetadataResponse?.data?.message);
+            // trigger refetch of token record / metadata
+            setFetchIndex(fetchIndex + 1);
+          }
+        } catch (e) {
+          console.log({e});
+        }
+      }
+      setIsMetadataRefreshing(false);
+    }
 
     return (
         <GenericPageContainer>
@@ -103,6 +147,13 @@ const SingleTokenPage = () => {
               {tokenRecord && tokenMetadata &&
                 <>
                   <Typography variant="h2" style={{fontWeight: 'bold'}}>{`${TOKEN_NAME_PREFIX[tokenRecord.address]} #${tokenMetadata.name}`}</Typography>
+                  <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
+                    <div className={[classes.actionInfoEntry, 'clickable', isMetadataRefreshing ? 'disable-click' : ''].join(" ")} onClick={() => refreshTokenMetadata()}>
+                      {!isMetadataRefreshing && <RefreshIcon className={classes.actionInfoEntryIcon} />}
+                      {isMetadataRefreshing && <CircularProgress className={classes.actionInfoProgressIcon} style={{width: 18, height: 18}} color="inherit"/>}
+                      <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
+                    </div>
+                  </div>
                   <GenericTitleContainer variant={"h5"} paddingBottom={8} title="History"/>
                 </>
               }

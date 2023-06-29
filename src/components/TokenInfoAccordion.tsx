@@ -105,6 +105,7 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                     expanded={expandedSectionIndex === index}
                     onChange={() => toggleSectionIndexExpansion(index)}
                     className={[classes.sectionItem, expandedSectionIndex === index ? classes.sectionItemOpened : ''].join(' ')}
+                    key={`token-info-accordion-${item.sectionTitle}-${index}`}
                   >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
@@ -129,8 +130,8 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                     >
                       {item.sectionId === 'attributes' && tokenMetadata?.attributes && (tokenMetadata?.attributes.length > 0) && 
                         <Grid container spacing={2} columns={12}>
-                          {tokenMetadata?.attributes.map((attributeEntry) => 
-                            <Grid item xs={12} sm={6} lg={6} xl={6}>
+                          {tokenMetadata?.attributes.map((attributeEntry, attributeIndex) => 
+                            <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
                               <div className={classes.attributeContainer}>
                                 <Typography style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
                                 <Typography style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{attributeEntry.value}</Typography>
