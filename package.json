@@ -25,6 +25,7 @@
     "@walletconnect/web3-provider": "1.8.0",
     "assert": "^2.0.0",
     "axios": "^1.4.0",
+    "dayjs": "^1.11.9",
     "ethers": "5.5.1",
     "https-browserify": "^1.0.0",
     "numeral": "^2.0.6",

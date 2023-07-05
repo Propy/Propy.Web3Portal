@@ -65,7 +65,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
           </IconButton> */}
           <img onClick={() => navigate('/')} height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
-            Web3 Portal
+            dApp
           </Typography>
           <Web3ModalButton darkMode={darkMode} />
           <IconButton

@@ -2,6 +2,42 @@ export interface IType {
     test: boolean;
 }
 
+export interface IEVMTransactionRecord {
+    network_name: string;
+    hash: string;
+    block_hash: string;
+    block_number: string;
+    block_timestamp: string;
+    from: string;
+    to: string;
+    gas: string;
+    input: string;
+    nonce: string;
+    r: string;
+    s: string;
+    v: string;
+    transaction_index: string;
+    type: string;
+    value: string;
+  }
+
+export interface ITransferEventERC721Record {
+    network: string;
+    block_number: string;
+    block_hash: string;
+    transaction_index: string;
+    removed: boolean;
+    contract_address: string;
+    data: string;
+    topic: string;
+    from: string;
+    to: string;
+    token_id: string;
+    transaction_hash: string;
+    log_index: number;
+    evm_transaction?: IEVMTransactionRecord;
+}
+
 export interface IAssetRecord {
     id: number;
     address: string;
@@ -20,7 +56,8 @@ export interface IAssetRecord {
     change_24hr_usd_percent: string;
     coingecko_id: null | string;
     balance_record?: IBalanceRecord;
-  }
+    transfer_events_erc721?: ITransferEventERC721Record[];
+}
 
 export interface IBalanceRecord {
     network_name: string,
