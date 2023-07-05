@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import GenericPageContainer from '../containers/GenericPageContainer';
 import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
+import EventHistoryContainer from '../containers/EventHistoryContainer';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -154,7 +155,8 @@ const SingleTokenPage = () => {
                       <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
                     </div>
                   </div>
-                  <GenericTitleContainer variant={"h5"} paddingBottom={8} title="History"/>
+                  <GenericTitleContainer variant={"h5"} paddingBottom={8} marginBottom={12} title="History"/>
+                  {tokenRecord && tokenRecord?.transfer_events_erc721 && <EventHistoryContainer eventRecords={tokenRecord?.transfer_events_erc721} />}
                 </>
               }
             </Grid>

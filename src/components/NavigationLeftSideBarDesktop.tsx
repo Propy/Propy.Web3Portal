@@ -50,7 +50,7 @@ const navigationMenu : IMenuEntry[] = [
   {
     text: 'Liquidity',
     path: '/liquidity',
-    externalLink: 'https://info.uniswap.org/#/pools/0xc7cf089fb4bc91f1981df2285ca019ab09a5dd3b', // todo use unipilot link
+    externalLink: 'https://app.unipilot.io/add?vault=0x15a4a47e85aa36fe4ee68e35eedb6bc10489f4af&chainId=1',
     icon: <LiquidityIcon />
   },
   // {

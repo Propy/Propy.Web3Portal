@@ -5,3 +5,5 @@ export const API_ENDPOINT = "http://localhost:8420";
 export const TOKEN_NAME_PREFIX : {[key: string]: string} = {
   "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC": "MetaAgent"
 }
+
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
