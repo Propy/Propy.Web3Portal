@@ -148,11 +148,14 @@ export const priceFormat = (number: number, decimals = 2, currency = "$", prefix
 	if(result === 'NaN') {
 		result = '0.00';
 	}
-	if (prefix) {
+	if(currency && (currency.length > 0)) {
+		if (prefix) {
 			return `${currency}${'\u00A0'}`+ result;
-	} else {
+		} else {
 			return result + `${'\u00A0'}${currency}`
+		}
 	}
+	return result;
 }
 
 export function getResolvableIpfsLink(ipfsUrl: string) {

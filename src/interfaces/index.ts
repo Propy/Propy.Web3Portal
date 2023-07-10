@@ -19,7 +19,9 @@ export interface IEVMTransactionRecord {
     transaction_index: string;
     type: string;
     value: string;
-  }
+}
+
+export type SupportedNetworks = 'ethereum' | 'arbitrum';
 
 export interface ITransferEventERC721Record {
     network: string;
@@ -33,6 +35,22 @@ export interface ITransferEventERC721Record {
     from: string;
     to: string;
     token_id: string;
+    transaction_hash: string;
+    log_index: number;
+    evm_transaction?: IEVMTransactionRecord;
+}
+
+export interface ITransferEventERC20Record {
+    network: string;
+    block_number: string;
+    block_hash: string;
+    transaction_index: string;
+    removed: boolean;
+    contract_address: string;
+    data: string;
+    topic: string;
+    from: string;
+    to: string;
     transaction_hash: string;
     log_index: number;
     evm_transaction?: IEVMTransactionRecord;
@@ -57,6 +75,8 @@ export interface IAssetRecord {
     coingecko_id: null | string;
     balance_record?: IBalanceRecord;
     transfer_events_erc721?: ITransferEventERC721Record[];
+    transfer_events_erc20?: ITransferEventERC20Record[];
+    transfer_event_erc20_count?: number;
 }
 
 export interface IBalanceRecord {

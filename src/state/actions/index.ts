@@ -1,3 +1,7 @@
+import {
+    SupportedNetworks,   
+} from '../../interfaces';
+
 export const setShowLeftMenu = (visible: boolean) => ({
     type: "SHOW_LEFT_MENU",
     visible
@@ -21,4 +25,9 @@ export const setConsideredMobile = (mobile: boolean) => ({
 export const setConsideredMedium = (medium: boolean) => ({
     type: "IS_CONSIDERED_MEDIUM",
     medium
+})
+
+export const setActiveNetwork = (network: SupportedNetworks) => ({
+    type: "SET_ACTIVE_NETWORK",
+    network: network,
 })

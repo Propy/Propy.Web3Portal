@@ -17,6 +17,7 @@ import { PropsFromRedux } from '../containers/EventHistoryContainer';
 
 import {
   ITransferEventERC721Record,
+  ITransferEventERC20Record,
 } from '../interfaces';
 
 import {
@@ -71,10 +72,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface ITokenEventHistory {
-  eventRecords: ITransferEventERC721Record[] | null
+  eventRecords: ITransferEventERC721Record[] | ITransferEventERC20Record[] | null
 }
 
-const getEventIcon = (event: ITransferEventERC721Record) => {
+const getEventIcon = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
   // mint
   if((event.from === ZERO_ADDRESS) && (event.to !== ZERO_ADDRESS)) {
     return <MintIcon color="inherit" />;
@@ -89,7 +90,7 @@ const getEventIcon = (event: ITransferEventERC721Record) => {
   }
 }
 
-const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record) => {
+const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
   // mint
   if((event.from === ZERO_ADDRESS) && (event.to !== ZERO_ADDRESS)) {
     return (
@@ -127,7 +128,7 @@ const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record) => {
   }
 }
 
-const getEventSummaryLineEntryTwo = (event: ITransferEventERC721Record) => {
+const getEventSummaryLineEntryTwo = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
   return (
     <div style={{display: 'flex'}}>
       <Typography variant="overline" style={{lineHeight: 1}}>{event.evm_transaction ? dayjs.unix(Number(event.evm_transaction.block_timestamp)).format('DD/MM/YYYY, hh:mm A') : 'loading...'}</Typography>
