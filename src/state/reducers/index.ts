@@ -4,6 +4,7 @@ import activeAccount from './activeAccount';
 import darkMode from './darkMode';
 import isConsideredMobile from './isConsideredMobile';
 import isConsideredMedium from './isConsideredMedium';
+import activeNetwork from './activeNetwork';
 
 const rootReducer = combineReducers({
     showLeftMenu,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
     darkMode,
     isConsideredMobile,
     isConsideredMedium,
+    activeNetwork,
 });
 
 export default rootReducer;

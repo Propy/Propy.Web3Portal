@@ -45,6 +45,7 @@ interface IGenericBannerPage {
   variant?: Variant,
   paddingBottom?: number,
   marginBottom?: number,
+  marginTop?: number,
 }
 
 const GenericTitle = (props: PropsFromRedux & IGenericBannerPage) => {
@@ -56,12 +57,13 @@ const GenericTitle = (props: PropsFromRedux & IGenericBannerPage) => {
     variant = 'h2',
     paddingBottom = 16,
     marginBottom = 16,
+    marginTop = 48,
   } = props;
 
   return (
     <div className={classes.root}>
         {title &&
-          <div className={classes.titleContainer} style={{paddingBottom: paddingBottom, marginBottom: marginBottom}}>
+          <div className={classes.titleContainer} style={{paddingBottom: paddingBottom, marginBottom: marginBottom, marginTop: marginTop}}>
             <Typography variant={variant} component="h2" className={[classes.title].join(" ")}>
               {title}
             </Typography>

@@ -8,6 +8,8 @@ import Chip from '@mui/material/Chip';
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
+import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownContainer';
+
 interface IWeb3ModalButtonProps {
   darkMode: boolean
 }
@@ -77,6 +79,9 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
   return (
     <Account>
       <ErrorWrapper>{activateError}</ErrorWrapper>
+      <div style={{marginRight: 16}}>
+        <NetworkSelectDropdownContainer/>
+      </div>
       {account ? (
         <>
           <AccountChip style={darkMode ? {} : { backgroundColor: "#414141" }} label={account ? shortenAddress(account) : ""}/>

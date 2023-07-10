@@ -1,36 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
-import { ChainId, DAppProvider } from '@usedapp/core'
+import { PersistGate } from 'redux-persist/es/integration/react';
 
 import './styles/index.css';
-import AppContainer from './containers/AppContainer';
+import DappProviderContainer from './containers/DappProviderContainer';
 import reportWebVitals from './reportWebVitals';
-import store from './state';
+import store, { persistor } from './state';
 
-const mainnetReadOnlyUrl = () => {
-  if(process.env.REACT_APP_INFURA_RPC_URL) {
-    return `${process.env.REACT_APP_INFURA_RPC_URL}`;
-  } else if(process.env.REACT_APP_ALCHEMY_RPC_URL) {
-    return `${process.env.REACT_APP_ALCHEMY_RPC_URL}`;
-  }
-  return '';
-}
-
-const config = {
-  readOnlyChainId: ChainId.Mainnet,
-  readOnlyUrls: {
-    [ChainId.Mainnet]: mainnetReadOnlyUrl(),
-  },
-  autoConnect: false,
-}
+const PGate = PersistGate as any;
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <DAppProvider config={config}>
-        <AppContainer />
-      </DAppProvider>
+      <PGate
+        loading={null}
+        persistor={persistor}
+      >
+        <DappProviderContainer />
+      </PGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
