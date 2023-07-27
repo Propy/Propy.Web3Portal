@@ -9,6 +9,7 @@ import { useEthers } from '@usedapp/core'
 
 import GenericPageContainer from '../containers/GenericPageContainer';
 import MyTokensBannerContainer from '../containers/MyTokensBannerContainer';
+import AllTokensBannerContainer from '../containers/AllTokensBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,6 +31,9 @@ const useStyles = makeStyles((theme: Theme) =>
     exampleImage: {
         width: '30%',
         margin: theme.spacing(4),
+    },
+    sectionSpacer: {
+        marginBottom: theme.spacing(6),
     }
   }),
 );
@@ -44,8 +48,11 @@ const HomePage = () => {
                 title="Dashboard"
             >
                 {account &&
-                    <MyTokensBannerContainer maxRecords={5} showTitle={true} />
+                    <div className={classes.sectionSpacer}>
+                        <MyTokensBannerContainer maxRecords={5} showTitle={true} />
+                    </div>
                 }
+                <AllTokensBannerContainer maxRecords={5} showTitle={true} />
             </GenericPageContainer>
         </>
     )

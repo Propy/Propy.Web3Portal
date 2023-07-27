@@ -16,8 +16,8 @@ import LinkWrapper from './LinkWrapper';
 
 import {
   IBalanceRecord,
+  IMixedBalancesResult,
   IAssetRecord,
-  IOwnedBalancesResult,
 } from '../interfaces';
 
 import {
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface IMyTokensBanner {
+interface IAllTokensBanner {
   maxRecords?: number
   showTitle?: boolean
 }
@@ -48,10 +48,10 @@ interface IAllTokenAssets {
   [key: string]: IAssetRecord
 }
 
-const MyTokensBanner = (props: IMyTokensBanner) => {
+const AllTokensBanner = (props: IAllTokensBanner) => {
 
-  const [ownedTokenBalances, setOwnedTokenBalances] = useState<IBalanceRecord[]>([]);
-  const [ownedTokenAssets, setOwnedTokenAssets] = useState<IAllTokenAssets>({});
+  const [allTokenBalances, setAllTokenBalances] = useState<IBalanceRecord[]>([]);
+  const [allTokenAssets, setAllTokenAssets] = useState<IAllTokenAssets>({});
 
   const { account } = useEthers();
 
@@ -65,11 +65,11 @@ const MyTokensBanner = (props: IMyTokensBanner) => {
   useEffect(() => {
     let isMounted = true;
     const fetchMixedTokens = async () => {
-      let apiResponse = await fetch(`${API_ENDPOINT}/balances/${account}`).then(resp => resp.json());
+      let apiResponse = await fetch(`${API_ENDPOINT}/balances/mix`).then(resp => resp.json());
       if(apiResponse?.status && apiResponse?.data && isMounted) {
         let renderResults: IBalanceRecord[] = [];
         let assetResults : IAllTokenAssets = {};
-        let apiResponseData : IOwnedBalancesResult = apiResponse.data;
+        let apiResponseData : IMixedBalancesResult = apiResponse.data;
         if(apiResponseData?.['ERC-721']) {
           for(let [assetAddress, assetRecord] of Object.entries(apiResponseData?.['ERC-721'])) {
             if(assetRecord?.balances) {
@@ -80,12 +80,12 @@ const MyTokensBanner = (props: IMyTokensBanner) => {
             }
           }
         }
-        console.log({renderResults, assetResults})
-        setOwnedTokenBalances(renderResults);
-        setOwnedTokenAssets(assetResults);
+        console.log({renderResults})
+        setAllTokenBalances(renderResults);
+        setAllTokenAssets(assetResults);
       } else {
-        setOwnedTokenBalances([]);
-        setOwnedTokenAssets({});
+        setAllTokenBalances([]);
+        setAllTokenAssets({});
       }
     }
     fetchMixedTokens();
@@ -99,24 +99,24 @@ const MyTokensBanner = (props: IMyTokensBanner) => {
       {showTitle &&
         <div className={classes.titleContainer}>
           <Typography variant="h4" className={[classes.title].join(" ")}>
-            My Tokens
+            Propy Tokens
           </Typography>
           <LinkWrapper link="my-tokens">
             <Button variant="contained" color="secondary">
-              View my tokens
+              View all tokens
             </Button>
           </LinkWrapper>
         </div>
       }
-      <Grid container spacing={2} columns={10}>
-        {ownedTokenBalances && ownedTokenBalances.sort((a, b) => {
-          if(a?.asset?.standard && b?.asset?.standard) {
-            return (a.asset.standard).localeCompare(b.asset.standard);
+      <Grid container spacing={2} columns={25}>
+        {allTokenBalances && allTokenBalances.sort((a, b) => {
+          if(allTokenAssets[a?.asset_address]?.standard && allTokenAssets[b?.asset_address]?.standard) {
+            return (allTokenAssets[a?.asset_address]?.standard).localeCompare(allTokenAssets[b?.asset_address]?.standard);
           }
           return 0;
-        }).slice(0,maxRecords ? maxRecords : ownedTokenBalances.length).map((item, index) => 
-          <Grid key={`single-token-card-${index}`} item xs={5} md={2}>
-            <SingleTokenCard assetRecord={ownedTokenAssets[item?.asset_address]} balanceRecord={item} />
+        }).slice(0,maxRecords ? maxRecords : allTokenBalances.length).map((item, index) => 
+          <Grid key={`single-token-card-${index}`} item xs={12} md={5}>
+            <SingleTokenCard balanceRecord={item} assetRecord={allTokenAssets[item?.asset_address]} />
           </Grid>
         )}
       </Grid>
@@ -124,4 +124,4 @@ const MyTokensBanner = (props: IMyTokensBanner) => {
   )
 }
 
-export default MyTokensBanner;
+export default AllTokensBanner;

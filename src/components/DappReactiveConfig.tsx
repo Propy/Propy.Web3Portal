@@ -68,6 +68,7 @@ const DappReactiveConfig = (props: PropsFromRedux) => {
           [ChainId.Mainnet]: mainnetReadOnlyUrl(),
           [ChainId.Arbitrum]: arbitrumReadOnlyUrl(),
         },
+        autoConnect: true,
       });
     } else {
       handleConnectedAccountNetworkSwitch(activeNetwork);

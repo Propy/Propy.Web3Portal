@@ -42,7 +42,7 @@ const DappProvider = (props: PropsFromRedux) => {
       [ChainId.Mainnet]: mainnetReadOnlyUrl(),
       [ChainId.Arbitrum]: arbitrumReadOnlyUrl(),
     },
-    autoConnect: false,
+    autoConnect: true,
   }
 
   return (
