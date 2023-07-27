@@ -11,8 +11,6 @@ import Grid from '@mui/material/Grid';
 
 import { useParams } from 'react-router-dom';
 
-import { useEthers } from '@usedapp/core';
-
 import { toast } from 'sonner'
 
 import GenericPageContainer from '../containers/GenericPageContainer';
@@ -30,7 +28,10 @@ import {
 
 import {
   IAssetRecord,
+  IBalanceRecord,
   ITokenMetadata,
+  ITransferEventERC20Record,
+  ITransferEventERC721Record,
 } from '../interfaces';
 
 import {
@@ -100,9 +101,10 @@ const MetadataPRO = {
 
 const SingleTokenPage = () => {
     const classes = useStyles();
-    const { account } = useEthers();
 
     const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
+    const [tokenBalanceRecord, setTokenBalanceRecord] = useState<IBalanceRecord | null>(null);
+    const [tokenEventRecord, setTokenEventRecord] = useState<ITransferEventERC721Record[] | ITransferEventERC20Record[] | null>(null);
     const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
@@ -119,20 +121,29 @@ const SingleTokenPage = () => {
       const fetchToken = async () => {
         let queryUrl = `${API_ENDPOINT}/asset/${network}/${tokenAddress}`;
         if(tokenId) {
-          queryUrl += `/${tokenId}`;
+          queryUrl = `${API_ENDPOINT}/nft/${network}/${tokenAddress}/${tokenId}`;
         }
         let tokenRecordQueryResponse = await fetch(queryUrl).then(resp => resp.json());
         if(tokenRecordQueryResponse?.status && tokenRecordQueryResponse?.data && isMounted) {
-          setTokenRecord(tokenRecordQueryResponse?.data);
-          setTokenStandard(tokenRecordQueryResponse?.data?.standard);
+          setTokenRecord(tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset : tokenRecordQueryResponse?.data);
+          setTokenStandard(tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset?.standard : tokenRecordQueryResponse?.data?.standard);
           if(tokenRecordQueryResponse?.data?.transfer_event_erc20_count) {
             MetadataPRO.attributes.push({
               trait_type: "Transfers",
               value: priceFormat(tokenRecordQueryResponse?.data?.transfer_event_erc20_count, 0, ''),
             })
           }
-          if(tokenRecordQueryResponse?.data?.balance_record?.[0]?.metadata) {
-            let metadata = JSON.parse(tokenRecordQueryResponse?.data?.balance_record?.[0]?.metadata);
+          if(tokenRecordQueryResponse?.data?.transfer_events_erc721) {
+            setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc721);
+          }
+          if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
+            setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc20);
+          }
+          // if(tokenRecordQueryResponse?.data?.balance_record?.[0]) {
+            // setTokenBalanceRecord(tokenRecordQueryResponse?.data?.balance_record?.[0])
+          // }
+          if(tokenRecordQueryResponse?.data?.metadata) {
+            let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
             if(metadata && isMounted) {
               setTokenMetadata(metadata);
             }
@@ -141,6 +152,8 @@ const SingleTokenPage = () => {
           setTokenRecord(null);
           setTokenMetadata(null);
           setTokenStandard(null);
+          setTokenBalanceRecord(null);
+          setTokenEventRecord(null);
         }
       }
       fetchToken();
@@ -179,7 +192,7 @@ const SingleTokenPage = () => {
               <Grid item xs={12} md={7}>
                 {tokenRecord && tokenMetadata &&
                   <>
-                    <Typography variant="h2" style={{fontWeight: 'bold'}}>{`${TOKEN_NAME_PREFIX[tokenRecord.address]} #${tokenMetadata.name}`}</Typography>
+                    <Typography variant="h2" style={{fontWeight: 'bold'}}>{`${TOKEN_NAME_PREFIX[tokenRecord.address] ? TOKEN_NAME_PREFIX[tokenRecord.address] : tokenMetadata.name} #${tokenBalanceRecord ? tokenBalanceRecord.token_id : tokenMetadata.name}`}</Typography>
                     <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
                       <div className={[classes.actionInfoEntry, 'clickable', isMetadataRefreshing ? 'disable-click' : ''].join(" ")} onClick={() => refreshTokenMetadata()}>
                         {!isMetadataRefreshing && <RefreshIcon className={classes.actionInfoEntryIcon} />}
@@ -187,8 +200,14 @@ const SingleTokenPage = () => {
                         <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
                       </div>
                     </div>
-                    <GenericTitleContainer variant={"h5"} paddingBottom={8} marginBottom={12} title="History"/>
-                    {tokenRecord && tokenRecord?.transfer_events_erc721 && <EventHistoryContainer eventRecords={tokenRecord?.transfer_events_erc721} />}
+                    {tokenMetadata?.description &&
+                      <>
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
+                        <Typography variant="body1">{tokenMetadata?.description}</Typography>
+                      </>
+                    }
+                    <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
+                    {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} />}
                   </>
                 }
               </Grid>

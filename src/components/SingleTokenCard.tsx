@@ -16,7 +16,8 @@ import { utils } from "ethers";
 import DefaultTokenImage from '../assets/img/default-token.webp';
 
 import {
-  IBalanceRecord
+  IBalanceRecord,
+  IAssetRecord,
 } from '../interfaces';
 
 import {
@@ -68,13 +69,15 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface ISingleTokenCardProps {
-  tokenRecord: IBalanceRecord,
+  balanceRecord: IBalanceRecord,
+  assetRecord: IAssetRecord,
 }
 
 const SingleTokenCard = (props: ISingleTokenCardProps) => {
 
   const {
-    tokenRecord,
+    assetRecord,
+    balanceRecord,
   } = props;
 
   const [tokenImage, setTokenImage] = useState('');
@@ -85,31 +88,33 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   const [tokenLink, setTokenLink] = useState('');
 
   useEffect(() => {
-    let tokenRecordMetadata = JSON.parse(tokenRecord.metadata);
-    if(tokenRecord.asset?.standard) {
-      setTokenStandard(tokenRecord.asset.standard);
+    console.log({assetRecord, balanceRecord})
+    let tokenRecordMetadata = balanceRecord.nft?.metadata ? JSON.parse(balanceRecord.nft?.metadata) : {};
+    console.log("balanceRecord.nft?.metadata", balanceRecord.nft?.metadata);
+    if(balanceRecord.asset?.standard) {
+      setTokenStandard(balanceRecord.asset.standard);
     }
-    if(tokenRecord.asset?.standard === "ERC-721") {
+    if(assetRecord?.standard === "ERC-721") {
       if(tokenRecordMetadata?.image) {
         setTokenImage(getResolvableIpfsLink(tokenRecordMetadata?.image));
       }
       if(tokenRecordMetadata?.name) {
         setTokenTitle(tokenRecordMetadata?.name);
       }
-      if(tokenRecord.token_id) {
-        setTokenId(`# ${tokenRecord.token_id}`);
+      if(balanceRecord.token_id) {
+        setTokenId(`# ${balanceRecord.token_id}`);
       }
-      setTokenLink(`token/${tokenRecord.network_name}/${tokenRecord.asset_address}/${tokenRecord.token_id}`);
-    } else if (tokenRecord.asset?.standard === "ERC-20") {
+      setTokenLink(`token/${balanceRecord.network_name}/${balanceRecord.asset_address}/${balanceRecord.token_id}`);
+    } else if (assetRecord?.standard === "ERC-20") {
       setTokenImage(DefaultTokenImage);
-      let balance = priceFormat(Number(utils.formatUnits(tokenRecord.balance, tokenRecord.asset.decimals)), 2, "PRO", false);
+      let balance = priceFormat(Number(utils.formatUnits(balanceRecord.balance, assetRecord.decimals)), 2, "PRO", false);
       setTokenTitle(balance);
-      setTokenLink(`token/${tokenRecord.network_name}/${tokenRecord.asset_address}`);
+      setTokenLink(`token/${balanceRecord.network_name}/${balanceRecord.asset_address}`);
     }
-    if(tokenRecord?.asset?.name) {
-      setTokenCollectionName(tokenRecord?.asset?.name);
+    if(assetRecord?.name) {
+      setTokenCollectionName(assetRecord?.name);
     }
-  }, [tokenRecord])
+  }, [balanceRecord, assetRecord])
 
   const classes = useStyles();
 

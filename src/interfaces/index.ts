@@ -85,8 +85,46 @@ export interface IBalanceRecord {
     holder_address: string,
     token_id: string,
     balance: string,
-    metadata: string,
+    nft: INFTRecord,
     asset?: IAssetRecord
+}
+
+export interface INFTRecord {
+    network_name: string,
+    asset_address: string,
+    token_id: string,
+    metadata: string,
+    balances?: IBalanceRecord[],
+    asset?: IAssetRecord,
+    transfer_events_erc721?: ITransferEventERC721Record[];
+  }
+
+export interface IPagination {
+    total?: number
+    count?: number
+    perPage?: number
+    currentPage?: number
+    totalPages?: number
+}
+
+export interface IMixedBalancesResult {
+    [key: string]: {
+        [key: string]: {
+            balances?: IBalanceRecord[],
+            asset: IAssetRecord,
+            balancesPagination?: IPagination
+        },
+    }
+}
+
+export interface IOwnedBalancesResult {
+    [key: string]: {
+        [key: string]: {
+            balances?: IBalanceRecord[],
+            asset: IAssetRecord,
+            balancesPagination?: IPagination
+        },
+    }
 }
 
 export interface IAttribute {
@@ -96,6 +134,8 @@ export interface IAttribute {
 
 export interface ITokenMetadata {
     name: string;
+    token_id?: string;
+    description?: string;
     image: string;
     attributes: IAttribute[];
 }
