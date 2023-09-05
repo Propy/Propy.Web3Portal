@@ -13,19 +13,28 @@ import MintIcon from '@mui/icons-material/AutoAwesome';
 import BurnIcon from '@mui/icons-material/LocalFireDepartment';
 import TransferIcon from '@mui/icons-material/Send';
 
+import { utils } from "ethers";
+
 import { PropsFromRedux } from '../containers/EventHistoryContainer';
+
+import LinkWrapper from './LinkWrapper';
 
 import {
   ITransferEventERC721Record,
   ITransferEventERC20Record,
+  NetworkName,
+  IAssetRecord,
 } from '../interfaces';
 
 import {
   ZERO_ADDRESS,
+  PROPY_LIGHT_GREY,
 } from '../utils/constants';
 
 import {
   centerShortenLongString,
+  getEtherscanLinkByNetworkName,
+  priceFormat,
 } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -50,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(2),
     },
     eventIconInnerContainer: {
-      backgroundColor: '#e7e7e7',
+      backgroundColor: PROPY_LIGHT_GREY,
       width: 40,
       height: 40,
       display: 'flex',
@@ -73,6 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ITokenEventHistory {
   eventRecords: ITransferEventERC721Record[] | ITransferEventERC20Record[] | null
+  assetRecord: IAssetRecord
 }
 
 const getEventIcon = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
@@ -90,15 +100,42 @@ const getEventIcon = (event: ITransferEventERC721Record | ITransferEventERC20Rec
   }
 }
 
-const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
+const renderAddress = (value: string, networkName: NetworkName) => {
+  let innerElement = <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>{shortenAddress(value)}</Typography>;
+  let link = getEtherscanLinkByNetworkName(networkName, value, 'address');
+  if(link) {
+    return (
+      <LinkWrapper external={true} link={link}>
+        {innerElement}
+      </LinkWrapper>
+    )
+  }
+  return innerElement
+}
+
+const renderTxHash = (value: string, networkName: NetworkName) => {
+  let innerElement = <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>0x{centerShortenLongString(value.replace('0x', ''), 8)}</Typography>;
+  let link = getEtherscanLinkByNetworkName(networkName, value, 'transaction');
+  if(link) {
+    return (
+      <LinkWrapper external={true} link={link}>
+        {innerElement}
+      </LinkWrapper>
+    )
+  }
+  return innerElement
+}
+
+const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransferEventERC20Record, assetRecord: IAssetRecord) => {
+  console.log({event, assetRecord});
   // mint
   if((event.from === ZERO_ADDRESS) && (event.to !== ZERO_ADDRESS)) {
     return (
       <div style={{display: 'flex'}}>
         <Typography variant="body1" style={{lineHeight: 1}}>Minted into&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>{shortenAddress(event.to)}</Typography>
+        {renderAddress(event.to, event.network_name)}
         <Typography variant="body1" style={{lineHeight: 1}}>&nbsp;via tx&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>0x{centerShortenLongString(event.transaction_hash.replace('0x', ''), 8)}</Typography>
+        {renderTxHash(event.transaction_hash, event.network_name)}
       </div>
     );
   }
@@ -107,9 +144,9 @@ const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransf
     return (
       <div style={{display: 'flex'}}>
         <Typography variant="body1" style={{lineHeight: 1}}>Burnt from&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>{shortenAddress(event.from)}</Typography>
+        {renderAddress(event.from, event.network_name)}
         <Typography variant="body1" style={{lineHeight: 1}}>&nbsp;via tx&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>0x{centerShortenLongString(event.transaction_hash.replace('0x', ''), 8)}</Typography>
+        {renderTxHash(event.transaction_hash, event.network_name)}
       </div>
     );
   }
@@ -117,12 +154,17 @@ const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransf
   if((event.from !== ZERO_ADDRESS) && (event.to !== ZERO_ADDRESS)) {
     return (
       <div style={{display: 'flex'}}>
-        <Typography variant="body1" style={{lineHeight: 1}}>Transferred from&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>{shortenAddress(event.from)}</Typography>
+        {assetRecord?.standard === "ERC-721" &&
+          <Typography variant="body1" style={{lineHeight: 1}}>Transferred from&nbsp;</Typography>
+        }
+        {assetRecord?.standard === "ERC-20" && event.value &&
+          <Typography variant="body1" style={{lineHeight: 1}}>Transferred <strong>{priceFormat(Number(utils.formatUnits(event.value, assetRecord.decimals)), 2, assetRecord.symbol, false)}</strong> from&nbsp;</Typography>
+        }
+        {renderAddress(event.from, event.network_name)}
         <Typography variant="body1" style={{lineHeight: 1}}>&nbsp;to&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>{shortenAddress(event.to)}</Typography>
+        {renderAddress(event.to, event.network_name)}
         <Typography variant="body1" style={{lineHeight: 1}}>&nbsp;via tx&nbsp;</Typography>
-        <Typography variant="body1" style={{fontWeight: 'bold', lineHeight: 1}}>0x{centerShortenLongString(event.transaction_hash.replace('0x', ''), 8)}</Typography>
+        {renderTxHash(event.transaction_hash, event.network_name)}
       </div>
     );
   }
@@ -139,9 +181,9 @@ const getEventSummaryLineEntryTwo = (event: ITransferEventERC721Record | ITransf
 const EventHistory = (props: PropsFromRedux & ITokenEventHistory) => {
     const classes = useStyles();
 
-    const { 
-      isConsideredMobile,
+    const {
       eventRecords,
+      assetRecord,
     } = props;
 
     return (
@@ -159,7 +201,7 @@ const EventHistory = (props: PropsFromRedux & ITokenEventHistory) => {
                     </div>
                     <div className={classes.eventRecordSummaryContainer}>
                       <div className={classes.eventRecordSummaryLineOne}>
-                        {getEventSummaryLineEntryOne(eventRecord)}
+                        {getEventSummaryLineEntryOne(eventRecord, assetRecord)}
                       </div>
                       {getEventSummaryLineEntryTwo(eventRecord)}
                     </div>

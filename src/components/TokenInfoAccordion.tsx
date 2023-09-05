@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
+import { shortenAddress } from '@usedapp/core'
+
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import createStyles from '@mui/styles/createStyles';
 
 import Accordion from '@mui/material/Accordion';
@@ -16,10 +17,21 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import { PropsFromRedux } from '../containers/TokenInfoAccordionContainer';
 
+import LinkWrapper from './LinkWrapper';
+
 import {
   IAssetRecord,
   ITokenMetadata,
 } from '../interfaces';
+
+import {
+  isAddress,
+} from '../utils';
+
+import {
+  PROPY_LIGHT_BLUE,
+  PROPY_LIGHT_GREY,
+} from '../utils/constants';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(2),
       marginTop: '0px!important',
       boxShadow: 'none',
-      border: '2px solid #EFEFEF',
+      border: `2px solid ${PROPY_LIGHT_GREY}`,
       overflow: 'hidden',
     },
     sectionItemOpened: {
@@ -51,17 +63,22 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: '0px!important',
     },
     sectionItemOpenedSummary: {
-      backgroundColor: "#EFEFEF!important",
+      backgroundColor: `${PROPY_LIGHT_GREY}!important`,
       minHeight: '0px!important',
     },
     summaryIcon: {
       marginRight: theme.spacing(1),
     },
     attributeContainer: {
-      backgroundColor: "#EFEFEF",
+      backgroundColor: PROPY_LIGHT_GREY,
       padding: theme.spacing(1),
       borderRadius: 12,
     },
+    attributeText: {
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }
   }),
 );
 
@@ -80,13 +97,11 @@ interface ITokenInfoAccordian {
 const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
     const classes = useStyles();
 
-    const { 
-      isConsideredMobile,
-      tokenRecord,
+    const {
       tokenMetadata,
     } = props;
 
-    const [expandedSectionIndex, setExpandedSectionIndex] = useState<number | null>();
+    const [expandedSectionIndex, setExpandedSectionIndex] = useState<number | null>(0);
 
     const toggleSectionIndexExpansion = (sectionIndex: number) => {
       if(sectionIndex === expandedSectionIndex) {
@@ -94,6 +109,24 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
       } else {
         setExpandedSectionIndex(sectionIndex);
       }
+    }
+
+    const formatPropertyValue = (value: string) => {
+      if(isAddress(value)) {
+        return shortenAddress(value);
+      }
+      return value;
+    }
+
+    const renderAttribute = (value: string) => {
+      if(value.indexOf("https://") === 0) {
+        return (
+          <LinkWrapper external={true} link={value}>
+            <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px', color: PROPY_LIGHT_BLUE}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
+          </LinkWrapper>
+        )
+      }
+      return <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
     }
 
     return (
@@ -133,8 +166,8 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                           {tokenMetadata?.attributes.map((attributeEntry, attributeIndex) => 
                             <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
                               <div className={classes.attributeContainer}>
-                                <Typography style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
-                                <Typography style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{attributeEntry.value}</Typography>
+                                <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
+                                {renderAttribute(attributeEntry.value)}
                               </div>
                             </Grid>
                           )}

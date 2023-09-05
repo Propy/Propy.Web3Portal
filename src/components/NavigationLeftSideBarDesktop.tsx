@@ -1,6 +1,8 @@
 import React, {useState, Fragment} from 'react';
 import { useNavigate } from "react-router-dom";
 
+import { useEthers } from '@usedapp/core'
+
 import makeStyles from '@mui/styles/makeStyles';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -13,6 +15,7 @@ import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
 import ExternalLinkIcon from '@mui/icons-material/Launch';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
@@ -22,11 +25,16 @@ import LinkWrapper from './LinkWrapper';
 
 import useCurrentPath from '../hooks/useCurrentPath';
 
+import {
+  PROPY_LIGHT_BLUE,
+} from '../utils/constants';
+
 interface IMenuEntry {
   text: string
   path?: string
   icon: any
   externalLink?: string
+  onlyConnected?: boolean
   children?: IMenuEntry[]
 }
 
@@ -37,8 +45,14 @@ const navigationMenu : IMenuEntry[] = [
     icon: <DashboardIcon />
   },
   {
-    text: 'Token Browser',
+    text: 'My Tokens',
     path: '/my-tokens',
+    icon: <AccountBalanceWalletIcon />,
+    onlyConnected: true,
+  },
+  {
+    text: 'Token Browser',
+    path: '/collections',
     icon: <TokenIcon />
   },
   {
@@ -123,12 +137,14 @@ const useStyles = makeStyles({
     color: 'white',
   },
   selectedIcon: {
-    color: '#38A6FB',
+    color: PROPY_LIGHT_BLUE,
   }
 });
 
 function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
   const classes = useStyles();
+
+  const { account } = useEthers();
 
   const {
     darkMode,
@@ -194,79 +210,81 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 >
                   <List>
                       {navigationMenu.map((item, index) => 
-                          <Fragment key={`parent-${index}`}>
-                            <div
-                              className={classes.entryContainerMargin}
-                            >
-                              <LinkWrapper 
-                                link={item.externalLink ? item.externalLink : undefined}
-                                external={item.externalLink ? true : undefined}
+                          (!item.onlyConnected || (item.onlyConnected && account)) ?
+                            <Fragment key={`parent-${index}`}>
+                              <div
+                                className={classes.entryContainerMargin}
                               >
-                                <ListItemButton
-                                  onClick={() => {
-                                    if(item.path) {
-                                      navigate(item.path)
-                                      props.setShowLeftMenu(false)
-                                    } else if (item.children) {
-                                      toggleOpenCollapseState(index)
-                                    }
-                                  }}
-                                  className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
-                                  sx={{
-                                    "&:hover": {
-                                      backgroundColor: darkMode ? "transparent" : "#ffffff",
-                                      border: darkMode ? '1px solid #333436' : '1px solid #ffffff',
-                                    }
-                                  }}
-                                  disableRipple
+                                <LinkWrapper 
+                                  link={item.externalLink ? item.externalLink : undefined}
+                                  external={item.externalLink ? true : undefined}
                                 >
-                                    <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
-                                    <ListItemText sx={{
-                                      "& .MuiTypography-root": {
-                                        fontWeight: 'inherit'
+                                  <ListItemButton
+                                    onClick={() => {
+                                      if(item.path) {
+                                        navigate(item.path)
+                                        props.setShowLeftMenu(false)
+                                      } else if (item.children) {
+                                        toggleOpenCollapseState(index)
                                       }
-                                    }} style={{fontWeight: 'inherit'}} primary={item.text} />
-                                    {item.externalLink &&
-                                      <ExternalLinkIcon style={{opacity: 0.5}} />
-                                    }
-                                    {item.children &&
-                                      <>
-                                        {openCollapseSections.indexOf(index) > -1 ? <ExpandLess /> : <ExpandMore />}
-                                      </>
-                                    }
-                                </ListItemButton>
-                              </LinkWrapper>
-                            </div>
-                            {item.children &&
-                              <Collapse in={openCollapseSections.indexOf(index) > -1} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                  {item.children.map((child, childIndex) => 
-                                      <div
-                                        className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
-                                      >
-                                        <ListItemButton
-                                          onClick={() => {
-                                            if(child.path && child.path.length > 0) {
-                                              navigate(child.path)
-                                              props.setShowLeftMenu(false)
-                                            }
-                                          }}
-                                          key={`child-${index}-${childIndex}`}
-                                          sx={{ pl: 4, color: 'inherit' }}
-                                          disableRipple
+                                    }}
+                                    className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                    sx={{
+                                      "&:hover": {
+                                        backgroundColor: darkMode ? "transparent" : "#ffffff",
+                                        border: darkMode ? '1px solid #333436' : '1px solid #ffffff',
+                                      }
+                                    }}
+                                    disableRipple
+                                  >
+                                      <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                      <ListItemText sx={{
+                                        "& .MuiTypography-root": {
+                                          fontWeight: 'inherit'
+                                        }
+                                      }} style={{fontWeight: 'inherit'}} primary={item.text} />
+                                      {item.externalLink &&
+                                        <ExternalLinkIcon style={{opacity: 0.5}} />
+                                      }
+                                      {item.children &&
+                                        <>
+                                          {openCollapseSections.indexOf(index) > -1 ? <ExpandLess /> : <ExpandMore />}
+                                        </>
+                                      }
+                                  </ListItemButton>
+                                </LinkWrapper>
+                              </div>
+                              {item.children &&
+                                <Collapse in={openCollapseSections.indexOf(index) > -1} timeout="auto" unmountOnExit>
+                                  <List component="div" disablePadding>
+                                    {item.children.map((child, childIndex) => 
+                                        <div
+                                          className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
                                         >
-                                          <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
-                                          <ListItemText primary={child.text} />
-                                          {item.externalLink &&
-                                            <ExternalLinkIcon />
-                                          }
-                                        </ListItemButton>
-                                      </div>
-                                  )}
-                                </List>
-                              </Collapse>
-                            }
-                          </Fragment>
+                                          <ListItemButton
+                                            onClick={() => {
+                                              if(child.path && child.path.length > 0) {
+                                                navigate(child.path)
+                                                props.setShowLeftMenu(false)
+                                              }
+                                            }}
+                                            key={`child-${index}-${childIndex}`}
+                                            sx={{ pl: 4, color: 'inherit' }}
+                                            disableRipple
+                                          >
+                                            <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
+                                            <ListItemText primary={child.text} />
+                                            {item.externalLink &&
+                                              <ExternalLinkIcon />
+                                            }
+                                          </ListItemButton>
+                                        </div>
+                                    )}
+                                  </List>
+                                </Collapse>
+                              }
+                            </Fragment>
+                            : null
                       )}
                   </List>
                 </div>

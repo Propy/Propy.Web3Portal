@@ -14,10 +14,12 @@ import Chip from '@mui/material/Chip';
 import { utils } from "ethers";
 
 import DefaultTokenImage from '../assets/img/default-token.webp';
+import PlaceholderImage from '../assets/img/placeholder.webp';
 
 import {
   IBalanceRecord,
   IAssetRecord,
+  INFTRecord,
 } from '../interfaces';
 
 import {
@@ -43,7 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
     },
     title: {
-
+      fontSize: '1.1rem',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
     },
     collectionName: {
 
@@ -69,8 +74,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface ISingleTokenCardProps {
-  balanceRecord: IBalanceRecord,
+  balanceRecord?: IBalanceRecord,
   assetRecord: IAssetRecord,
+  nftRecord?: INFTRecord,
 }
 
 const SingleTokenCard = (props: ISingleTokenCardProps) => {
@@ -78,9 +84,10 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   const {
     assetRecord,
     balanceRecord,
+    nftRecord,
   } = props;
 
-  const [tokenImage, setTokenImage] = useState('');
+  const [tokenImage, setTokenImage] = useState(PlaceholderImage);
   const [tokenTitle, setTokenTitle] = useState('');
   const [tokenId, setTokenId] = useState('');
   const [tokenCollectionName, setTokenCollectionName] = useState('');
@@ -89,32 +96,48 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
 
   useEffect(() => {
     console.log({assetRecord, balanceRecord})
-    let tokenRecordMetadata = balanceRecord.nft?.metadata ? JSON.parse(balanceRecord.nft?.metadata) : {};
-    console.log("balanceRecord.nft?.metadata", balanceRecord.nft?.metadata);
-    if(balanceRecord.asset?.standard) {
-      setTokenStandard(balanceRecord.asset.standard);
-    }
-    if(assetRecord?.standard === "ERC-721") {
-      if(tokenRecordMetadata?.image) {
-        setTokenImage(getResolvableIpfsLink(tokenRecordMetadata?.image));
+    let tokenRecordMetadata;
+    let useRecord;
+    if(balanceRecord) {
+      tokenRecordMetadata = balanceRecord.nft?.metadata ? JSON.parse(balanceRecord.nft?.metadata) : {};
+      useRecord = balanceRecord;
+      if (assetRecord?.standard === "ERC-20") {
+        setTokenImage(DefaultTokenImage);
+        let balance = priceFormat(Number(utils.formatUnits(useRecord.balance, assetRecord.decimals)), 2, "PRO", false);
+        setTokenTitle(balance);
+        setTokenLink(`token/${useRecord.network_name}/${useRecord.asset_address}`);
       }
-      if(tokenRecordMetadata?.name) {
-        setTokenTitle(tokenRecordMetadata?.name);
-      }
-      if(balanceRecord.token_id) {
-        setTokenId(`# ${balanceRecord.token_id}`);
-      }
-      setTokenLink(`token/${balanceRecord.network_name}/${balanceRecord.asset_address}/${balanceRecord.token_id}`);
-    } else if (assetRecord?.standard === "ERC-20") {
-      setTokenImage(DefaultTokenImage);
-      let balance = priceFormat(Number(utils.formatUnits(balanceRecord.balance, assetRecord.decimals)), 2, "PRO", false);
-      setTokenTitle(balance);
-      setTokenLink(`token/${balanceRecord.network_name}/${balanceRecord.asset_address}`);
+    } else if (nftRecord) {
+      tokenRecordMetadata = nftRecord.metadata ? JSON.parse(nftRecord.metadata) : {};
+      useRecord = nftRecord;
     }
-    if(assetRecord?.name) {
-      setTokenCollectionName(assetRecord?.name);
+    if(useRecord) {
+      if(useRecord.asset?.standard) {
+        setTokenStandard(useRecord.asset.standard);
+      }
+      if(assetRecord?.standard === "ERC-721") {
+        if(tokenRecordMetadata?.image) {
+          setTokenImage(getResolvableIpfsLink(tokenRecordMetadata?.image));
+        } else {
+          setTokenImage(PlaceholderImage);
+        }
+        if(tokenRecordMetadata?.name) {
+          setTokenTitle(tokenRecordMetadata?.name);
+        }
+        if(useRecord.token_id) {
+          setTokenId(`# ${useRecord.token_id}`);
+        }
+        setTokenLink(`token/${useRecord.network_name}/${useRecord.asset_address}/${useRecord.token_id}`);
+      }
     }
-  }, [balanceRecord, assetRecord])
+    if(assetRecord) {
+      if(assetRecord?.collection_name) {
+        setTokenCollectionName(assetRecord?.collection_name);
+      } else if(assetRecord?.name) {
+        setTokenCollectionName(assetRecord?.name);
+      }
+    }
+  }, [balanceRecord, assetRecord, nftRecord])
 
   const classes = useStyles();
 
@@ -122,14 +145,18 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     <Card style={{width: '100%', height: '290px'}}>
       <LinkWrapper link={tokenLink ? tokenLink : `./`}>
         <CardActionArea className={classes.actionArea}>
-          {tokenImage && 
-            <CardMedia
-              component="img"
-              height="200"
-              image={tokenImage}
-              alt="featured property media"
-            />
-          }
+          <CardMedia
+            component="img"
+            height="200"
+            image={tokenImage ? tokenImage : PlaceholderImage}
+            style={{position: 'absolute'}}
+            alt="featured property media"
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src=PlaceholderImage;
+            }}
+          />
+          <div style={{height: 200}}></div>
           <div className={classes.chipContainer}>
             <div className={classes.leftChips}>
               {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
@@ -139,14 +166,14 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
             </div>
           </div>
           <div className={classes.typographyZone}>
-            <Typography variant="h5" className={[classes.title].join(" ")}>
-              {tokenTitle}
-            </Typography>
             {tokenCollectionName &&
               <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
                 {tokenCollectionName}
               </Typography>
             }
+            <Typography variant="h6" className={[classes.title].join(" ")}>
+              {tokenTitle}
+            </Typography>
           </div>
         </CardActionArea>
       </LinkWrapper>

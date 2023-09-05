@@ -7,10 +7,6 @@ import {
   // API_IDENTITY_SERVER_URL,
 } from '../utils/constants';
 
-import {
-  parseJwt
-} from '../utils/';
-
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
 
 export interface IApiResponse {
@@ -105,22 +101,36 @@ export const FlowService = {
   },
 }
 
-interface IRegisterUser {
-  email: string;
-  phoneNumber: string;
-  isAgent: boolean;
-  password?: string;
-  firstName?: string;
-  lastName?: string;
-  leadUUID?: string;
-}
-
-export const AssetService = {
+export const NFTService = {
   async refreshMetadata(network: string, tokenAddress: string, tokenId: string) : Promise<AxiosResponse["data"]> {
-    return ApiService.post(`asset/refresh-metadata`, {
+    return ApiService.post(`nft/refresh-metadata`, {
       network: network,
       asset_address: tokenAddress,
       token_id: tokenId
     })
   },
+  async getCollectionPaginated(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    perPage: number,
+    page: number,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
+  },
+  async getRecentlyMintedPaginated(
+    perPage: number,
+    page: number,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/recently-minted`, `?perPage=${perPage}&page=${page}`)
+  }
+}
+
+export const AccountBalanceService = {
+  async getAccountBalancesPaginated(
+    account: string,
+    perPage: number,
+    page: number,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}?perPage=${perPage}&page=${page}`)
+  }
 }

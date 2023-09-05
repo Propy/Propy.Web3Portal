@@ -1,6 +1,10 @@
 import { ChainId, shortenAddress } from '@usedapp/core'
 import numeral from "numeral";
 
+import {
+	NetworkName,
+} from '../interfaces';
+
 export const centerShortenLongString = (string: string, maxLength: number) => {
 	if(typeof string === 'string') {
 		if(string.length > maxLength) {
@@ -16,7 +20,7 @@ export const centerShortenLongString = (string: string, maxLength: number) => {
 	}
 }
 
-const ETHERSCAN_PREFIXES: { [chainId in ChainId]?: string } = {
+const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
 	1: '',
 	3: 'ropsten.',
 	4: 'rinkeby.',
@@ -48,13 +52,46 @@ const ETHERSCAN_PREFIXES: { [chainId in ChainId]?: string } = {
 	42161: '',
 	421611: '',
 }
-  
-export function getEtherscanLink(
+
+export function getEtherscanLinkByChainId(
 	chainId: ChainId,
 	data: string,
 	type: 'transaction' | 'token' | 'address' | 'block'
 ): string {
-	const prefix = `https://${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[1]}etherscan.io`
+	const prefix = `https://${ETHERSCAN_PREFIXES_CHAIN_ID[chainId] || ETHERSCAN_PREFIXES_CHAIN_ID[1]}etherscan.io`
+
+	switch (type) {
+		case 'transaction': {
+		return `${prefix}/tx/${data}`
+		}
+		case 'token': {
+		return `${prefix}/token/${data}`
+		}
+		case 'block': {
+		return `${prefix}/block/${data}`
+		}
+		case 'address':
+		default: {
+		return `${prefix}/address/${data}`
+		}
+	}
+}
+
+const ETHERSCAN_PREFIXES_NETWORK_NAME: { [networkName in NetworkName]?: string } = {
+	'ethereum': 'etherscan.io',
+	'ropsten': 'ropsten.etherscan.io',
+	'rinkeby': 'rinkeby.etherscan.io',
+	'goerli': 'goerli.etherscan.io',
+	'arbitrum': 'arbiscan.io',
+	'sepolia': 'sepolia.etherscan.io'
+}
+  
+export function getEtherscanLinkByNetworkName(
+	networkName: NetworkName,
+	data: string,
+	type: 'transaction' | 'token' | 'address' | 'block'
+): string {
+	const prefix = `https://${ETHERSCAN_PREFIXES_NETWORK_NAME[networkName] || ETHERSCAN_PREFIXES_NETWORK_NAME['ethereum']}`
 
 	switch (type) {
 		case 'transaction': {

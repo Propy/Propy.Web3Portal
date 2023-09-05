@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { useNavigate } from "react-router-dom";
 
@@ -18,6 +18,10 @@ import LogoLightMode from '../assets/svg/propy-light-mode.svg'
 import { Web3ModalButton } from './Web3ModalButton';
 import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
 
+import {
+  PROPY_LIGHT_BLUE,
+} from '../utils/constants';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -35,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
     },
     appBar: {
-      borderBottom: '3px solid #38A6FB',
+      borderBottom: `3px solid ${PROPY_LIGHT_BLUE}`,
       borderRadius: 0,
     }
   }),
