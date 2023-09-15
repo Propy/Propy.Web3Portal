@@ -72,14 +72,16 @@ const NavigationTopBar = (props: PropsFromRedux) => {
             dApp
           </Typography>
           <Web3ModalButton darkMode={darkMode} />
-          <IconButton
-            color="inherit"
-            onClick={() => props.setDarkMode(!darkMode)}
-            aria-label="delete"
-            className={classes.margin}
-            size="large">
-            {darkMode ? <LightModeIcon/> : <DarkModeIcon />}
-          </IconButton>
+          {process.env.REACT_ENV === 'local' && 
+            <IconButton
+              color="inherit"
+              onClick={() => props.setDarkMode(!darkMode)}
+              aria-label="delete"
+              className={classes.margin}
+              size="large">
+              {darkMode ? <LightModeIcon/> : <DarkModeIcon />}
+            </IconButton>
+          }
         </Toolbar>
       </AppBar>
       <AppBar style={{opacity: 0}} position="static">
