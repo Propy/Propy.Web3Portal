@@ -1,6 +1,14 @@
 export const STAKING_CONTRACT = '0x00000000219ab540356cBB839Cbe05303d7705Fa'
 
-export const API_ENDPOINT = "http://localhost:8420";
+// export const API_ENDPOINT = "http://localhost:8420";
+
+export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
+  "local": "http://localhost:8420",
+  "dev": "https://dev.dappapi.propy.com/",
+  "prod": "https://dappapi.propy.com/",
+}
+
+export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
 export const TOKEN_NAME_PREFIX : {[key: string]: string} = {
   "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC": "MetaAgent",
