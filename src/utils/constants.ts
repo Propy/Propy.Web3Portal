@@ -31,6 +31,11 @@ export const COLLECTIONS_PAGE_ENTRIES = [
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
+    slug: "propy-certificates-testnet",
+  },
+  {
+    network: "arbitrum",
+    address: "0x567c407D054A644DBBBf2d3a6643776473f82d7a",
     slug: "propy-certificates",
   },
   {
