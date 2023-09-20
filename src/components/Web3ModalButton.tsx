@@ -12,6 +12,7 @@ import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownC
 
 interface IWeb3ModalButtonProps {
   darkMode: boolean
+  hideNetworkSwitch?: boolean
 }
 
 export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
@@ -21,6 +22,7 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
 
   let {
     darkMode,
+    hideNetworkSwitch = false,
   } = props;
 
   useEffect(() => {
@@ -79,9 +81,11 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
   return (
     <Account>
       <ErrorWrapper>{activateError}</ErrorWrapper>
-      <div style={{marginRight: 16}}>
-        <NetworkSelectDropdownContainer/>
-      </div>
+      {!hideNetworkSwitch &&
+        <div style={{marginRight: 16}}>
+          <NetworkSelectDropdownContainer/>
+        </div>
+      }
       {account ? (
         <>
           <AccountChip style={darkMode ? {} : { backgroundColor: "#414141" }} label={account ? shortenAddress(account) : ""}/>
