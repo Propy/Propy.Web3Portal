@@ -159,6 +159,12 @@ export interface IAttribute {
     trait_type: string;
     value: string;
 }
+export interface ITokenMetadataTimelineEntry {
+    milestone: string;
+    due_date: number;
+    complete: boolean;
+    is_estimate?: boolean;
+}
 
 export interface ITokenMetadata {
     name: string;
@@ -166,4 +172,5 @@ export interface ITokenMetadata {
     description?: string;
     image: string;
     attributes: IAttribute[];
+    timeline?: ITokenMetadataTimelineEntry[];
 }
