@@ -20,7 +20,7 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
   const { error } = useEthers()
 
   let {
-    darkMode
+    darkMode,
   } = props;
 
   useEffect(() => {

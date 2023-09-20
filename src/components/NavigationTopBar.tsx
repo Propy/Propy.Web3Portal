@@ -41,6 +41,16 @@ const useStyles = makeStyles((theme: Theme) =>
     appBar: {
       borderBottom: `3px solid ${PROPY_LIGHT_BLUE}`,
       borderRadius: 0,
+    },
+    appBarBottom: {
+      top: '100%',
+      transform: 'translateY(-100%)',
+      borderTop: `3px solid ${PROPY_LIGHT_BLUE}`,
+      borderRadius: 0,
+    },
+    mobileToolbar: {
+      display: 'flex',
+      justifyContent: 'end',
     }
   }),
 );
@@ -50,6 +60,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
 
   let {
     darkMode,
+    isConsideredMobile,
   } = props;
 
   let navigate = useNavigate();
@@ -71,7 +82,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
             dApp
           </Typography>
-          <Web3ModalButton darkMode={darkMode} />
+          {!isConsideredMobile && <Web3ModalButton darkMode={darkMode} />}
           {process.env.REACT_ENV === 'local' && 
             <IconButton
               color="inherit"
@@ -87,6 +98,13 @@ const NavigationTopBar = (props: PropsFromRedux) => {
       <AppBar style={{opacity: 0}} position="static">
         <Toolbar/>
       </AppBar>
+      {isConsideredMobile && 
+        <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBarBottom} position="fixed">
+          <Toolbar className={classes.mobileToolbar}>
+            <Web3ModalButton darkMode={darkMode} />
+          </Toolbar>
+        </AppBar>
+      }
     </div>
   );
 }

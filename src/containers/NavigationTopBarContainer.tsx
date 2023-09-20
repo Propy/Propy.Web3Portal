@@ -7,11 +7,13 @@ import NavigationTopBar from '../components/NavigationTopBar';
 interface RootState {
     showLeftMenu: boolean;
     darkMode: boolean;
+    isConsideredMobile: boolean;
 }
   
 const mapStateToProps = (state: RootState) => ({
     showLeftMenu: state.showLeftMenu,
-    darkMode: state.darkMode 
+    darkMode: state.darkMode,
+    isConsideredMobile: state.isConsideredMobile,
 })
   
 const mapDispatchToProps = {
