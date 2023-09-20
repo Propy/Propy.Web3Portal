@@ -27,12 +27,15 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
-export const COLLECTIONS_PAGE_ENTRIES = [
+const COLLECTIONS_ENTRIES_DEV = [
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
     slug: "propy-certificates-testnet",
-  },
+  }
+]
+
+const COLLECTIONS_ENTRIES_PROD = [
   {
     network: "arbitrum",
     address: "0x567c407D054A644DBBBf2d3a6643776473f82d7a",
@@ -49,3 +52,5 @@ export const COLLECTIONS_PAGE_ENTRIES = [
     slug: "propy-nft",
   }
 ]
+
+export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
