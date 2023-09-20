@@ -17,6 +17,7 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import EventHistoryContainer from '../containers/EventHistoryContainer';
+import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
@@ -144,6 +145,32 @@ const SingleTokenPage = () => {
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
+            // TODO remove temp timeline shim
+            if(network === 'goerli') {
+              metadata.timeline = [
+                {
+                  milestone: "Offer signed",
+                  due_date: 1695301253,
+                  complete: false,
+                },
+                {
+                  milestone: "Deposit payment",
+                  due_date: 1695819674,
+                  complete: false,
+                },
+                {
+                  milestone: "Inspection",
+                  due_date: 1696424490,
+                  complete: false,
+                  is_estimate: true,
+                },
+                {
+                  milestone: "Closing",
+                  due_date: 1697029313,
+                  complete: false,
+                }
+              ]
+            }
             if(metadata && isMounted) {
               setTokenMetadata(metadata);
             }
@@ -217,6 +244,12 @@ const SingleTokenPage = () => {
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
                         <Typography variant="body1">{tokenMetadata?.description}</Typography>
+                      </>
+                    }
+                    {tokenMetadata?.timeline &&
+                      <>
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Transaction Timeline"/>
+                        <TokenMetadataTimelineContainer timeline={tokenMetadata?.timeline} />
                       </>
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
