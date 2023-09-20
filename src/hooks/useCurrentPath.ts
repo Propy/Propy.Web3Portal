@@ -3,6 +3,7 @@ import { matchRoutes, useLocation } from "react-router-dom"
 const routes = [
   { path: "/" },
   { path: "/my-tokens" },
+  { path: "/collections" },
   // { path: "/example/:exampleParam" },
 ]
 

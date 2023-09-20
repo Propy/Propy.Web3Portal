@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components'
 import Typography from '@mui/material/Typography';
 import { useBlockNumber, useEthers } from '@usedapp/core'
 
-import { getEtherscanLink } from '../utils';
+import { getEtherscanLinkByChainId } from '../utils';
 
 import { ExternalLink } from './ExternalLink';
 
@@ -114,7 +114,7 @@ const BlockNumberIndicator = () => {
         }
     }, [blockNumber])
     return (blockNumber ?
-        <ExternalLink href={chainId && blockNumber ? getEtherscanLink(chainId, blockNumber.toString(), 'block') : ''}>
+        <ExternalLink href={chainId && blockNumber ? getEtherscanLinkByChainId(chainId, blockNumber.toString(), 'block') : ''}>
             <BlockNumberContainer>
                 <StyledPollingDot blockSyncStatus={blockSyncStatus}>{showSpinner && <Spinner/>}</StyledPollingDot><span style={{opacity: !showSpinner ? '0.6' : '0.8'}}><Typography variant="overline" style={{fontFamily: 'monospace', lineHeight: 0}}>{blockNumber}</Typography></span>
             </BlockNumberContainer>

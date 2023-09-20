@@ -1,6 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import MyTokensBanner from '../components/MyTokensBanner';
+import AccountTokensBanner from '../components/AccountTokensBanner';
 
 interface RootState {
   isConsideredMobile: boolean
@@ -16,4 +16,4 @@ const connector = connect(mapStateToProps, {})
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(MyTokensBanner)
+export default connector(AccountTokensBanner)

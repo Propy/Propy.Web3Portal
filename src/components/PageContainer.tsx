@@ -9,8 +9,11 @@ import createStyles from '@mui/styles/createStyles';
 import Navigation from './Navigation';
 import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftSideBarDesktopContainer';
 import HomePage from '../pages/HomePage';
-import MyTokensPage from '../pages/MyTokensPage';
+import AccountTokensPage from '../pages/AccountTokensPage';
 import SingleTokenPage from '../pages/SingleTokenPage';
+import RecentlyMintedPage from '../pages/RecentlyMintedPage';
+import CollectionPage from '../pages/CollectionPage';
+import CollectionsPage from '../pages/CollectionsPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -45,9 +48,13 @@ const PageContainer = () => {
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
-                    <Route path="/my-tokens" element={<MyTokensPage/>} />
+                    <Route path="/my-tokens" element={<AccountTokensPage/>} />
                     <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
                     <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
+                    <Route path="/account/:accountAddress" element={<AccountTokensPage/>} />
+                    <Route path="/collections" element={<CollectionsPage/>} />
+                    <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
+                    <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
                 </Routes>
             </div>
         </Navigation>

@@ -14,6 +14,12 @@ import BlockNumberIndicator from './BlockNumberIndicator';
 import PageContainer from './PageContainer';
 
 import { useWindowSize } from '../hooks';
+
+declare module '@mui/material/styles' {
+  interface BreakpointOverrides {
+    xxl: true; // adds the `mobile` breakpoint
+  }
+}
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface DefaultTheme extends Theme {}
@@ -46,6 +52,16 @@ const App = (props: PropsFromRedux) => {
   const theme = React.useMemo(
     () =>
       createTheme({
+        breakpoints: {
+          values: {
+            xs: 0,
+            sm: 500,
+            md: 800,
+            lg: 1300,
+            xl: 1600,
+            xxl: 1800,
+          },
+        },
         palette: {
           mode: props.darkMode ? 'dark' : 'light',
           ...(props.darkMode && {

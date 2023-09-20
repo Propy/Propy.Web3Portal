@@ -23,8 +23,20 @@ export interface IEVMTransactionRecord {
 
 export type SupportedNetworks = 'ethereum' | 'arbitrum';
 
+export type TokenStandard = "ERC-20" | "ERC-721";
+
+export enum NetworkName {
+    ethereum = "ethereum",
+    ropsten = "ropsten",
+    rinkeby = "rinkeby",
+    goerli = "goerli",
+    sepolia = "sepolia",
+    optimism = "optimism",
+    arbitrum = "arbitrum",
+}
+
 export interface ITransferEventERC721Record {
-    network: string;
+    network_name: NetworkName;
     block_number: string;
     block_hash: string;
     transaction_index: string;
@@ -38,10 +50,11 @@ export interface ITransferEventERC721Record {
     transaction_hash: string;
     log_index: number;
     evm_transaction?: IEVMTransactionRecord;
+    value?: string;
 }
 
 export interface ITransferEventERC20Record {
-    network: string;
+    network_name: NetworkName;
     block_number: string;
     block_hash: string;
     transaction_index: string;
@@ -54,6 +67,7 @@ export interface ITransferEventERC20Record {
     transaction_hash: string;
     log_index: number;
     evm_transaction?: IEVMTransactionRecord;
+    value: string;
 }
 
 export interface IAssetRecord {
@@ -61,12 +75,14 @@ export interface IAssetRecord {
     address: string;
     network_name: string;
     symbol: string;
-    standard: string;
+    standard: TokenStandard;
     decimals: string;
     created_at: string;
     updated_at: string;
     deployment_block: string;
     name: string;
+    collection_name: string;
+    slug: string;
     last_price_usd: string;
     is_base_asset: boolean,
     market_cap_usd: string;
@@ -117,13 +133,25 @@ export interface IMixedBalancesResult {
     }
 }
 
+export interface IRecentlyMintedResult {
+    data: INFTRecord[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
 export interface IOwnedBalancesResult {
-    [key: string]: {
+    data: {
         [key: string]: {
-            balances?: IBalanceRecord[],
-            asset: IAssetRecord,
-            balancesPagination?: IPagination
-        },
+            [key: string]: {
+                balances?: IBalanceRecord[],
+                asset: IAssetRecord,
+                balancesPagination?: IPagination
+            },
+        }
+    },
+    metadata: {
+        pagination: IPagination,
     }
 }
 

@@ -18,25 +18,29 @@ import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContain
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import EventHistoryContainer from '../containers/EventHistoryContainer';
 
+import LinkWrapper from '../components/LinkWrapper';
+
 import DefaultTokenImage from '../assets/img/default-token.webp';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import {
-  AssetService,
+  NFTService,
 } from '../services/api';
 
 import {
   IAssetRecord,
-  IBalanceRecord,
   ITokenMetadata,
   ITransferEventERC20Record,
   ITransferEventERC721Record,
+  TokenStandard,
 } from '../interfaces';
 
 import {
   API_ENDPOINT,
   TOKEN_NAME_PREFIX,
+  TOKEN_NAME_HIDE_ID,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import {
@@ -103,12 +107,11 @@ const SingleTokenPage = () => {
     const classes = useStyles();
 
     const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
-    const [tokenBalanceRecord, setTokenBalanceRecord] = useState<IBalanceRecord | null>(null);
     const [tokenEventRecord, setTokenEventRecord] = useState<ITransferEventERC721Record[] | ITransferEventERC20Record[] | null>(null);
     const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
-    const [tokenStandard, setTokenStandard] = useState<string | null>(null);
+    const [tokenStandard, setTokenStandard] = useState<TokenStandard | null>(null);
 
     let { 
       network,
@@ -139,9 +142,6 @@ const SingleTokenPage = () => {
           if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
             setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc20);
           }
-          // if(tokenRecordQueryResponse?.data?.balance_record?.[0]) {
-            // setTokenBalanceRecord(tokenRecordQueryResponse?.data?.balance_record?.[0])
-          // }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
             if(metadata && isMounted) {
@@ -152,7 +152,6 @@ const SingleTokenPage = () => {
           setTokenRecord(null);
           setTokenMetadata(null);
           setTokenStandard(null);
-          setTokenBalanceRecord(null);
           setTokenEventRecord(null);
         }
       }
@@ -166,7 +165,7 @@ const SingleTokenPage = () => {
       if(network && tokenAddress && tokenId) {
         try {
           setIsMetadataRefreshing(true);
-          let refreshMetadataResponse = await AssetService.refreshMetadata(network, tokenAddress, tokenId);
+          let refreshMetadataResponse = await NFTService.refreshMetadata(network, tokenAddress, tokenId);
           if(refreshMetadataResponse?.data?.message) {
             await toast.success(refreshMetadataResponse?.data?.message);
             // trigger refetch of token record / metadata
@@ -190,9 +189,23 @@ const SingleTokenPage = () => {
                 </div>
               </Grid>
               <Grid item xs={12} md={7}>
-                {tokenRecord && tokenMetadata &&
+                {tokenRecord &&
                   <>
-                    <Typography variant="h2" style={{fontWeight: 'bold'}}>{`${TOKEN_NAME_PREFIX[tokenRecord.address] ? TOKEN_NAME_PREFIX[tokenRecord.address] : tokenMetadata.name} #${tokenBalanceRecord ? tokenBalanceRecord.token_id : tokenMetadata.name}`}</Typography>
+                    <LinkWrapper link={`collection/${tokenRecord.network_name}/${tokenRecord.slug}`}>
+                      <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
+                        {
+                          `${tokenRecord.collection_name ? tokenRecord.collection_name : tokenRecord.name} `
+                        }
+                      </Typography>
+                    </LinkWrapper>
+                    <Typography variant="h3" style={{fontWeight: 'bold'}}>
+                      {
+                        tokenMetadata && `${TOKEN_NAME_PREFIX[tokenRecord.address] ? `${TOKEN_NAME_PREFIX[tokenRecord.address]} ${tokenMetadata.name}` : tokenMetadata.name}`
+                      }
+                      {
+                        TOKEN_NAME_HIDE_ID[tokenRecord.address] && tokenMetadata ? '' : ` #${tokenId}`
+                      }
+                    </Typography>
                     <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
                       <div className={[classes.actionInfoEntry, 'clickable', isMetadataRefreshing ? 'disable-click' : ''].join(" ")} onClick={() => refreshTokenMetadata()}>
                         {!isMetadataRefreshing && <RefreshIcon className={classes.actionInfoEntryIcon} />}
@@ -207,7 +220,7 @@ const SingleTokenPage = () => {
                       </>
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
-                    {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} />}
+                    {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
                   </>
                 }
               </Grid>
@@ -233,7 +246,7 @@ const SingleTokenPage = () => {
                       </div>
                     </div> */}
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginBottom={12} marginTop={16} title="History"/>
-                    {tokenRecord && tokenRecord?.transfer_events_erc20 && <EventHistoryContainer eventRecords={tokenRecord?.transfer_events_erc20} />}
+                    {tokenRecord?.transfer_events_erc20 && <EventHistoryContainer eventRecords={tokenRecord?.transfer_events_erc20} assetRecord={tokenRecord} />}
                   </>
                 }
               </Grid>
