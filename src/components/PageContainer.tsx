@@ -34,7 +34,7 @@ const PageContainer = () => {
     const [showDesktopMenu, setShowDesktopMenu] = useState(true);
 
     useLayoutEffect(() => {
-        let sizeShowDesktopMenu = 1100;
+        let sizeShowDesktopMenu = 1000;
         if (windowSize.width && (windowSize.width <= sizeShowDesktopMenu)) {
           setShowDesktopMenu(false);
         }else{
