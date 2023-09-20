@@ -43,8 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: 0,
     },
     appBarBottom: {
-      top: '100%',
-      transform: 'translateY(-100%)',
+      top: 'auto',
+      bottom: '0px',
       borderTop: `3px solid ${PROPY_LIGHT_BLUE}`,
       borderRadius: 0,
     },
