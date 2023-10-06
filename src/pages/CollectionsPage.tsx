@@ -24,7 +24,7 @@ const CollectionsPage = () => {
 
     return (
         <GenericPageContainer
-          title="Token Browser"
+          title="Asset Browser"
         >
           {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry) => 
             <div className={classes.spacer}>
