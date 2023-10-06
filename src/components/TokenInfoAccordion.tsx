@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
 let sections = [
   {
     sectionId: "attributes",
-    sectionTitle: "Token properties",
+    sectionTitle: "Asset properties",
   },
 ]
 

@@ -48,7 +48,7 @@ const PageContainer = () => {
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
-                    <Route path="/my-tokens" element={<AccountTokensPage/>} />
+                    <Route path="/my-assets" element={<AccountTokensPage/>} />
                     <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
                     <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
                     <Route path="/account/:accountAddress" element={<AccountTokensPage/>} />

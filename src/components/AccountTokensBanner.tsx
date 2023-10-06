@@ -131,11 +131,11 @@ const AccountTokensBanner = (props: IAccountTokensBanner) => {
       {showTitle &&
         <div className={classes.titleContainer}>
           <Typography variant="h4" className={[classes.title].join(" ")}>
-            My Tokens
+            My Assets
           </Typography>
-          <LinkWrapper link="my-tokens">
+          <LinkWrapper link="my-assets">
             <Button variant="contained" color="secondary">
-              View my tokens
+              View my assets
             </Button>
           </LinkWrapper>
         </div>

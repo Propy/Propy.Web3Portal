@@ -31,26 +31,26 @@ const COLLECTIONS_ENTRIES_DEV = [
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
-    slug: "propy-certificates-testnet",
+    slug: "propy-deed-certificates-testnet",
   }
 ]
 
 const COLLECTIONS_ENTRIES_PROD = [
   {
+    network: "ethereum",
+    address: "0x2dbC375B35c5A2B6E36A386c8006168b686b70D3",
+    slug: "propy-real-world-assets",
+  },
+  {
     network: "arbitrum",
     address: "0x567c407D054A644DBBBf2d3a6643776473f82d7a",
-    slug: "propy-certificates",
+    slug: "propy-deed-certificates",
   },
   {
     network: "ethereum",
     address: "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC",
     slug: "meta-agents",
   },
-  {
-    network: "ethereum",
-    address: "0x2dbC375B35c5A2B6E36A386c8006168b686b70D3",
-    slug: "propy-nft",
-  }
 ]
 
-export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
+export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_PROD, ...COLLECTIONS_ENTRIES_DEV];

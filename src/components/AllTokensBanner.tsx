@@ -99,11 +99,11 @@ const AllTokensBanner = (props: IAllTokensBanner) => {
       {showTitle &&
         <div className={classes.titleContainer}>
           <Typography variant="h4" className={[classes.title].join(" ")}>
-            Propy Tokens
+            Propy Assets
           </Typography>
-          <LinkWrapper link="my-tokens">
+          <LinkWrapper link="my-assets">
             <Button variant="contained" color="secondary">
-              View all tokens
+              View all assets
             </Button>
           </LinkWrapper>
         </div>
