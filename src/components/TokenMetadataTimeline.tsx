@@ -107,7 +107,7 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
               <Typography variant="subtitle1">{timelineEntry.milestone}</Typography>
             </StepLabel>
             <StepContent>
-              <Typography variant="subtitle2">By {dayjs.unix(Number(timelineEntry.due_date)).format('MMMM Do')}</Typography>
+              <Typography variant="subtitle2">By {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>
             </StepContent>
           </Step>
         ))}
