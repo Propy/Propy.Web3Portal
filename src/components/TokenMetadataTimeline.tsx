@@ -102,12 +102,13 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
     <Box sx={{ maxWidth: 400 }}>
       <Stepper activeStep={activeStep} orientation="vertical">
         {timeline.map((timelineEntry, index) => (
-          <Step key={timelineEntry.milestone} expanded={true}>
+          <Step key={timelineEntry.milestone} expanded={true} completed={timelineEntry.complete}>
             <StepLabel StepIconComponent={QontoStepIcon}>
               <Typography variant="subtitle1">{timelineEntry.milestone}</Typography>
             </StepLabel>
             <StepContent>
-              <Typography variant="subtitle2">By {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>
+              {timelineEntry.due_date && <Typography variant="subtitle2">By {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
+              {!timelineEntry.due_date && <Typography variant="subtitle2">Date estimation pending</Typography>}
             </StepContent>
           </Step>
         ))}
