@@ -161,7 +161,7 @@ export interface IAttribute {
 }
 export interface ITokenMetadataTimelineEntry {
     milestone: string;
-    due_date: number;
+    due_date?: number;
     complete: boolean;
     is_estimate?: boolean;
 }
