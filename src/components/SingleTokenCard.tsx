@@ -51,7 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
       textOverflow: 'ellipsis',
     },
     collectionName: {
-
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
     },
     chipContainer: {
       position: 'absolute',
