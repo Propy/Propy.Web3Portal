@@ -52,7 +52,7 @@ const QontoStepIconRoot = styled('div')<{ ownerState: { active?: boolean } }>(
     marginLeft: 8,
     alignItems: 'center',
     ...(ownerState.active && {
-      color: PROPY_LIGHT_BLUE,
+    //   color: PROPY_LIGHT_BLUE,
     }),
     '& .QontoStepIcon-completedIcon': {
       color: PROPY_LIGHT_BLUE,
@@ -103,11 +103,15 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
       <Stepper activeStep={activeStep} orientation="vertical">
         {timeline.map((timelineEntry, index) => (
           <Step key={timelineEntry.milestone} expanded={true} completed={timelineEntry.complete}>
-            <StepLabel StepIconComponent={QontoStepIcon}>
+            <StepLabel StepIconComponent={QontoStepIcon} sx={{
+              '& .MuiStepLabel-labelContainer': {
+                color: "#212121"
+              }
+            }}>
               <Typography variant="subtitle1">{timelineEntry.milestone}</Typography>
             </StepLabel>
             <StepContent>
-              {timelineEntry.due_date && <Typography variant="subtitle2">By {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
+              {timelineEntry.due_date && <Typography variant="subtitle2">{timelineEntry.milestone === "Transaction created" ? "At" : "By"} {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
               {!timelineEntry.due_date && <Typography variant="subtitle2">Date estimation pending</Typography>}
             </StepContent>
           </Step>
