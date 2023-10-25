@@ -21,6 +21,7 @@ import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineC
 
 import LinkWrapper from '../components/LinkWrapper';
 
+import PlaceholderImage from '../assets/img/placeholder.webp';
 import DefaultTokenImage from '../assets/img/default-token.webp';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -171,7 +172,7 @@ const SingleTokenPage = () => {
             //     }
             //   ]
             // }
-            if(metadata && isMounted) {
+            if(metadata && metadata.name !== null && isMounted) {
               setTokenMetadata(metadata);
             }
           }
@@ -210,10 +211,12 @@ const SingleTokenPage = () => {
           {(!tokenStandard || tokenStandard === 'ERC-721') &&
             <Grid container spacing={6} columns={12}>
               <Grid item xs={12} md={5}>
-                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : ""}")`}}/>
-                <div className={classes.sectionSpacer}>
-                  <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
-                </div>
+                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : PlaceholderImage}")`}}/>
+                {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
+                  <div className={classes.sectionSpacer}>
+                    <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
+                  </div>
+                }
               </Grid>
               <Grid item xs={12} md={7}>
                 {tokenRecord &&
@@ -246,7 +249,7 @@ const SingleTokenPage = () => {
                         <Typography variant="body1">{tokenMetadata?.description}</Typography>
                       </>
                     }
-                    {tokenMetadata?.timeline &&
+                    {tokenMetadata?.timeline && tokenMetadata?.timeline.length > 0 &&
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Transaction Timeline"/>
                         <TokenMetadataTimelineContainer timeline={tokenMetadata?.timeline} />

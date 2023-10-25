@@ -32,7 +32,7 @@ const COLLECTIONS_ENTRIES_DEV = [
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
-    slug: "propy-deed-certificates-staging-testnet",
+    slug: "propy-deed-certificates-stage-testnet",
   },
   {
     network: "goerli",
