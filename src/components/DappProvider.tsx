@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChainId, DAppProvider } from '@usedapp/core'
+import { ChainId, DAppProvider, MetamaskConnector, CoinbaseWalletConnector } from '@usedapp/core'
 
 import DappReactiveConfigContainer from '../containers/DappReactiveConfigContainer';
 
@@ -43,6 +43,11 @@ const DappProvider = (props: PropsFromRedux) => {
       [ChainId.Arbitrum]: arbitrumReadOnlyUrl(),
     },
     autoConnect: true,
+    // noMetamaskDeactivate: true,
+    connectors: {
+      metamask: new MetamaskConnector(),
+      coinbase: new CoinbaseWalletConnector(),
+    },
   }
 
   return (
