@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ChainId, useEthers, useUpdateConfig } from '@usedapp/core'
+import { ChainId, useEthers, useUpdateConfig, MetamaskConnector, CoinbaseWalletConnector } from '@usedapp/core'
 
 import AppContainer from '../containers/AppContainer';
 
@@ -69,6 +69,11 @@ const DappReactiveConfig = (props: PropsFromRedux) => {
           [ChainId.Arbitrum]: arbitrumReadOnlyUrl(),
         },
         autoConnect: true,
+        // noMetamaskDeactivate: true,
+        connectors: {
+          metamask: new MetamaskConnector(),
+          coinbase: new CoinbaseWalletConnector(),
+        },
       });
     } else {
       handleConnectedAccountNetworkSwitch(activeNetwork);
