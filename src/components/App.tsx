@@ -11,7 +11,7 @@ import '../styles/App.scss';
 import { PropsFromRedux } from '../containers/AppContainer';
 
 import BlockNumberIndicator from './BlockNumberIndicator';
-import PageContainer from './PageContainer';
+import PageContainerContainer from '../containers/PageContainerContainer';
 
 import { useWindowSize } from '../hooks';
 
@@ -114,7 +114,7 @@ const App = (props: PropsFromRedux) => {
           <ThemeProvider theme={theme}>
             <CssBaseline/>
             <Toaster richColors position="bottom-right" />
-            <PageContainer/>
+            <PageContainerContainer/>
             <BlockNumberIndicator/>
           </ThemeProvider>
         </StyledEngineProvider>

@@ -17,15 +17,24 @@ import CollectionsPage from '../pages/CollectionsPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
+import { PropsFromRedux } from '../containers/PageContainerContainer';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
     },
+    rootMobile: {
+      marginBottom: 50,
+    }
   }),
 );
 
-const PageContainer = () => {
+const PageContainer = (props: PropsFromRedux) => {
+
+    const {
+      isConsideredMobile,
+    } = props;
 
     const classes = useStyles();
 
@@ -44,7 +53,7 @@ const PageContainer = () => {
 
     return (
         <Navigation>
-            <div className={classes.root}>
+            <div className={[classes.root, isConsideredMobile ? classes.rootMobile : ""].join(" ")}>
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
