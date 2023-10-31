@@ -19,7 +19,9 @@ const DappProvider = (props: PropsFromRedux) => {
   }
 
   const mainnetReadOnlyUrl = () => {
-    if(process.env.REACT_APP_INFURA_RPC_URL_MAINNET) {
+    if (process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET) {
+      return process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET;
+    } else if(process.env.REACT_APP_INFURA_RPC_URL_MAINNET) {
       return `${process.env.REACT_APP_INFURA_RPC_URL_MAINNET}`;
     } else if(process.env.REACT_APP_ALCHEMY_RPC_URL_MAINNET) {
       return `${process.env.REACT_APP_ALCHEMY_RPC_URL_MAINNET}`;
@@ -28,7 +30,9 @@ const DappProvider = (props: PropsFromRedux) => {
   }
   
   const arbitrumReadOnlyUrl = () => {
-    if(process.env.REACT_APP_INFURA_RPC_URL_ARBITRUM) {
+    if(process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM) {
+      return `${process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM}`;
+    } else if(process.env.REACT_APP_INFURA_RPC_URL_ARBITRUM) {
       return `${process.env.REACT_APP_INFURA_RPC_URL_ARBITRUM}`;
     } else if(process.env.REACT_APP_ALCHEMY_RPC_URL_ARBITRUM) {
       return `${process.env.REACT_APP_ALCHEMY_RPC_URL_ARBITRUM}`;
