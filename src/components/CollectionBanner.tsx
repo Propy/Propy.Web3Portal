@@ -14,6 +14,8 @@ import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 import LinkWrapper from './LinkWrapper';
 
+import { PropsFromRedux } from '../containers/CollectionBannerContainer';
+
 import {
   IAssetRecord,
   INFTRecord,
@@ -61,7 +63,7 @@ interface INftAssets {
   [key: string]: IAssetRecord
 }
 
-const CollectionBanner = (props: ICollectionBanner) => {
+const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
 
   const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
   const [nftAssets, setNftAssets] = useState<INftAssets>({});
@@ -82,6 +84,7 @@ const CollectionBanner = (props: ICollectionBanner) => {
     contractNameOrCollectionNameOrAddress,
     collectionSlug,
     showPagination = false,
+    isConsideredMobile,
   } = props;
 
   useEffect(() => {
@@ -134,13 +137,13 @@ const CollectionBanner = (props: ICollectionBanner) => {
   return (
     <>
       {showTitle &&
-        <div className={classes.titleContainer}>
-          <Typography variant="h4" className={[classes.title].join(" ")}>
+        <div className={[classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
+          <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
             {title ? title : "Loading..."}
           </Typography>
           {showCollectionLink && 
-            <LinkWrapper link={`collection/${network}/${collectionSlug}`}>
-              <Button variant="contained" color="secondary">
+            <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`collection/${network}/${collectionSlug}`}>
+              <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
                 View {title}
               </Button>
             </LinkWrapper>
