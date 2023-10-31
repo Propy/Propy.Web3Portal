@@ -13,6 +13,19 @@
   color: white;
 }
 
+.full-width {
+  width: 100%;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.margin-top-8 {
+  margin-top: 8px;
+}
+
 .inherit-color {
   color: inherit;
 }

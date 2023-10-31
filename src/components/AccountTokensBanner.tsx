@@ -14,6 +14,8 @@ import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 import LinkWrapper from './LinkWrapper';
 
+import { PropsFromRedux } from '../containers/AccountTokensBannerContainer';
+
 import {
   IBalanceRecord,
   IAssetRecord,
@@ -57,7 +59,7 @@ interface IAllTokenAssets {
   [key: string]: IAssetRecord
 }
 
-const AccountTokensBanner = (props: IAccountTokensBanner) => {
+const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
 
   const [ownedTokenBalances, setOwnedTokenBalances] = useState<IBalanceRecord[]>([]);
   const [ownedTokenAssets, setOwnedTokenAssets] = useState<IAllTokenAssets>({});
@@ -74,6 +76,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner) => {
     showTitle = false,
     account,
     showPagination = false,
+    isConsideredMobile,
   } = props;
 
   useEffect(() => {
@@ -129,12 +132,12 @@ const AccountTokensBanner = (props: IAccountTokensBanner) => {
   return (
     <>
       {showTitle &&
-        <div className={classes.titleContainer}>
-          <Typography variant="h4" className={[classes.title].join(" ")}>
+        <div className={[classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
+          <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
             My Assets
           </Typography>
-          <LinkWrapper link="my-assets">
-            <Button variant="contained" color="secondary">
+          <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link="my-assets">
+            <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
               View my assets
             </Button>
           </LinkWrapper>

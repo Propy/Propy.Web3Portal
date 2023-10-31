@@ -14,6 +14,8 @@ import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 import LinkWrapper from './LinkWrapper';
 
+import { PropsFromRedux } from '../containers/RecentlyMintedTokensBannerContainer';
+
 import {
   IRecentlyMintedResult,
   INFTRecord,
@@ -58,7 +60,7 @@ interface IRecentlyMintedTokenAssets {
   [key: string]: IAssetRecord
 }
 
-const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner) => {
+const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFromRedux) => {
 
   const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
   const [nftAssets, setNftAssets] = useState<IRecentlyMintedTokenAssets>({});
@@ -75,6 +77,7 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner) => {
     showTitle = false,
     showPagination = false,
     showRecentlyMintedLink = false,
+    isConsideredMobile,
   } = props;
 
   useEffect(() => {
@@ -116,13 +119,13 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner) => {
   return (
     <>
       {showTitle &&
-        <div className={classes.titleContainer}>
-          <Typography variant="h4" className={[classes.title].join(" ")}>
+        <div className={[classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
+          <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
             Recently Minted Assets
           </Typography>
           {showRecentlyMintedLink && 
-            <LinkWrapper link="recently-minted">
-              <Button variant="contained" color="secondary">
+            <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link="recently-minted">
+              <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
                 View recently minted assets
               </Button>
             </LinkWrapper>
