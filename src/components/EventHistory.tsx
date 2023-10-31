@@ -1,6 +1,7 @@
 import React from 'react';
 
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 import { shortenAddress } from '@usedapp/core'
 
@@ -36,6 +37,8 @@ import {
   getEtherscanLinkByNetworkName,
   priceFormat,
 } from '../utils';
+
+dayjs.extend(advancedFormat);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -173,7 +176,7 @@ const getEventSummaryLineEntryOne = (event: ITransferEventERC721Record | ITransf
 const getEventSummaryLineEntryTwo = (event: ITransferEventERC721Record | ITransferEventERC20Record) => {
   return (
     <div style={{display: 'flex'}}>
-      <Typography variant="overline" style={{lineHeight: 1}}>{event.evm_transaction ? dayjs.unix(Number(event.evm_transaction.block_timestamp)).format('DD/MM/YYYY, hh:mm A') : 'loading...'}</Typography>
+      <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{event.evm_transaction ? dayjs.unix(Number(event.evm_transaction.block_timestamp)).format('MMM-D-YYYY hh:mm A') : 'loading...'}</Typography>
     </div>
   );
 }

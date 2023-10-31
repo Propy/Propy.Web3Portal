@@ -45,13 +45,13 @@ const navigationMenu : IMenuEntry[] = [
     icon: <DashboardIcon />
   },
   {
-    text: 'My Tokens',
-    path: '/my-tokens',
+    text: 'My Assets',
+    path: '/my-assets',
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
   },
   {
-    text: 'Token Browser',
+    text: 'Asset Browser',
     path: '/collections',
     icon: <TokenIcon />
   },

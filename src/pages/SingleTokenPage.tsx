@@ -17,9 +17,11 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import EventHistoryContainer from '../containers/EventHistoryContainer';
+import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
+import PlaceholderImage from '../assets/img/placeholder.webp';
 import DefaultTokenImage from '../assets/img/default-token.webp';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -144,7 +146,33 @@ const SingleTokenPage = () => {
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
-            if(metadata && isMounted) {
+            // // temp timeline shim for testing design
+            // if(network === 'goerli') {
+            //   metadata.timeline = [
+            //     {
+            //       milestone: "Offer signed",
+            //       due_date: 1695301253,
+            //       complete: false,
+            //     },
+            //     {
+            //       milestone: "Deposit payment",
+            //       due_date: 1695819674,
+            //       complete: false,
+            //     },
+            //     {
+            //       milestone: "Inspection",
+            //       due_date: 1696424490,
+            //       complete: false,
+            //       is_estimate: true,
+            //     },
+            //     {
+            //       milestone: "Closing",
+            //       due_date: 1697029313,
+            //       complete: false,
+            //     }
+            //   ]
+            // }
+            if(metadata && metadata.name !== null && isMounted) {
               setTokenMetadata(metadata);
             }
           }
@@ -183,10 +211,12 @@ const SingleTokenPage = () => {
           {(!tokenStandard || tokenStandard === 'ERC-721') &&
             <Grid container spacing={6} columns={12}>
               <Grid item xs={12} md={5}>
-                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : ""}")`}}/>
-                <div className={classes.sectionSpacer}>
-                  <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
-                </div>
+                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : PlaceholderImage}")`}}/>
+                {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
+                  <div className={classes.sectionSpacer}>
+                    <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
+                  </div>
+                }
               </Grid>
               <Grid item xs={12} md={7}>
                 {tokenRecord &&
@@ -217,6 +247,12 @@ const SingleTokenPage = () => {
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
                         <Typography variant="body1">{tokenMetadata?.description}</Typography>
+                      </>
+                    }
+                    {tokenMetadata?.timeline && tokenMetadata?.timeline.length > 0 &&
+                      <>
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Transaction Timeline"/>
+                        <TokenMetadataTimelineContainer timeline={tokenMetadata?.timeline} />
                       </>
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>

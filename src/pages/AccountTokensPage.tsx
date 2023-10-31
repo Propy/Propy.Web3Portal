@@ -17,7 +17,7 @@ const AccountTokensPage = () => {
     return (
         <>
             <GenericPageContainer
-                title="My Tokens"
+                title="My Assets"
             >
                 {account && !accountAddress &&
                   <AccountTokensBannerContainer maxRecords={20} showPagination={true} account={account} />

@@ -118,12 +118,12 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner) => {
       {showTitle &&
         <div className={classes.titleContainer}>
           <Typography variant="h4" className={[classes.title].join(" ")}>
-            Recently Minted Tokens
+            Recently Minted Assets
           </Typography>
           {showRecentlyMintedLink && 
             <LinkWrapper link="recently-minted">
               <Button variant="contained" color="secondary">
-                View recently minted tokens
+                View recently minted assets
               </Button>
             </LinkWrapper>
           }
