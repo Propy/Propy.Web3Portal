@@ -1,3 +1,5 @@
+![Propy dApp](https://propy.mypinata.cloud/ipfs/QmdRYtw7isQhUwmDeAgbPM9tCS3ZKdtRWhLrV54BkbmNd4)
+
 # Propy dApp Frontend
 
 Welcome to Propy dApp, a window into all of Propy's on-chain activity. This dApp frontend can be used to view all of Propy's on-chain assets, link users to active governance proposals, DEX liquidity management as well as to connect your wallet via MetaMask or your preferred wallet application in order to view your own balances of Propy assets (from PRO to Propy-issued NFTs).
