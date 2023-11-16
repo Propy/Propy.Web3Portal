@@ -134,3 +134,18 @@ export const AccountBalanceService = {
     return ApiService.get(`/balances`, `${account}?perPage=${perPage}&page=${page}`)
   }
 }
+
+export const SignerService = {
+  async getSignerNonce(signerAddress: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`/signature/nonce`, {
+      signer_address: signerAddress,
+    });
+  },
+  async validateSignedMessageAndPerformAction(plaintextMessage: string, signedMessage: string, signerAddress: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`/signature/perform-action`, {
+      signer_address: signerAddress,
+      plaintext_message: plaintextMessage,
+      signed_message: signedMessage,
+    });
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useEthers, shortenAddress } from '@usedapp/core'
 import styled from 'styled-components'
 import Web3Modal from 'web3modal'
@@ -14,16 +14,22 @@ import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownC
 interface IWeb3ModalButtonProps {
   darkMode: boolean
   hideNetworkSwitch?: boolean
+  overrideConnectText?: string
+  variant?: "text" | "outlined" | "contained"
+  color?: "primary" | "secondary" | "info" | "success" | "error"
 }
 
 export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
   const { account, activate, deactivate, chainId } = useEthers()
-  const [activateError, setActivateError] = useState('')
+  // const [activateError, setActivateError] = useState('')
   const { error } = useEthers()
 
   let {
     darkMode,
     hideNetworkSwitch = false,
+    overrideConnectText,
+    variant,
+    color,
   } = props;
 
   useEffect(() => {
@@ -31,7 +37,7 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
       // Temp workaround to avoid network changed error message until useDapp handles this internally
       if(error?.message?.indexOf('underlying network changed') === -1) {
         // setActivateError(error.message);
-        setActivateError("");
+        // setActivateError("");
         toast.error(`Wallet connection error: ${error.message}`);
       }
     }
@@ -84,7 +90,6 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
 
   return (
     <Account>
-      <ErrorWrapper>{activateError}</ErrorWrapper>
       {!hideNetworkSwitch &&
         <div style={{marginRight: 16}}>
           <NetworkSelectDropdownContainer/>
@@ -93,21 +98,15 @@ export const Web3ModalButton = (props: IWeb3ModalButtonProps) => {
       {account ? (
         <>
           <AccountChip style={darkMode ? {} : { backgroundColor: "#414141" }} label={account ? shortenAddress(account) : ""}/>
-          <Button color="inherit" onClick={() => deactivate()}>Disconnect</Button>
+          <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => deactivate()}>Disconnect</Button>
         </>
       ) : (
-        <Button color="inherit" onClick={activateProvider}>Connect</Button>
+        <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={activateProvider}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
       )}
     </Account>
   )
 }
 
-const ErrorWrapper = styled.div`
-  color: #ff3960;
-  margin-right: 40px;
-  margin-left: 40px;
-  overflow: auto;
-`
 
 const Account = styled.div`
   display: flex;

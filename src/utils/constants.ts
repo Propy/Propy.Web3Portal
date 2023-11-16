@@ -10,6 +10,9 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
+export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
+export const PRO_TOKEN_DECIMALS = 8;
+
 export const TOKEN_NAME_PREFIX : {[key: string]: string} = {
   "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC": "MetaAgent",
 }
@@ -20,6 +23,7 @@ export const TOKEN_NAME_HIDE_ID : {[key: string]: boolean} = {
   "0x73C3a1437B0307732Eb086cb2032552eBea15444": true,
   "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC": true,
   "0x567c407D054A644DBBBf2d3a6643776473f82d7a": true,
+  "0x77932CA68a539a738d167Ec019B6aE7596766152": true,
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -29,6 +33,11 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
 const COLLECTIONS_ENTRIES_DEV = [
+  {
+    network: "sepolia",
+    address: "0x77932CA68a539a738d167Ec019B6aE7596766152",
+    slug: "propy-home-nft-dev-testnet",
+  },
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
