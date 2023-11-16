@@ -174,3 +174,15 @@ export interface ITokenMetadata {
     attributes: IAttribute[];
     timeline?: ITokenMetadataTimelineEntry[];
 }
+
+export interface ISignMessageError {
+    code: number;
+    message: string;
+}
+
+export interface INonceResponse {
+    data: {
+        nonce: number;
+        salt: string;
+    }
+}

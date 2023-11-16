@@ -218,3 +218,24 @@ export const parseJwt = (token: string) => {
 export const getCookieValue = (name: string) => (
   document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 )
+
+export const constructSignerMessage = (
+	signerAccount: string,
+	nonce: number,
+	salt: string,
+	actionType: string,
+	metadata: any
+) => {
+	if(!isNaN(nonce) && salt && actionType) {
+		return JSON.stringify({
+			account: signerAccount,
+			action: actionType,
+			metadata,
+			timestamp: Math.floor(new Date().getTime() / 1000),
+			nonce,
+			salt,
+		}, null, 4);
+	} else {
+		return false;
+	}
+}

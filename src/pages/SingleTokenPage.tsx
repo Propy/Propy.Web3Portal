@@ -18,6 +18,7 @@ import TokenInfoAccordionContainer from '../containers/TokenInfoAccordionContain
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import EventHistoryContainer from '../containers/EventHistoryContainer';
 import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineContainer';
+import SignalInterestContainer from '../containers/SignalInterestContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
@@ -114,6 +115,7 @@ const SingleTokenPage = () => {
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
     const [tokenStandard, setTokenStandard] = useState<TokenStandard | null>(null);
+    const [allowSignalInterest] = useState(true);
 
     let { 
       network,
@@ -257,6 +259,12 @@ const SingleTokenPage = () => {
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
                     {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
+                    {allowSignalInterest && tokenId && tokenAddress && 
+                      <>
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Make an Offer"/>
+                        <SignalInterestContainer tokenId={tokenId} tokenAddress={tokenAddress} />
+                      </>
+                    }
                   </>
                 }
               </Grid>
