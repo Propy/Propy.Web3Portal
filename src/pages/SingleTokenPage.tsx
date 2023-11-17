@@ -259,10 +259,10 @@ const SingleTokenPage = () => {
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
                     {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
-                    {allowSignalInterest && tokenId && tokenAddress && 
+                    {allowSignalInterest && tokenId && tokenAddress && network && 
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Make an Offer"/>
-                        <SignalInterestContainer tokenId={tokenId} tokenAddress={tokenAddress} />
+                        <SignalInterestContainer tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
                       </>
                     }
                   </>

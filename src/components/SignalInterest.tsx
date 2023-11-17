@@ -76,6 +76,7 @@ interface ISignalInterest {
   title?: string,
   tokenAddress: string,
   tokenId: string,
+  tokenNetwork: string,
 }
 
 const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
@@ -93,6 +94,7 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
     darkMode,
     tokenAddress,
     tokenId,
+    tokenNetwork,
   } = props;
 
   const signOfferMessage = async (proAmount: string) => {
@@ -111,10 +113,11 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
           signerAccount,
           nonce,
           salt,
-          "make_offer",
+          "make_offchain_offer",
           {
             token_address: tokenAddress,
             token_id: tokenId,
+            token_network: tokenNetwork,
             offer_token_address: PRO_TOKEN_ADDRESS,
             offer_token_amount: utils.parseUnits(proAmount.toString(), PRO_TOKEN_DECIMALS).toString()
           }
