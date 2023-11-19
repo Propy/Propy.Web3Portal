@@ -19,6 +19,7 @@ import GenericTitleContainer from '../containers/GenericTitleContainer';
 import EventHistoryContainer from '../containers/EventHistoryContainer';
 import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineContainer';
 import SignalInterestContainer from '../containers/SignalInterestContainer';
+import OfferListContainer from '../containers/OfferListContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
@@ -36,6 +37,7 @@ import {
   ITokenMetadata,
   ITransferEventERC20Record,
   ITransferEventERC721Record,
+  IOfferRecord,
   TokenStandard,
 } from '../interfaces';
 
@@ -111,6 +113,7 @@ const SingleTokenPage = () => {
 
     const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
     const [tokenEventRecord, setTokenEventRecord] = useState<ITransferEventERC721Record[] | ITransferEventERC20Record[] | null>(null);
+    const [tokenOfferList, setTokenOfferList] = useState<IOfferRecord[] | null>(null);
     const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
@@ -145,6 +148,9 @@ const SingleTokenPage = () => {
           }
           if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
             setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc20);
+          }
+          if(tokenRecordQueryResponse?.data?.offchain_offers) {
+            setTokenOfferList(tokenRecordQueryResponse?.data?.offchain_offers);
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
@@ -261,8 +267,11 @@ const SingleTokenPage = () => {
                     {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
                     {allowSignalInterest && tokenId && tokenAddress && network && 
                       <>
-                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Make an Offer"/>
-                        <SignalInterestContainer tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Offers"/>
+                        <SignalInterestContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+                        <div className={classes.sectionSpacer}>
+                          {tokenEventRecord && <OfferListContainer offerRecords={tokenOfferList} />}
+                        </div>
                       </>
                     }
                   </>

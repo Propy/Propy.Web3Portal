@@ -77,6 +77,7 @@ interface ISignalInterest {
   tokenAddress: string,
   tokenId: string,
   tokenNetwork: string,
+  onSuccess?: () => void,
 }
 
 const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
@@ -95,6 +96,7 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
     tokenAddress,
     tokenId,
     tokenNetwork,
+    onSuccess,
   } = props;
 
   const signOfferMessage = async (proAmount: string) => {
@@ -129,6 +131,9 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
             let triggerSignedMessageActionResponse = await SignerService.validateSignedMessageAndPerformAction(messageForSigning, signedMessage, signerAccount);
             console.log({triggerSignedMessageActionResponse});
             if(triggerSignedMessageActionResponse.status) {
+              if(onSuccess) {
+                onSuccess();
+              }
               toast.success("Offer placed successfully!");
               setShowDialog(false);
             }
