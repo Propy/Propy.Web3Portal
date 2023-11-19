@@ -186,3 +186,13 @@ export interface INonceResponse {
         salt: string;
     }
 }
+
+export interface IOfferRecord {
+    asset_address: string;
+    offer_token_address: string;
+    offer_token_amount: string;
+    timestamp_unix: number; 
+    token_id: string; 
+    user_address: string;
+    offer_token: IAssetRecord;
+}
