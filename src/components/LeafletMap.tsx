@@ -1,12 +1,5 @@
 import React from 'react';
 
-import { Theme } from '@mui/material/styles';
-
-import makeStyles from '@mui/styles/makeStyles';
-import createStyles from '@mui/styles/createStyles';
-
-import Typography from '@mui/material/Typography';
-
 import leaflet from 'leaflet';
 
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
@@ -21,34 +14,6 @@ import {
 } from '../interfaces';
 
 import { PropsFromRedux } from '../containers/GenericPageContainer';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-  }),
-);
-
-const center = [51.505, -0.09]
-
-const multiPolygon = [
-  [
-    [51.51, -0.12],
-    [51.51, -0.13],
-    [51.53, -0.13],
-  ],
-  [
-    [51.51, -0.05],
-    [51.51, -0.07],
-    [51.53, -0.07],
-  ],
-]
-
-const rectangle = [
-  [51.49, -0.08],
-  [51.5, -0.06],
-]
 
 interface ILeafletMap {
   zoom?: number
@@ -69,12 +34,6 @@ interface ILeafletMap {
 // }
 
 const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
-
-  // const map = useMap();
-
-  // console.log({map})
-
-  const classes = useStyles();
 
   const {
     zoom = 6,
