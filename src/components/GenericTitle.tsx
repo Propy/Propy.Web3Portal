@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(4),
       marginTop: theme.spacing(6),
       borderBottom: '2px solid #EFEFEF',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     title: {
       fontWeight: 500,
@@ -46,6 +49,7 @@ interface IGenericBannerPage {
   paddingBottom?: number,
   marginBottom?: number,
   marginTop?: number,
+  actionComponent?: React.ReactNode,
 }
 
 const GenericTitle = (props: PropsFromRedux & IGenericBannerPage) => {
@@ -58,6 +62,7 @@ const GenericTitle = (props: PropsFromRedux & IGenericBannerPage) => {
     paddingBottom = 16,
     marginBottom = 16,
     marginTop = 48,
+    actionComponent,
   } = props;
 
   return (
@@ -67,6 +72,7 @@ const GenericTitle = (props: PropsFromRedux & IGenericBannerPage) => {
             <Typography variant={variant} component="h2" className={[classes.title].join(" ")}>
               {title}
             </Typography>
+            {actionComponent && actionComponent}
           </div>
         }
     </div>

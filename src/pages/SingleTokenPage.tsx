@@ -267,8 +267,7 @@ const SingleTokenPage = () => {
                     {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
                     {allowSignalInterest && tokenId && tokenAddress && network && 
                       <>
-                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Offers"/>
-                        <SignalInterestContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Offers" actionComponent={<SignalInterestContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />}/>
                         <div className={classes.sectionSpacer}>
                           {tokenEventRecord && <OfferListContainer offerRecords={tokenOfferList} />}
                         </div>

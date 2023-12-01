@@ -14,6 +14,7 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 import RecentlyMintedTokensBannerContainer from '../containers/RecentlyMintedTokensBannerContainer';
 import CollectionBannerContainer from '../containers/CollectionBannerContainer';
+import ReserveAnAddressHomeBannerContainer from '../containers/ReserveAnAddressHomeBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,8 +50,11 @@ const HomePage = () => {
     return (
         <>
             <GenericPageContainer
-                title="Dashboard"
+                // title="Dashboard"
             >
+                <div className={classes.sectionSpacer}>
+                    <ReserveAnAddressHomeBannerContainer />
+                </div>
                 {account &&
                     <div className={classes.sectionSpacer}>
                         <AccountTokensBannerContainer account={account} maxRecords={5} showTitle={true} />
@@ -61,7 +65,14 @@ const HomePage = () => {
                 </div>
                 {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry) => 
                     <div className={classes.sectionSpacer}>
-                        <CollectionBannerContainer showCollectionLink={true} maxRecords={5} showTitle={true} network={entry.network} contractNameOrCollectionNameOrAddress={entry.address} collectionSlug={entry.slug} />
+                        <CollectionBannerContainer
+                            showCollectionLink={true}
+                            maxRecords={5}
+                            showTitle={true}
+                            network={entry.network}
+                            contractNameOrCollectionNameOrAddress={entry.address}
+                            collectionSlug={entry.slug}
+                        />
                     </div>
                 )}
             </GenericPageContainer>

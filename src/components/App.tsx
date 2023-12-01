@@ -7,11 +7,13 @@ import { Toaster } from 'sonner'
 import { createTheme, StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+import 'leaflet/dist/leaflet.css';
 import '../styles/App.scss';
 import { PropsFromRedux } from '../containers/AppContainer';
 
 import BlockNumberIndicator from './BlockNumberIndicator';
 import PageContainerContainer from '../containers/PageContainerContainer';
+import RecentHomeNftScrollingBanner from './RecentHomeNftScrollingBanner';
 
 import { useWindowSize } from '../hooks';
 
@@ -75,7 +77,7 @@ const App = (props: PropsFromRedux) => {
           },
           secondary: {
             main: "#434343",
-          }
+          },
         },
         components: {
           MuiCardContent :{
@@ -113,6 +115,7 @@ const App = (props: PropsFromRedux) => {
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
             <CssBaseline/>
+            <RecentHomeNftScrollingBanner />
             <Toaster richColors position="bottom-right" />
             <PageContainerContainer/>
             <BlockNumberIndicator/>

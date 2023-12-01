@@ -111,8 +111,10 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
               <Typography variant="subtitle1">{timelineEntry.milestone}</Typography>
             </StepLabel>
             <StepContent>
-              {timelineEntry.due_date && <Typography variant="subtitle2">{timelineEntry.milestone === "Transaction created" ? "At" : "By"} {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
-              {!timelineEntry.due_date && <Typography variant="subtitle2">Date estimation pending</Typography>}
+              {timelineEntry.due_date && timelineEntry.hasOwnProperty("due_date") && <Typography variant="subtitle2">{timelineEntry.milestone === "Transaction created" ? "" : "By"} {dayjs.unix(Number(timelineEntry.due_date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
+              {!timelineEntry.due_date && timelineEntry.hasOwnProperty("due_date") && <Typography variant="subtitle2">Date estimation pending</Typography>}
+              {timelineEntry.date && timelineEntry.hasOwnProperty("date") && !isNaN(timelineEntry.date) && <Typography variant="subtitle2">{dayjs.unix(Number(timelineEntry.date)).format('MMM-D-YYYY hh:mm A')}</Typography>}
+              {timelineEntry.date && timelineEntry.hasOwnProperty("date") && isNaN(timelineEntry.date) && <Typography variant="subtitle2">Not yet</Typography>}
             </StepContent>
           </Step>
         ))}

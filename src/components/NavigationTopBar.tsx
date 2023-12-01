@@ -20,6 +20,8 @@ import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
 
 import {
   PROPY_LIGHT_BLUE,
+  IS_GLOBAL_TOP_BANNER_ENABLED,
+  GLOBAL_TOP_BANNER_HEIGHT,
 } from '../utils/constants';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -41,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
     appBar: {
       borderBottom: `3px solid ${PROPY_LIGHT_BLUE}`,
       borderRadius: 0,
+      top: IS_GLOBAL_TOP_BANNER_ENABLED ? GLOBAL_TOP_BANNER_HEIGHT : 0,
     },
     appBarBottom: {
       top: 'auto',

@@ -27,6 +27,8 @@ import useCurrentPath from '../hooks/useCurrentPath';
 
 import {
   PROPY_LIGHT_BLUE,
+  IS_GLOBAL_TOP_BANNER_ENABLED,
+  GLOBAL_TOP_BANNER_HEIGHT,
 } from '../utils/constants';
 
 interface IMenuEntry {
@@ -199,7 +201,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 '& .MuiDrawer-paper': {
                   borderRadius: 0,
                   zIndex: 1,
-                  top: 61,
+                  top: IS_GLOBAL_TOP_BANNER_ENABLED ? (61 + GLOBAL_TOP_BANNER_HEIGHT) : 61,
                   backgroundColor: darkMode ? '#141618' : '#F3F3F3',
                 },
               }}

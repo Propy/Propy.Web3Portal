@@ -48,7 +48,7 @@ import {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      width: 'auto',
     },
     dialogRoot: {
       margin: theme.spacing(2),
