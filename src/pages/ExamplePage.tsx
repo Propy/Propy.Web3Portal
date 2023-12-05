@@ -8,7 +8,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,18 +38,18 @@ const ExamplePage = () => {
 
     const classes = useStyles();
 
-    const { account } = useEthers();
+    const { address } = useAccount();
 
     return (
         <Container maxWidth="md">
-            {account && (
+            {address && (
                 <Card className={classes.root}>
                     <CardContent>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
                             Account:
                         </Typography>
                         <Typography variant="h5" component="h2">
-                            {account}
+                            {address}
                         </Typography>
                     </CardContent>
                 </Card>

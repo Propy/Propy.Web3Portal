@@ -1,7 +1,7 @@
 import React, {useState, Fragment} from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import makeStyles from '@mui/styles/makeStyles';
 import Drawer from '@mui/material/Drawer';
@@ -146,7 +146,7 @@ const useStyles = makeStyles({
 function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
   const classes = useStyles();
 
-  const { account } = useEthers();
+  const { address } = useAccount();
 
   const {
     darkMode,
@@ -212,7 +212,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 >
                   <List>
                       {navigationMenu.map((item, index) => 
-                          (!item.onlyConnected || (item.onlyConnected && account)) ?
+                          (!item.onlyConnected || (item.onlyConnected && address)) ?
                             <Fragment key={`parent-${index}`}>
                               <div
                                 className={classes.entryContainerMargin}

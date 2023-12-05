@@ -62,6 +62,7 @@
 
 .leaflet-container {
   background: rgb(214, 232, 235);
+  z-index: 10;
 }
 
 .leaflet-container .leaflet-control-attribution, .leaflet-container .leaflet-control-scale {
@@ -84,4 +85,8 @@
 
 .text-center {
   text-align: center;
+}
+
+w3m-modal {
+  z-index: 9999;
 }

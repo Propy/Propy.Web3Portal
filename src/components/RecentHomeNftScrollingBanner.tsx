@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react'
 
-import { Theme } from '@mui/material/styles';
-
-import makeStyles from '@mui/styles/makeStyles';
-import createStyles from '@mui/styles/createStyles';
-
 import {
   IRecentlyMintedResult,
   IHorizontalScrollingTextEntry,
@@ -20,24 +15,13 @@ import {
 
 import HorizontalScrollingTextBannerContainer from '../containers/HorizontalScrollingTextBannerContainer';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-      overflowX: 'hidden',
-    },
-  }),
-);
-
 let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propy-home-nft' : 'propy-home-nft-dev-testnet'));
 
 let maxScrollingEntries = 8;
 
 const RecentHomeNftScrollingBanner = () => {
 
-  const classes = useStyles();
-
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [scrollingTextEntries, setScrollingTextEntries] = useState<IHorizontalScrollingTextEntry[]>([]);
 
   useEffect(() => {
@@ -50,8 +34,7 @@ const RecentHomeNftScrollingBanner = () => {
           10,
           1,
         )
-        setIsLoading(false);
-        console.log({collectionResponse})
+        // setIsLoading(false);
         if(collectionResponse?.status && collectionResponse?.data && isMounted) {
           let renderResults : IHorizontalScrollingTextEntry[] = [];
           let apiResponseData : IRecentlyMintedResult = collectionResponse.data;

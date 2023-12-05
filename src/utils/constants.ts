@@ -68,6 +68,11 @@ const COLLECTIONS_ENTRIES_PROD = [
   },
 ]
 
+export const NETWORK_ID_TO_NAME : {[key: number]: string} = {
+	1: 'ethereum',
+	42161: 'arbitrum',
+}
+
 export const IS_GLOBAL_TOP_BANNER_ENABLED = true;
 export const GLOBAL_TOP_BANNER_HEIGHT = 28;
 

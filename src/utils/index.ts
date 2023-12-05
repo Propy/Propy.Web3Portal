@@ -21,11 +21,11 @@ export const centerShortenLongString = (string: string, maxLength: number) => {
 }
 
 const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
-	1: '',
-	3: 'ropsten.',
-	4: 'rinkeby.',
-	5: 'goerli.',
-	42: 'kovan.',
+	1: 'etherscan.io',
+	3: 'ropsten.etherscan.io',
+	4: 'rinkeby.etherscan.io',
+	5: 'goerli.etherscan.io',
+	42: 'kovan.etherscan.io',
 	100: '',
 	1337: '',
 	56: '',
@@ -49,7 +49,7 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
 	588: '',
 	69: '',
 	10: '',
-	42161: '',
+	42161: 'arbiscan.io',
 	421611: '',
 }
 
@@ -58,7 +58,7 @@ export function getEtherscanLinkByChainId(
 	data: string,
 	type: 'transaction' | 'token' | 'address' | 'block'
 ): string {
-	const prefix = `https://${ETHERSCAN_PREFIXES_CHAIN_ID[chainId] || ETHERSCAN_PREFIXES_CHAIN_ID[1]}etherscan.io`
+	const prefix = `https://${ETHERSCAN_PREFIXES_CHAIN_ID[chainId] || ETHERSCAN_PREFIXES_CHAIN_ID[1]}`
 
 	switch (type) {
 		case 'transaction': {

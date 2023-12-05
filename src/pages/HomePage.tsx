@@ -4,7 +4,7 @@ import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import {
     COLLECTIONS_PAGE_ENTRIES,
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const HomePage = () => {
     const classes = useStyles();
-    const { account } = useEthers()
+    const { address } = useAccount();
 
     return (
         <>
@@ -55,9 +55,9 @@ const HomePage = () => {
                 <div className={classes.sectionSpacer}>
                     <ReserveAnAddressHomeBannerContainer />
                 </div>
-                {account &&
+                {address &&
                     <div className={classes.sectionSpacer}>
-                        <AccountTokensBannerContainer account={account} maxRecords={5} showTitle={true} />
+                        <AccountTokensBannerContainer account={address} maxRecords={5} showTitle={true} />
                     </div>
                 }
                 <div className={classes.sectionSpacer}>

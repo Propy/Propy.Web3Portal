@@ -1,31 +1,12 @@
-import React, { useState, useEffect } from 'react'
-
-import { Theme } from '@mui/material/styles';
-
-import makeStyles from '@mui/styles/makeStyles';
-import createStyles from '@mui/styles/createStyles';
+import React from 'react'
 
 import Card from '@mui/material/Card';
-import CardActionArea from '@mui/material/CardActionArea';
 
 import LeafletMapContainer from '../containers/LeafletMapContainer';
 
 import {
   ILeafletMapMarker,
 } from '../interfaces';
-
-import LinkWrapper from './LinkWrapper';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-    },
-    actionArea: {
-      height: '100%',
-    },
-  }),
-);
 
 interface IMapCardProps {
   height?: string | number
@@ -52,8 +33,6 @@ const MapCard = (props: IMapCardProps) => {
     markers = [],
     center,
   } = props;
-
-  const classes = useStyles();
 
   return (
     <Card style={{width, height}}>

@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/es/integration/react';
 
 import './styles/index.css';
-import DappProviderContainer from './containers/DappProviderContainer';
+import DappProviderWagmiContainer from './containers/DappProviderWagmiContainer';
 import reportWebVitals from './reportWebVitals';
 import store, { persistor } from './state';
 
@@ -17,7 +17,7 @@ ReactDOM.render(
         loading={null}
         persistor={persistor}
       >
-        <DappProviderContainer />
+        <DappProviderWagmiContainer />
       </PGate>
     </Provider>
   </React.StrictMode>,

@@ -15,7 +15,7 @@ import LightModeIcon from '@mui/icons-material/WbSunny';
 import LogoDarkMode from '../assets/svg/propy-dark-mode.svg'
 import LogoLightMode from '../assets/svg/propy-light-mode.svg'
 
-import { Web3ModalButton } from './Web3ModalButton';
+import { Web3ModalButtonWagmi } from './Web3ModalButtonWagmi';
 import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
 
 import {
@@ -85,7 +85,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
             dApp
           </Typography>
-          {!isConsideredMobile && <Web3ModalButton darkMode={darkMode} />}
+          {!isConsideredMobile && <Web3ModalButtonWagmi darkMode={darkMode}/>}
           {process.env.REACT_ENV === 'local' && 
             <IconButton
               color="inherit"
@@ -104,7 +104,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
       {isConsideredMobile && 
         <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBarBottom} position="fixed">
           <Toolbar className={classes.mobileToolbar}>
-            <Web3ModalButton darkMode={darkMode} hideNetworkSwitch={true} />
+            <Web3ModalButtonWagmi darkMode={darkMode} hideNetworkSwitch={true} />
           </Toolbar>
         </AppBar>
       }

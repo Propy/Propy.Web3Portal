@@ -21,7 +21,7 @@ export interface IEVMTransactionRecord {
     value: string;
 }
 
-export type SupportedNetworks = 'ethereum' | 'arbitrum';
+export type SupportedNetworks = 'ethereum' | 'arbitrum' | 'unsupported';
 
 export type TokenStandard = "ERC-20" | "ERC-721";
 

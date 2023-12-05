@@ -2,13 +2,14 @@ import React from 'react';
 
 import { useParams } from 'react-router-dom';
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import GenericPageContainer from '../containers/GenericPageContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 
 const AccountTokensPage = () => {
-    const { account } = useEthers();
+
+    const { address } = useAccount();
 
     let { 
         accountAddress,
@@ -19,8 +20,8 @@ const AccountTokensPage = () => {
             <GenericPageContainer
                 title="My Assets"
             >
-                {account && !accountAddress &&
-                  <AccountTokensBannerContainer maxRecords={20} showPagination={true} account={account} />
+                {address && !accountAddress &&
+                  <AccountTokensBannerContainer maxRecords={20} showPagination={true} account={address} />
                 }
                 {accountAddress &&
                     <AccountTokensBannerContainer maxRecords={20} showPagination={true} account={accountAddress} />
