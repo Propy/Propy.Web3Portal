@@ -7,7 +7,7 @@ import { arbitrum, mainnet } from 'wagmi/chains'
 import AppContainer from '../containers/AppContainer';
 
 // 1. Get projectId at https://cloud.walletconnect.com
-const projectId = 'f230464ddad38c3d4ab987793e5d2b64'
+const projectId = '40a62032057258c14ebfdc9c25bfe42e'
 
 // 2. Create wagmiConfig
 const metadata = {
