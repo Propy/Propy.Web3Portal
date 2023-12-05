@@ -11,7 +11,7 @@ interface IFloatingActionButton {
   checkboxMode?: boolean
   checked?: boolean
   size?: 'large' | 'medium' | 'small'
-  buttonColor?: 'primary' | 'secondary' | "default"
+  buttonColor?: 'primary' | 'secondary' | "default" | "info"
   textColor?: string
   className?: string
   component?: "button" | "div"

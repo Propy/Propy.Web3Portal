@@ -1,7 +1,7 @@
 import React, {useState, Fragment} from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import makeStyles from '@mui/styles/makeStyles';
 import Drawer from '@mui/material/Drawer';
@@ -27,6 +27,8 @@ import useCurrentPath from '../hooks/useCurrentPath';
 
 import {
   PROPY_LIGHT_BLUE,
+  IS_GLOBAL_TOP_BANNER_ENABLED,
+  GLOBAL_TOP_BANNER_HEIGHT,
 } from '../utils/constants';
 
 interface IMenuEntry {
@@ -144,7 +146,7 @@ const useStyles = makeStyles({
 function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
   const classes = useStyles();
 
-  const { account } = useEthers();
+  const { address } = useAccount();
 
   const {
     darkMode,
@@ -199,7 +201,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 '& .MuiDrawer-paper': {
                   borderRadius: 0,
                   zIndex: 1,
-                  top: 61,
+                  top: IS_GLOBAL_TOP_BANNER_ENABLED ? (61 + GLOBAL_TOP_BANNER_HEIGHT) : 61,
                   backgroundColor: darkMode ? '#141618' : '#F3F3F3',
                 },
               }}
@@ -210,7 +212,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 >
                   <List>
                       {navigationMenu.map((item, index) => 
-                          (!item.onlyConnected || (item.onlyConnected && account)) ?
+                          (!item.onlyConnected || (item.onlyConnected && address)) ?
                             <Fragment key={`parent-${index}`}>
                               <div
                                 className={classes.entryContainerMargin}

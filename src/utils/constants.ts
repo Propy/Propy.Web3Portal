@@ -68,4 +68,12 @@ const COLLECTIONS_ENTRIES_PROD = [
   },
 ]
 
-export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_PROD, ...COLLECTIONS_ENTRIES_DEV];
+export const NETWORK_ID_TO_NAME : {[key: number]: string} = {
+	1: 'ethereum',
+	42161: 'arbitrum',
+}
+
+export const IS_GLOBAL_TOP_BANNER_ENABLED = true;
+export const GLOBAL_TOP_BANNER_HEIGHT = 28;
+
+export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];

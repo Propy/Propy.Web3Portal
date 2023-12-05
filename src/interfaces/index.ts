@@ -21,7 +21,7 @@ export interface IEVMTransactionRecord {
     value: string;
 }
 
-export type SupportedNetworks = 'ethereum' | 'arbitrum';
+export type SupportedNetworks = 'ethereum' | 'arbitrum' | 'unsupported';
 
 export type TokenStandard = "ERC-20" | "ERC-721";
 
@@ -162,6 +162,7 @@ export interface IAttribute {
 export interface ITokenMetadataTimelineEntry {
     milestone: string;
     due_date?: number;
+    date?: number;
     complete: boolean;
     is_estimate?: boolean;
 }
@@ -195,4 +196,14 @@ export interface IOfferRecord {
     token_id: string; 
     user_address: string;
     offer_token: IAssetRecord;
+}
+
+export interface ILeafletMapMarker {
+    longitude: number;
+    latitude: number;
+}
+
+export interface IHorizontalScrollingTextEntry {
+    string: string;
+    link?: string;
 }

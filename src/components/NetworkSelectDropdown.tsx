@@ -1,15 +1,19 @@
-import React from 'react';
-import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
+import React, { useEffect } from 'react';
+import Button from '@mui/material/Button';
+
+import { useWeb3Modal } from '@web3modal/wagmi/react'
+
+import { useNetwork } from 'wagmi'
 
 import { PropsFromRedux } from '../containers/NetworkSelectDropdownContainer';
 
 import EthLogo from '../assets/img/eth.png';
 import ArbitrumLogo from '../assets/img/arbitrum.png';
 import { SupportedNetworks } from '../interfaces';
+
+import {
+  NETWORK_ID_TO_NAME,
+} from '../utils/constants'
 
 const NetworkSelectDropdown = (props: PropsFromRedux) => {
 
@@ -18,54 +22,46 @@ const NetworkSelectDropdown = (props: PropsFromRedux) => {
     setActiveNetwork,
   } = props;
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setActiveNetwork(event.target.value as SupportedNetworks);
-  };
+  const { chain } = useNetwork()
+
+  const { open } = useWeb3Modal();
+
+  useEffect(() => {
+    if(chain) {
+      console.log({chain})
+      let networkName = NETWORK_ID_TO_NAME[chain.id];
+      if(networkName) {
+        setActiveNetwork(networkName as SupportedNetworks);
+      } else {
+        // setActiveNetwork('unsupported');
+        open({ view: 'Networks' });
+      }
+    }
+  }, [chain, setActiveNetwork, open]);
 
   return (
-    <Box sx={{ minWidth: 151 }}>
-      <FormControl fullWidth size="small">
-        {/* <InputLabel id="network-selection-dropdown-label">Network</InputLabel> */}
-        <Select
-          labelId="network-selection-dropdown-label"
-          id="network-selection-dropdown"
-          value={activeNetwork}
-          // label="Network"
-          onChange={handleChange}
-          // renderValue={(value) => {
-          //   if(value === 'arbitrum') {
-          //     return (
-          //       <div style={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
-          //         <img src={ArbitrumLogo} style={{height: 23}} alt="Arbitrum Network" />
-          //       </div>
-          //     );
-          //   }
-          //   return (
-          //     <div style={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
-          //       <img src={EthLogo} style={{height: 23}} alt="Ethereum Network" />
-          //     </div>
-          //   )
-          // }}
-        >
-          <MenuItem value={'ethereum'}>
-            <Box sx={{ display: "flex", gap: 0.5, alignItems: 'center' }}>
-              <img src={EthLogo} style={{height: 23, marginRight: 8}} alt="Ethereum Network" />
-              <Typography>
-                Ethereum
-              </Typography>
-            </Box>
-          </MenuItem>
-          <MenuItem value={'arbitrum'}>
-            <Box sx={{ display: "flex", gap: 0.5, alignItems: 'center' }}>
-              <img src={ArbitrumLogo} style={{height: 23, marginRight: 8}} alt="Arbitrum Network" />
-              <Typography>
-                Arbitrum
-              </Typography>
-            </Box>
-          </MenuItem>
-        </Select>
-      </FormControl>
-    </Box>
+    <Button
+      onClick={
+        (e) => {
+          open({ view: 'Networks' });
+        }
+      }
+      variant={'text'}
+      color={"inherit"}
+    >
+      {activeNetwork === 'ethereum' && 
+        <>
+          <img src={EthLogo} style={{height: 23, marginRight: 8}} alt="Ethereum Network" />
+          Ethereum
+        </>
+      }
+      {activeNetwork === 'arbitrum' && 
+        <>
+          <img src={ArbitrumLogo} style={{height: 23, marginRight: 8}} alt="Arbitrum Network" />
+          Arbitrum
+        </>
+      }
+    </Button>
   );
 }
 

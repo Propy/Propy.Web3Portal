@@ -8,6 +8,7 @@ import createStyles from '@mui/styles/createStyles';
 
 import Navigation from './Navigation';
 import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftSideBarDesktopContainer';
+
 import HomePage from '../pages/HomePage';
 import AccountTokensPage from '../pages/AccountTokensPage';
 import SingleTokenPage from '../pages/SingleTokenPage';
@@ -19,10 +20,17 @@ import useWindowSize from '../hooks/useWindowSize';
 
 import { PropsFromRedux } from '../containers/PageContainerContainer';
 
+import {
+  IS_GLOBAL_TOP_BANNER_ENABLED,
+  GLOBAL_TOP_BANNER_HEIGHT,
+} from '../utils/constants';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
+      position: 'relative',
+      top: IS_GLOBAL_TOP_BANNER_ENABLED ? GLOBAL_TOP_BANNER_HEIGHT : 0,
     },
     rootMobile: {
       marginBottom: 50,

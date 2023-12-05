@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useEthers, useSigner } from '@usedapp/core';
+import { useAccount, useSignMessage } from 'wagmi';
 
 import { toast } from 'sonner';
 
@@ -22,13 +22,13 @@ import * as yup from 'yup';
 
 import Typography from '@mui/material/Typography';
 
-import { Web3ModalButton } from './Web3ModalButton';
+import { Web3ModalButtonWagmi } from './Web3ModalButtonWagmi';
 import FloatingActionButton from './FloatingActionButton';
 
 import { PropsFromRedux } from '../containers/SignalInterestContainer';
 
 import {
-  ISignMessageError,
+  // ISignMessageError,
   INonceResponse,
 } from '../interfaces';
 
@@ -48,7 +48,7 @@ import {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      width: 'auto',
     },
     dialogRoot: {
       margin: theme.spacing(2),
@@ -84,9 +84,15 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
 
   const classes = useStyles();
 
-  const { account } = useEthers();
+  const { address } = useAccount();
 
-  const signer = useSigner();
+  const { 
+    // data,
+    // isError,
+    // isLoading,
+    // isSuccess, 
+    signMessageAsync
+  } = useSignMessage();
 
   const [showDialog, setShowDialog] = useState(false);
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
@@ -100,9 +106,9 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
   } = props;
 
   const signOfferMessage = async (proAmount: string) => {
-    if(signer && account) {
-      let signerAccount = account;
-      let nonceResponse : INonceResponse = await SignerService.getSignerNonce(account);
+    if(signMessageAsync && address) {
+      let signerAccount = address;
+      let nonceResponse : INonceResponse = await SignerService.getSignerNonce(address);
       let {
         data,
       } = nonceResponse;
@@ -125,7 +131,8 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
           }
         );
         if(messageForSigning) {
-          let signedMessage = await signer.signMessage(messageForSigning).catch((e: any | ISignMessageError) => toast.error(e?.message ? e?.message : "Unable to sign offer message"));
+          let signedMessage = await signMessageAsync({message: messageForSigning})
+            // .catch((e: any | ISignMessageError) => toast.error(e?.message ? e?.message : "Unable to sign offer message"));
           console.log({signedMessage, messageForSigning})
           if(typeof signedMessage === "string") {
             let triggerSignedMessageActionResponse = await SignerService.validateSignedMessageAndPerformAction(messageForSigning, signedMessage, signerAccount);
@@ -155,10 +162,10 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
 
   return (
     <div className={classes.root}>
-        {!account && 
-          <Web3ModalButton variant="contained" color="secondary" darkMode={darkMode} overrideConnectText="Connect wallet" hideNetworkSwitch={true} />
+        {!address && 
+          <Web3ModalButtonWagmi variant="contained" color="secondary" darkMode={darkMode} overrideConnectText="Connect wallet" hideNetworkSwitch={true} />
         }
-        {account &&
+        {address &&
           <Button variant="contained" color="secondary" onClick={() => setShowDialog(true)}>Make an Offer</Button>
         }
         <Dialog onClose={() => setShowDialog(false)} open={showDialog}>

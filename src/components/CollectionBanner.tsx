@@ -57,6 +57,7 @@ interface ICollectionBanner {
   collectionSlug: string
   title?: string
   showPagination?: boolean
+  firstElementShim?: React.ReactNode
 }
 
 interface INftAssets {
@@ -85,7 +86,12 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     collectionSlug,
     showPagination = false,
     isConsideredMobile,
+    firstElementShim,
   } = props;
+
+  if(firstElementShim && maxRecords) {
+    maxRecords = maxRecords - 1;
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -151,6 +157,11 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         </div>
       }
       <Grid className={classes.sectionSpacer} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
+        {!isLoading && nftRecords && firstElementShim && 
+          <Grid key={`single-token-card-first-element-shim-${new Date().getTime()}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            {firstElementShim}
+          </Grid>
+        }
         {!isLoading && nftRecords && nftRecords.sort((a, b) => {
           if(nftAssets[a?.asset_address]?.standard && nftAssets[b?.asset_address]?.standard) {
             return (nftAssets[a?.asset_address]?.standard).localeCompare(nftAssets[b?.asset_address]?.standard);
