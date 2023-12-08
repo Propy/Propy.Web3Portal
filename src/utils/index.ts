@@ -51,6 +51,7 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
 	10: '',
 	42161: 'arbiscan.io',
 	421611: '',
+	11155111: 'sepolia.etherscan.io'
 }
 
 export function getEtherscanLinkByChainId(

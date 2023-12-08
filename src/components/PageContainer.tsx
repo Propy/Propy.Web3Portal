@@ -15,6 +15,7 @@ import SingleTokenPage from '../pages/SingleTokenPage';
 import RecentlyMintedPage from '../pages/RecentlyMintedPage';
 import CollectionPage from '../pages/CollectionPage';
 import CollectionsPage from '../pages/CollectionsPage';
+import StakingPage from '../pages/StakingPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -72,6 +73,7 @@ const PageContainer = (props: PropsFromRedux) => {
                     <Route path="/collections" element={<CollectionsPage/>} />
                     <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                     <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
+                    <Route path="/staking" element={<StakingPage/>} />
                 </Routes>
             </div>
         </Navigation>

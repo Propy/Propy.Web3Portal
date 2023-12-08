@@ -1,6 +1,6 @@
 export const STAKING_CONTRACT = '0x00000000219ab540356cBB839Cbe05303d7705Fa'
 
-// export const API_ENDPOINT = "http://localhost:8420";
+export const API_ENDPOINT = "http://localhost:8420";
 
 export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "local": "http://localhost:8420",
@@ -8,7 +8,7 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "prod": "https://dappapi.propy.com/",
 }
 
-export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
+// export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
 export const PRO_TOKEN_DECIMALS = 8;
@@ -68,12 +68,44 @@ const COLLECTIONS_ENTRIES_PROD = [
   },
 ]
 
-export const NETWORK_ID_TO_NAME : {[key: number]: string} = {
+export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
 	1: 'ethereum',
 	42161: 'arbitrum',
+  8453: 'base',
+  ...(process?.env?.REACT_APP_ENV !== 'prod' && {
+    84532: 'base-sepolia',
+    5: 'goerli',
+    11155111: 'sepolia',
+  })
+}
+
+export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
+	'ethereum': 'Ethereum',
+	'arbitrum': 'Arbitrum',
+  'base': 'Base',
+  ...(process?.env?.REACT_APP_ENV !== 'prod' && {
+    'base-sepolia': 'Base Sepolia',
+    'goerli': "Goerli",
+    'sepolia': 'Sepolia'
+  })
+}
+
+export const NETWORK_NAME_TO_ID : {[key: string]: number} = {
+	'ethereum': 1,
+	'arbitrum': 42161,
+  'base': 8453,
+  ...(process?.env?.REACT_APP_ENV !== 'prod' && {
+    'base-sepolia': 84532,
+    'goerli': 5,
+    'sepolia': 11155111,
+  })
 }
 
 export const IS_GLOBAL_TOP_BANNER_ENABLED = true;
 export const GLOBAL_TOP_BANNER_HEIGHT = 28;
+export const GLOBAL_PAGE_HEIGHT = IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${184 + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 184px)';
+
+export const HOME_ADDRESS_NFT_STAKING_CONTRACT_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '' : '0x5ACD9Aa50B20b6E9F43c43c6Fbd81263D2C03b33';
+export const HOME_ADDRESS_NFT_STAKING_CONTRACT_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia';
 
 export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
