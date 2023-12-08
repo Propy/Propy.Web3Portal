@@ -80,8 +80,11 @@ const BlockNumberContainer = styled.div`
 
 const BlockNumberIndicator = () => {
 
-    const { data: blockNumber } = useBlockNumber();
-    const { chain } = useNetwork()
+    const { data: blockNumber } = useBlockNumber({
+      watch: true,
+      cacheTime: 5_000,
+    });
+    const { chain } = useNetwork();
 
     const [showSpinner, setShowSpinner] = useState(false)
     const [blockSyncStatus, setBlockSyncStatus] = useState('connecting');

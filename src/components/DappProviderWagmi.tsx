@@ -2,7 +2,7 @@ import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
 
 import { WagmiConfig } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
-import { arbitrum, mainnet } from 'wagmi/chains'
+import { base, arbitrum, mainnet, goerli, sepolia, baseSepolia } from 'wagmi/chains'
 
 import AppContainer from '../containers/AppContainer';
 
@@ -17,7 +17,21 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-const chains = [mainnet, arbitrum]
+const chains = 
+  process?.env?.REACT_APP_ENV === 'prod' ? [
+    base,
+    mainnet,
+    arbitrum,
+  ] :
+  [
+    base,
+    mainnet,
+    arbitrum,
+    goerli,
+    sepolia,
+    baseSepolia,
+  ];
+
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
 
 // 3. Create modal
