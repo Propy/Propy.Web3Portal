@@ -49,7 +49,8 @@ const PageContainer = (props: PropsFromRedux) => {
 
     const windowSize = useWindowSize();
 
-    const [showDesktopMenu, setShowDesktopMenu] = useState(true);
+    const [showDesktopMenu, setShowDesktopMenu] = useState(false);
+    const [isLayoutInitialized, setIsLayoutInitialized] = useState(false);
 
     useLayoutEffect(() => {
         let sizeShowDesktopMenu = 1000;
@@ -58,23 +59,28 @@ const PageContainer = (props: PropsFromRedux) => {
         }else{
           setShowDesktopMenu(true);
         }
+        if(windowSize.width && windowSize.height) {
+          setIsLayoutInitialized(true);
+        }
     }, [windowSize.width, windowSize.height, setShowDesktopMenu]);
 
     return (
         <Navigation>
             <div className={[classes.root, isConsideredMobile ? classes.rootMobile : ""].join(" ")}>
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
-                <Routes>
-                    <Route path="/" element={<HomePage/>} />
-                    <Route path="/my-assets" element={<AccountTokensPage/>} />
-                    <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
-                    <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
-                    <Route path="/account/:accountAddress" element={<AccountTokensPage/>} />
-                    <Route path="/collections" element={<CollectionsPage/>} />
-                    <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
-                    <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
-                    <Route path="/staking" element={<StakingPage/>} />
-                </Routes>
+                {isLayoutInitialized &&
+                  <Routes>
+                      <Route path="/" element={<HomePage/>} />
+                      <Route path="/my-assets" element={<AccountTokensPage/>} />
+                      <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
+                      <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
+                      <Route path="/account/:accountAddress" element={<AccountTokensPage/>} />
+                      <Route path="/collections" element={<CollectionsPage/>} />
+                      <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
+                      <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
+                      <Route path="/staking" element={<StakingPage/>} />
+                  </Routes>
+                }
             </div>
         </Navigation>
     )
