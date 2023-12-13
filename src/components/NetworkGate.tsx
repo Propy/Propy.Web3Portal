@@ -1,16 +1,21 @@
 import React, { useEffect } from 'react';
 
+import { animated, useSpring } from '@react-spring/web'
+
 import { toast } from 'sonner';
 
 import { useAccount, useSwitchNetwork } from 'wagmi'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
-import NetworkGraphic from '../assets/svg/network_icon.svg'; 
+import NetworkGraphic from '../assets/svg/network_icon.svg';
+import WalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownContainer';
 
@@ -43,6 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     mainGraphic: {
       width: 250,
+      height: 250,
       opacity: 0.15
     },
   }),
@@ -51,7 +57,8 @@ const useStyles = makeStyles((theme: Theme) =>
 interface INetworkGate {
   children: React.ReactElement,
   requiredNetwork: string,
-  onlyConnected?: boolean,
+  onlyGateConnected?: boolean,
+  requireConnected?: boolean,
 }
 
 export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
@@ -60,7 +67,8 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
     children,
     activeNetwork,
     requiredNetwork,
-    onlyConnected,
+    onlyGateConnected,
+    requireConnected,
   } = props;
 
   const classes = useStyles();
@@ -83,13 +91,51 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
     }
   }, [error])
 
+  const { open } = useWeb3Modal();
+
+  const connectSpring = useSpring({
+    from: {
+      opacity: 0,
+      transform: 'rotate(-22deg)',
+    },
+    to: {
+      opacity: !address ? 1 : 0,
+      transform: !address ? 'rotate(0deg)' : 'rotate(-22deg)',
+    },
+  })
+
+  const chainSpring = useSpring({
+    from: {
+      opacity: 0,
+      transform: 'rotate(-22deg)',
+    },
+    to: {
+      opacity: !address ? 0 : 1,
+      transform: !address ? 'rotate(-22deg)' : 'rotate(0deg)',
+    },
+  })
+
   return (
     <>
-      {(requiredNetwork !== activeNetwork) && ((onlyConnected && address) || !onlyConnected) &&
+      {(requireConnected && !onlyGateConnected && !address) &&
         <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT}}>
-          <div className={classes.sectionSpacer}>
+          <animated.div className={classes.sectionSpacer} style={connectSpring}>
+            <WalletIcon className={classes.mainGraphic} />
+          </animated.div>
+          <Typography variant="h4" className={classes.title}>
+            Connect Wallet
+          </Typography>
+          <Typography variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
+            Please connect your wallet to continue
+          </Typography>
+          <Button variant={'outlined'} color={"primary"} onClick={() => open()}>{"Connect Wallet"}</Button>
+        </div>
+      }
+      {(requiredNetwork !== activeNetwork) && ((onlyGateConnected && address) || !onlyGateConnected) &&
+        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT}}>
+          <animated.div className={classes.sectionSpacer} style={chainSpring}>
             <img className={classes.mainGraphic} src={NetworkGraphic} alt="Network Graphic"/>
-          </div>
+          </animated.div>
           <Typography variant="h4" className={classes.title}>
             Network Checkpoint
           </Typography>
@@ -99,7 +145,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isLoading} onClickOverride={() => switchNetwork && switchNetwork(NETWORK_NAME_TO_ID[requiredNetwork])} />
         </div>
       }
-      {((requiredNetwork === activeNetwork) || (onlyConnected && !address)) &&
+      {((requiredNetwork === activeNetwork) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address)) &&
         <>
           {children}
         </>

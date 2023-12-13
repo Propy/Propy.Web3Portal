@@ -1,7 +1,5 @@
 import React from 'react';
 
-import leaflet from 'leaflet';
-
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 
 import MarkerClusterGroup from 'react-leaflet-cluster'
@@ -36,18 +34,21 @@ interface ILeafletMap {
 const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
 
   const {
-    zoom = 6,
+    zoom = 2,
     zoomControl = true,
     dragging = true,
     doubleClickZoom = true,
     scrollWheelZoom = true,
     markers = [],
-    center = [38.171368, -95.430112]
+    center = [0, 0]
   } = props;
 
-  let corner1 = leaflet.latLng(53.466832, -133.789535);
-  let corner2 = leaflet.latLng(21.583438, -57.764142);
-  let bounds = leaflet.latLngBounds(corner1, corner2);
+  // zoom = 6 = US zoom on desktop
+  // center = [38.171368, -95.430112] = middle area US
+
+  // let corner1 = leaflet.latLng(53.466832, -133.789535);
+  // let corner2 = leaflet.latLng(21.583438, -57.764142);
+  // let bounds = leaflet.latLngBounds(corner1, corner2);
 
   return (
     <MapContainer
@@ -60,8 +61,8 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       scrollWheelZoom={scrollWheelZoom}
       center={center}
       boundsOptions={{padding: [50, 50]}}
-      maxBounds={bounds}
-      minZoom={4}
+      // maxBounds={bounds}
+      minZoom={2}
       maxBoundsViscosity={0.7}
     >
       <TileLayer

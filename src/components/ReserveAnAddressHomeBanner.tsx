@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
@@ -18,6 +18,19 @@ import MapCard from './MapCard';
 import RaTier1Icon from '../assets/svg/ra_tier_1.svg';
 import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
 import RaTier3Icon from '../assets/svg/ra_tier_3.svg';
+
+import {
+  NFTService,
+} from '../services/api';
+
+import {
+  COLLECTIONS_PAGE_ENTRIES,
+} from '../utils/constants';
+
+import {
+  ICoordinate,
+  IRecentlyMintedResult
+} from '../interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,11 +83,58 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const maxEntries = 10000;
+
 const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
 
   let {
     isConsideredMobile,
   } = props;
+
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propy-home-nft' : 'propy-home-nft-dev-testnet'));
+
+  const [nftCoordinates, setNftCoordinates] = useState<ICoordinate[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCollection = async () => {
+      if(collectionConfigEntry) {
+        let collectionResponse = await NFTService.getCollectionPaginated(
+          collectionConfigEntry.network,
+          collectionConfigEntry.address,
+          10,
+          1,
+        )
+        // setIsLoading(false);
+        if(collectionResponse?.status && collectionResponse?.data && isMounted) {
+          let renderResults : ICoordinate[] = [];
+          let apiResponseData : IRecentlyMintedResult = collectionResponse.data;
+          if(collectionResponse?.status && apiResponseData?.data) {
+            for(let nftRecord of apiResponseData?.data) {
+              if(nftRecord.metadata) {
+                let parsedMetadata = JSON.parse(nftRecord.metadata);
+                if(parsedMetadata.longitude && parsedMetadata.latitude && (renderResults.length < maxEntries)) {
+                  renderResults.push({
+                    latitude: parsedMetadata.latitude,
+                    longitude: parsedMetadata.longitude
+                  });
+                }
+              }
+            }
+          }
+          setNftCoordinates(renderResults);
+        } else {
+          setNftCoordinates([]);
+        }
+      }else {
+        setNftCoordinates([]);
+      }
+    }
+    fetchCollection();
+    return () => {
+      isMounted = false;
+    }
+  }, [collectionConfigEntry])
 
   const classes = useStyles();
 
@@ -91,67 +151,15 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
           Inching closer to a future where tokenized real-estate could be used as collateral in on-chain protocols
         </Typography>
         <MapCard 
-          height="500px"
-          zoom={4}
-          // zoomControl={false}
-          // dragging={false}
-          // doubleClickZoom={false}
-          scrollWheelZoom={false}
-          center={[38.171368, -95.430112]}
-          markers={[
-              {
-                  latitude: 25.74738836656242,
-                  longitude: -80.21081450527502
-              },
-              {
-                  latitude: 27.80123919186629, 
-                  longitude: -82.69137347243559,
-              },
-              {
-                  latitude: 28.80024277241692, 
-                  longitude: -81.26515531356154,
-              },
-              {
-                  latitude: 28.771281831838856, 
-                  longitude: -82.48445286471406,
-              },
-              {
-                  latitude: 26.133741738269627,
-                  longitude: -81.76728638767402,
-              },
-              {
-                latitude: 39.634074889192846,
-                longitude: -104.98173553916226
-              },
-              {
-                latitude: 39.86900286792705,
-                longitude: -105.0357852243619
-              },
-              {
-                latitude: 38.82028017903629,
-                longitude: -104.78480967285692
-              },
-              {
-                latitude: 38.79371781343436,
-                longitude: -104.8428600551695
-              },
-              {
-                latitude: 33.43829494460039,
-                longitude:  -112.13701636985634
-              },
-              {
-                latitude: 33.3380512440426,
-                longitude: -111.77467139320312
-              },
-              {
-                latitude: 33.67367409702406,
-                longitude: -112.28221200657671
-              },
-              {
-                latitude: 45.480896580693766,
-                longitude: -122.69693903068564
-              }
-          ]}
+          height="550px"
+          zoom={2}
+          zoomControl={true}
+          dragging={true}
+          doubleClickZoom={true}
+          scrollWheelZoom={true}
+          // center={[38.171368, -95.430112]} // US center
+          center={[24.424473, 10.059095]}
+          markers={nftCoordinates}
       />
       </div>
       <div>
@@ -219,7 +227,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Speed up the buying & selling process, potentially use NFT as on-chain collateral
                   </Typography>
                   <Button variant="outlined" color="secondary">
-                    In Development
+                    5000 PRO
                   </Button>
                 </CardActionArea>
               </LinkWrapper>
