@@ -14,7 +14,7 @@ import createStyles from '@mui/styles/createStyles';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-import NetworkGraphic from '../assets/png/network-icon-compressed.png';
+import NetworkGraphic from '../assets/img/network-icon-compressed.png';
 import WalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownContainer';
