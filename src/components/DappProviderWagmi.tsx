@@ -2,7 +2,7 @@ import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
 
 import { WagmiConfig } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
-import { base, arbitrum, mainnet, goerli, sepolia, baseSepolia } from 'wagmi/chains'
+import { base, mainnet, sepolia, baseSepolia } from 'wagmi/chains'
 
 import AppContainer from '../containers/AppContainer';
 
@@ -19,15 +19,12 @@ const metadata = {
 
 const chains = 
   process?.env?.REACT_APP_ENV === 'prod' ? [
-    base,
     mainnet,
-    arbitrum,
+    base,
   ] :
   [
-    base,
     mainnet,
-    arbitrum,
-    goerli,
+    base,
     sepolia,
     baseSepolia,
   ];
