@@ -13,7 +13,7 @@ const StakingPage = () => {
       <GenericPageContainer>
         <NetworkGateContainer
           requiredNetwork={HOME_ADDRESS_NFT_STAKING_CONTRACT_NETWORK}
-          onlyConnected={true}
+          onlyGateConnected={true}
         >
           <h1>Passed Network Gate</h1>
         </NetworkGateContainer>

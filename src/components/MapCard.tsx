@@ -23,9 +23,9 @@ interface IMapCardProps {
 const MapCard = (props: IMapCardProps) => {
 
   const {
-    height = "290px",
+    height = "320px",
     width = "100%",
-    zoom = 6,
+    zoom = 2,
     zoomControl = true,
     dragging = true,
     doubleClickZoom = true,

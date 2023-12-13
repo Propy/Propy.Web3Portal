@@ -1,3 +1,7 @@
+import {
+  SupportedNetworks,
+} from '../interfaces';
+
 export const STAKING_CONTRACT = '0x00000000219ab540356cBB839Cbe05303d7705Fa'
 
 // export const API_ENDPOINT = "http://localhost:8420";
@@ -99,6 +103,45 @@ export const NETWORK_NAME_TO_ID : {[key: string]: number} = {
     'goerli': 5,
     'sepolia': 11155111,
   })
+}
+
+export const BRIDGE_SELECTION_TO_REQUIRED_NETWORK : {[key: string]: SupportedNetworks} = {
+  'ethereum-to-base': process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia',
+  'base-to-ethereum': process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia',
+}
+
+export const ETHEREUM_TO_BASE_BRIDGE = process?.env?.REACT_APP_ENV === 'prod' ? "0x3154Cf16ccdb4C6d922629664174b904d80F2C35" : "0xfd0Bf71F60660E2f608ed56e1659C450eB113120";
+export const BASE_TO_ETHEREUM_BRIDGE = process?.env?.REACT_APP_ENV === 'prod' ? "0x4200000000000000000000000000000000000010" : "0x4200000000000000000000000000000000000010";
+export const PRO_ETHEREUM_L1_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0xa7423583D3b0B292E093aAC2f8900396EC110960";
+export const PRO_BASE_L2_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0x15269C6bDfe0bD1A107e1eEcF3200664D40bc042";
+
+export const BRIDGE_SELECTION_TO_ORIGIN_AND_DESTINATION_NETWORK : {[key: string]: {
+  bridgeAddress: `0x${string}`,
+  origin: SupportedNetworks,
+  destination: SupportedNetworks,
+  originAssetAddress: `0x${string}`,
+  originAssetDecimals: number,
+  destinationAssetAddress: `0x${string}`
+  destinationAssetDecimals: number,
+}} = {
+  'ethereum-to-base': {
+    bridgeAddress: ETHEREUM_TO_BASE_BRIDGE,
+    origin: process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia',
+    destination: process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia',
+    originAssetAddress: PRO_ETHEREUM_L1_ADDRESS,
+    originAssetDecimals: 8,
+    destinationAssetAddress: PRO_BASE_L2_ADDRESS,
+    destinationAssetDecimals: 18,
+  },
+  'base-to-ethereum': {
+    bridgeAddress: BASE_TO_ETHEREUM_BRIDGE,
+    origin: process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia',
+    destination: process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia',
+    originAssetAddress: PRO_BASE_L2_ADDRESS,
+    originAssetDecimals: 18,
+    destinationAssetAddress: PRO_ETHEREUM_L1_ADDRESS,
+    destinationAssetDecimals: 8,
+  },
 }
 
 export const IS_GLOBAL_TOP_BANNER_ENABLED = true;

@@ -117,6 +117,14 @@ export const NFTService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
   },
+  async getCoordinatesPaginated(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    perPage: number,
+    page: number,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
+  },
   async getRecentlyMintedPaginated(
     perPage: number,
     page: number,

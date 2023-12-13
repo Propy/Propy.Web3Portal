@@ -112,8 +112,15 @@ export interface INFTRecord {
     metadata: string,
     balances?: IBalanceRecord[],
     asset?: IAssetRecord,
+    longitude?: number,
+    latitude?: number,
     transfer_events_erc721?: ITransferEventERC721Record[];
-  }
+}
+
+export interface ICoordinate {
+    longitude: number
+    latitude: number
+}
 
 export interface IPagination {
     total?: number

@@ -4,6 +4,7 @@ import Fab from '@mui/material/Fab';
 import Checkbox from '@mui/material/Checkbox';
 import UncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckedIcon from '@mui/icons-material/TaskAlt';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface IFloatingActionButton {
   id?: string
@@ -17,6 +18,14 @@ interface IFloatingActionButton {
   component?: "button" | "div"
   disabled?: boolean
   onClick?: () => void
+  showLoadingIcon?: boolean
+}
+
+const getCircularProgressColor = (color: IFloatingActionButton["buttonColor"]) => {
+  if(color === 'primary') {
+    return '#bdbdbd';
+  }
+  return "";
 }
 
 const FloatingActionButton = (props: IFloatingActionButton) => {
@@ -32,6 +41,7 @@ const FloatingActionButton = (props: IFloatingActionButton) => {
       className = "",
       component = "button",
       disabled = false,
+      showLoadingIcon = false,
       onClick,
     } = props;
 
@@ -47,6 +57,9 @@ const FloatingActionButton = (props: IFloatingActionButton) => {
         style={{color: textColor, lineHeight: 1.1}}
         {...(id && { id })}
       >
+        {showLoadingIcon &&
+          <CircularProgress color="inherit" style={{height: '18px', width: '18px', marginRight: '8px', color: getCircularProgressColor(buttonColor)}} />
+        }
         {checkboxMode &&
           <Checkbox
             checked={checked}

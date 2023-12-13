@@ -36,6 +36,7 @@ import {
 interface IMenuEntry {
   text: string
   path?: string
+  pathExtended?: string
   icon: any
   externalLink?: string
   onlyConnected?: boolean
@@ -55,13 +56,14 @@ const navigationMenu : IMenuEntry[] = [
     onlyConnected: true,
   },
   {
-    text: 'Staking',
-    path: '/staking',
+    text: 'Stake',
+    path: '/stake',
     icon: <StakingIcon />,
   },
   {
-    text: 'Bridging',
-    path: '/bridging',
+    text: 'Bridge',
+    path: '/bridge',
+    pathExtended: '/bridge/:bridgeSelection',
     icon: <BridgeIcon />,
   },
   {
@@ -242,7 +244,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                         toggleOpenCollapseState(index)
                                       }
                                     }}
-                                    className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                    className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                     sx={{
                                       "&:hover": {
                                         backgroundColor: darkMode ? "transparent" : "#ffffff",
@@ -251,7 +253,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                     }}
                                     disableRipple
                                   >
-                                      <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
                                       <ListItemText sx={{
                                         "& .MuiTypography-root": {
                                           fontWeight: 'inherit'
@@ -273,7 +275,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                         <div
-                                          className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
+                                          className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
                                         >
                                           <ListItemButton
                                             onClick={() => {
