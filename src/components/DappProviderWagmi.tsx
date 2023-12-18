@@ -2,7 +2,7 @@ import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
 
 import { WagmiConfig } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
-import { base, mainnet, sepolia, baseSepolia } from 'wagmi/chains'
+import { base, mainnet, sepolia, baseSepolia, goerli, baseGoerli } from 'wagmi/chains'
 
 import AppContainer from '../containers/AppContainer';
 
@@ -27,6 +27,8 @@ const chains =
     base,
     sepolia,
     baseSepolia,
+    goerli,
+    baseGoerli,
   ];
 
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })

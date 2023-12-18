@@ -72,6 +72,9 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
       case 'base-sepolia':
         networkImage = BaseLogo;
         break;
+      case 'base-goerli':
+        networkImage = BaseLogo;
+        break;
       case 'base':
         networkImage = BaseLogo;
         break;

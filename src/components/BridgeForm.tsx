@@ -175,7 +175,7 @@ const HelperTextTop = (props: IHelperTextMaxSelection) => {
       {
         (origin && (Number(balance) > 0) && destinationAssetDecimals && originAssetDecimals && (['base','base-sepolia'].indexOf(origin) > -1)) &&
         <Typography variant="subtitle2" style={{textAlign: 'right', cursor: 'pointer', fontWeight: 'bold'}} onClick={() => setFieldValue('proAmount', balance)}>
-          ≈ {priceFormat(utils.formatUnits(new BigNumber(rawBalance ? rawBalance.toString() : "0").shiftedBy(originAssetDecimals - destinationAssetDecimals).toString(), 18), 2, 'L1 PRO')}
+          ≈ {priceFormat(utils.formatUnits(new BigNumber(rawBalance ? rawBalance.toString() : "0").shiftedBy((destinationAssetDecimals - originAssetDecimals) * -1).toString(), 18), 2, 'L1 PRO')}
         </Typography>
       }
     </div>
