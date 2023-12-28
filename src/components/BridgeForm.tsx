@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 
 import { animated, useSpring } from '@react-spring/web';
 
@@ -29,7 +29,7 @@ import { TextField } from 'formik-mui';
 import { PropsFromRedux } from '../containers/BridgeFormContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base.png';
+import BaseLogo from '../assets/img/base-solid.png';
 
 import FloatingActionButton from './FloatingActionButton';
 
@@ -42,11 +42,19 @@ import {
 import {
   NETWORK_NAME_TO_DISPLAY_NAME,
   PROPY_LIGHT_BLUE,
+  NETWORK_NAME_TO_ID,
+  L2_TO_L1_MESSAGE_PASSER_ADDRESS,
+  OPTIMISM_PORTAL_ADDRESS,
+  L2_OUTPUT_ORACLE,
 } from '../utils/constants';
 
 import ERC20ABI from '../abi/ERC20ABI.json';
 import L1StandardBridgeABI from '../abi/L1StandardBridgeABI.json';
 import L2StandardBridgeABI from '../abi/L2StandardBridgeABI.json';
+
+import { usePrepareProveWithdrawal } from '../hooks/usePrepareProveWithdrawal';
+import { usePrepareFinalizeWithdrawal } from '../hooks/usePrepareFinalizeWithdrawal';
+import { useBlockNumberOfLatestL2OutputProposal } from '../base-bridge/hooks/useBlockNumberOfLatestL2OutputProposal';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -141,10 +149,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const getNetworkIcon = (network: SupportedNetworks) => {
-  if(['ethereum', 'sepolia'].indexOf(network) > -1) {
+  if(['ethereum', 'sepolia', 'goerli'].indexOf(network) > -1) {
     return EthLogo;
   }
-  if(['base', 'base-sepolia'].indexOf(network) > -1) {
+  if(['base', 'base-sepolia', 'base-goerli'].indexOf(network) > -1) {
     return BaseLogo;
   }
 }
@@ -170,12 +178,12 @@ const HelperTextTop = (props: IHelperTextMaxSelection) => {
   return (
     <div style={{display: 'flex', justifyContent: 'right', marginBottom: 4, flexDirection: 'column'}}>
       <Typography variant="subtitle2" style={{textAlign: 'right', fontWeight: 400, cursor: 'pointer'}} onClick={() => setFieldValue('proAmount', balance)}>
-        Balance: {balance}{origin && ['base','base-sepolia'].indexOf(origin) > -1 ? ' Base' : ''} PRO
+        Balance: {balance}{origin && ['base','base-sepolia','base-goerli'].indexOf(origin) > -1 ? ' Base' : ''} PRO
       </Typography>
       {
-        (origin && (Number(balance) > 0) && destinationAssetDecimals && originAssetDecimals && (['base','base-sepolia'].indexOf(origin) > -1)) &&
+        (origin && (Number(balance) > 0) && destinationAssetDecimals && originAssetDecimals && (['base','base-sepolia','base-goerli'].indexOf(origin) > -1)) &&
         <Typography variant="subtitle2" style={{textAlign: 'right', cursor: 'pointer', fontWeight: 'bold'}} onClick={() => setFieldValue('proAmount', balance)}>
-          ≈ {priceFormat(utils.formatUnits(new BigNumber(rawBalance ? rawBalance.toString() : "0").shiftedBy(originAssetDecimals - destinationAssetDecimals).toString(), 18), 2, 'L1 PRO')}
+          ≈ {priceFormat(utils.formatUnits(new BigNumber(rawBalance ? rawBalance.toString() : "0").shiftedBy((destinationAssetDecimals - originAssetDecimals) * -1).toString(), 18), 2, 'L1 PRO')}
         </Typography>
       }
     </div>
@@ -241,10 +249,10 @@ const getBridgeButtonText = (
 }
 
 const getTransitTime = (origin: string, destination: string) => {
-  if(['ethereum', 'sepolia'].indexOf(origin) > -1 && ['base', 'base-sepolia'].indexOf(destination)) {
+  if(['ethereum', 'sepolia', 'goerli'].indexOf(origin) > -1 && ['base', 'base-sepolia', 'base-goerli'].indexOf(destination)) {
     return `~ 20 minutes`;
   }
-  if(['base', 'base-sepolia'].indexOf(origin) > -1 && ['ethereum', 'sepolia'].indexOf(destination)) {
+  if(['base', 'base-sepolia', 'base-goerli'].indexOf(origin) > -1 && ['ethereum', 'sepolia', 'base-goerli'].indexOf(destination)) {
     return `~ 1 week`;
   }
 }
@@ -271,6 +279,33 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
   const { 
     address,
   } = useAccount();
+
+  const blockNumberOfLatestL2OutputProposal = useBlockNumberOfLatestL2OutputProposal(
+    L2_OUTPUT_ORACLE,
+    NETWORK_NAME_TO_ID[destination].toString()
+  );
+
+  console.log({blockNumberOfLatestL2OutputProposal, blockNumberOfLatestL2OutputProposalString: blockNumberOfLatestL2OutputProposal?.toString() })
+
+  const proveWithdrawalConfig = usePrepareProveWithdrawal(
+    "0xa16ec296fbbee911764c83af54a0061b03e184e1c9d2e15cf58a3e7f9f1a11e3",
+    blockNumberOfLatestL2OutputProposal ? blockNumberOfLatestL2OutputProposal : BigInt(0),
+    NETWORK_NAME_TO_ID[origin].toString(),
+    NETWORK_NAME_TO_ID[destination].toString(),
+    L2_TO_L1_MESSAGE_PASSER_ADDRESS,
+    OPTIMISM_PORTAL_ADDRESS,
+    L2_OUTPUT_ORACLE
+  );
+
+  const { writeAsync: submitProof } = useContractWrite(proveWithdrawalConfig);
+
+  const finalizeWithdrawalConfig = usePrepareFinalizeWithdrawal(
+    "0xa16ec296fbbee911764c83af54a0061b03e184e1c9d2e15cf58a3e7f9f1a11e3",
+    NETWORK_NAME_TO_ID[origin].toString(),
+    NETWORK_NAME_TO_ID[destination].toString(),
+    OPTIMISM_PORTAL_ADDRESS,
+  )
+  const { writeAsync: submitFinalizeWithdrawal } = useContractWrite(finalizeWithdrawalConfig);
 
   const formikRef = useRef<FormikProps<{[field: string]: any}>>();
 
@@ -458,6 +493,42 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   console.log('balance?.data', balance?.data);
 
+  const handleProveWithdrawal = useCallback(() => {
+    // setModalProveTxHash(undefined);
+    // onOpenProveWithdrawalModal();
+    void (async () => {
+      try {
+        const proveResult = await submitProof?.();
+        console.log({proveResult})
+        if (proveResult?.hash) {
+          // const proveTxHash = proveResult.hash;
+        }
+      } catch {
+        // onCloseProveWithdrawalModal();
+      }
+    })();
+  }, [
+    submitProof,
+  ]);
+
+  const handleFinalizeWithdrawal = useCallback(() => {
+    // setModalProveTxHash(undefined);
+    // onOpenProveWithdrawalModal();
+    void (async () => {
+      try {
+        const proveResult = await submitFinalizeWithdrawal?.();
+        console.log({proveResult})
+        if (proveResult?.hash) {
+          // const proveTxHash = proveResult.hash;
+        }
+      } catch {
+        // onCloseProveWithdrawalModal();
+      }
+    })();
+  }, [
+    submitFinalizeWithdrawal,
+  ]);
+
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
@@ -483,7 +554,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
             validationSchema={ValidationSchema}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                if(["ethereum", "sepolia"].indexOf(origin) > -1) {
+                if(["ethereum", "sepolia", "goerli"].indexOf(origin) > -1) {
                   if(isSufficientAllowance(Number(dataL1BridgePROAllowance ? dataL1BridgePROAllowance : 0), values.proAmount.toString(), originAssetDecimals)) {
                     setIsAwaitingPerformTx(true);
                     setIsAwaitingWalletInteraction(true);
@@ -503,14 +574,14 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                     ]})
                   }
                 }
-                if(["base", "base-sepolia"].indexOf(origin) > -1) {
+                if(["base", "base-sepolia", 'base-goerli'].indexOf(origin) > -1) {
                   if(isSufficientAllowance(Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0), values.proAmount.toString(), originAssetDecimals)) {
                     setIsAwaitingPerformTx(true);
                     setIsAwaitingWalletInteraction(true);
                     await writePerformBridgeL2({args: [
                       originAssetAddress,
                       utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
-                      1,
+                      150000,
                       '0x0'
                     ]});
                   } else {
@@ -547,7 +618,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                       required
                       name="proAmount"
                       type="number"
-                      label={`${origin && ['base','base-sepolia'].indexOf(origin) > -1 ? 'Base ' : ''}PRO Amount`}
+                      label={`${origin && ['base','base-sepolia','base-goerli'].indexOf(origin) > -1 ? 'Base ' : ''}PRO Amount`}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         handleChange(event)
                       }}
@@ -570,7 +641,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                   </Grid> */}
                   <Grid item xs={12} sm={12} md={12} lg={12}>
                     <div className={classes.submitButtonContainer}>
-                      {(['ethereum','sepolia'].indexOf(origin) > -1) &&
+                      {(['ethereum','sepolia','goerli'].indexOf(origin) > -1) &&
                         <FloatingActionButton
                           className={classes.submitButton}
                           buttonColor="secondary"
@@ -580,7 +651,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                           text={getBridgeButtonText(origin, destination, Number(dataL1BridgePROAllowance ? dataL1BridgePROAllowance : 0), values.proAmount ? values.proAmount.toString() : "0", originAssetDecimals, isAwaitingWalletInteraction, isAwaitingApproveTx, isAwaitingPerformTx)}
                         />
                       }
-                      {(['base','base-sepolia'].indexOf(origin) > -1) &&
+                      {(['base','base-sepolia','base-goerli'].indexOf(origin) > -1) &&
                         <FloatingActionButton
                           className={classes.submitButton}
                           buttonColor="secondary"
@@ -596,6 +667,8 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
               </Form>
             )}
           </Formik>
+          <button onClick={handleProveWithdrawal}>Submit Proof</button>
+          <button onClick={handleFinalizeWithdrawal}>Finalize Withdrawal</button>
           {/* <Typography variant="subtitle1" className={classes.cardSubtitle}>Bridge time: ~ 20 minutes</Typography> */}
         </div>
       </Card>

@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import DarkModeIcon from '@mui/icons-material/NightsStay';
 import LightModeIcon from '@mui/icons-material/WbSunny';
+import MenuIcon from '@mui/icons-material/Menu';
 
 import LogoDarkMode from '../assets/svg/propy-dark-mode.svg'
 import LogoLightMode from '../assets/svg/propy-light-mode.svg'
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
     },
     menuButton: {
-      marginRight: theme.spacing(2),
+      
     },
     title: {
       flexGrow: 1,
@@ -63,6 +64,8 @@ const NavigationTopBar = (props: PropsFromRedux) => {
 
   let {
     darkMode,
+    showLeftMenu,
+    setShowLeftMenu,
     isConsideredMobile,
   } = props;
 
@@ -72,15 +75,6 @@ const NavigationTopBar = (props: PropsFromRedux) => {
     <div className={classes.root}>
       <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBar} position="fixed">
         <Toolbar>
-          {/* <IconButton
-            onClick={() => props.setShowLeftMenu(!localShowLeftMenu)}
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="menu"
-            size="large">
-            <MenuIcon />
-          </IconButton> */}
           <img onClick={() => navigate('/')} height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
           <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
             dApp
@@ -94,6 +88,17 @@ const NavigationTopBar = (props: PropsFromRedux) => {
               className={classes.margin}
               size="large">
               {darkMode ? <LightModeIcon/> : <DarkModeIcon />}
+            </IconButton>
+          }
+          {isConsideredMobile &&
+            <IconButton
+              onClick={() => setShowLeftMenu(!showLeftMenu)}
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+              size="large">
+              <MenuIcon />
             </IconButton>
           }
         </Toolbar>

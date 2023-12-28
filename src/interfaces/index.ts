@@ -21,7 +21,7 @@ export interface IEVMTransactionRecord {
     value: string;
 }
 
-export type SupportedNetworks = 'ethereum' | 'arbitrum' | 'base' | 'base-sepolia' | 'goerli' | 'sepolia' | 'unsupported';
+export type SupportedNetworks = 'ethereum' | 'arbitrum' | 'base' | 'base-sepolia' | 'base-goerli' | 'goerli' | 'sepolia' | 'unsupported';
 
 export type TokenStandard = "ERC-20" | "ERC-721";
 
@@ -145,6 +145,18 @@ export interface IRecentlyMintedResult {
     metadata: {
         pagination: IPagination,
     }
+}
+
+export interface INFTCoordinateResponse {
+    data: INFTCoordinateEntry[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
+export interface INFTCoordinateEntry {
+    longitude: string;
+    latitude: string;
 }
 
 export interface IOwnedBalancesResult {

@@ -145,7 +145,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isLoading} onClickOverride={() => switchNetwork && switchNetwork(NETWORK_NAME_TO_ID[requiredNetwork])} />
         </div>
       }
-      {((requiredNetwork === activeNetwork) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address)) &&
+      {((requiredNetwork === activeNetwork) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address) || (onlyGateConnected && address)) &&
         <>
           {children}
         </>
