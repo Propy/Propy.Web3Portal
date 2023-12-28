@@ -20,7 +20,12 @@ export const centerShortenLongString = (string: string, maxLength: number) => {
 	}
 }
 
-const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
+enum ExtraChainId {
+	Base = 8453,
+	BaseSepolia = 84532,
+}
+
+const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId | ExtraChainId]?: string } = {
 	1: 'etherscan.io',
 	3: 'ropsten.etherscan.io',
 	4: 'rinkeby.etherscan.io',
@@ -51,7 +56,9 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
 	10: '',
 	42161: 'arbiscan.io',
 	421611: '',
-	11155111: 'sepolia.etherscan.io'
+	11155111: 'sepolia.etherscan.io',
+	84532: 'base-sepolia.blockscout.com',
+	8453: 'basescan.org/',
 }
 
 export function getEtherscanLinkByChainId(

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Link } from "react-router-dom";
 
+import ExternalLinkIcon from '@mui/icons-material/Launch';
+
 import { ExternalLink } from './ExternalLink';
 
 interface ILinkWrapper {
@@ -10,6 +12,7 @@ interface ILinkWrapper {
   className?: string,
   children: React.ReactNode,
   onClick?: () => void,
+  showExternalLinkIcon?: boolean,
 }
 
 // we use this component to dynamically handle internal links and external links
@@ -21,11 +24,15 @@ const LinkWrapper = (props: ILinkWrapper) => {
     className,
     children,
     onClick,
+    showExternalLinkIcon = false,
   } = props;
   if(external && link) {
     return (
-      <ExternalLink className={[className, 'no-decorate', 'inherit-color'].join(" ")} href={link}>
+      <ExternalLink className={[className, 'no-decorate', 'inherit-color'].join(" ")} style={{display: 'flex', alignItems: 'center'}} href={link}>
         {children}
+        {showExternalLinkIcon &&
+          <ExternalLinkIcon style={{marginLeft: 4}} />
+        }
       </ExternalLink>
     )
   }

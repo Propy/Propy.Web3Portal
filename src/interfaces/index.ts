@@ -147,6 +147,18 @@ export interface IRecentlyMintedResult {
     }
 }
 
+export interface INFTCoordinateResponse {
+    data: INFTCoordinateEntry[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
+export interface INFTCoordinateEntry {
+    longitude: string;
+    latitude: string;
+}
+
 export interface IOwnedBalancesResult {
     data: {
         [key: string]: {

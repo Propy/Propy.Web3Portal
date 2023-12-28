@@ -29,7 +29,7 @@ import {
 
 import {
   ICoordinate,
-  IRecentlyMintedResult
+  INFTCoordinateResponse,
 } from '../interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -99,26 +99,23 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
     let isMounted = true;
     const fetchCollection = async () => {
       if(collectionConfigEntry) {
-        let collectionResponse = await NFTService.getCollectionPaginated(
+        let collectionResponse = await NFTService.getCoordinatesPaginated(
           collectionConfigEntry.network,
           collectionConfigEntry.address,
-          10,
+          1000,
           1,
         )
         // setIsLoading(false);
         if(collectionResponse?.status && collectionResponse?.data && isMounted) {
           let renderResults : ICoordinate[] = [];
-          let apiResponseData : IRecentlyMintedResult = collectionResponse.data;
+          let apiResponseData : INFTCoordinateResponse = collectionResponse.data;
           if(collectionResponse?.status && apiResponseData?.data) {
             for(let nftRecord of apiResponseData?.data) {
-              if(nftRecord.metadata) {
-                let parsedMetadata = JSON.parse(nftRecord.metadata);
-                if(parsedMetadata.longitude && parsedMetadata.latitude && (renderResults.length < maxEntries)) {
-                  renderResults.push({
-                    latitude: parsedMetadata.latitude,
-                    longitude: parsedMetadata.longitude
-                  });
-                }
+              if(nftRecord.longitude && nftRecord.latitude && (renderResults.length < maxEntries)) {
+                renderResults.push({
+                  latitude: Number(nftRecord.latitude),
+                  longitude: Number(nftRecord.longitude)
+                });
               }
             }
           }

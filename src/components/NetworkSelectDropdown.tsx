@@ -11,7 +11,7 @@ import { PropsFromRedux } from '../containers/NetworkSelectDropdownContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
 import ArbitrumLogo from '../assets/img/arbitrum.png';
-import BaseLogo from '../assets/img/base.png';
+import BaseLogo from '../assets/img/base-solid.png';
 
 import { SupportedNetworks } from '../interfaces';
 
@@ -25,6 +25,7 @@ interface INetworkSelectButton {
   onClickOverride?: () => void
   isLoading?: boolean
   color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined
+  width?: string
 }
 
 const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => {
@@ -36,6 +37,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     setActiveNetwork,
     onClickOverride,
     color = "inherit",
+    width = "auto",
   } = props;
 
   const { chain } = useNetwork();
@@ -112,6 +114,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
       variant={'outlined'}
       color={color}
       disabled={isLoading}
+      style={{width: width}}
       className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
     >
       {switchMode && 
