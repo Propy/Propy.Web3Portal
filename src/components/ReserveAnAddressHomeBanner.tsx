@@ -25,6 +25,7 @@ import {
 
 import {
   COLLECTIONS_PAGE_ENTRIES,
+  MINT_AN_ADDRESS_LINK,
 } from '../utils/constants';
 
 import {
@@ -91,7 +92,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
     isConsideredMobile,
   } = props;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propy-home-nft' : 'propy-home-nft-dev-testnet'));
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-testnet'));
 
   const [nftCoordinates, setNftCoordinates] = useState<ICoordinate[]>([]);
 
@@ -163,7 +164,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
         <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>
           <Grid item xs={4} sm={8} md={6} lg={10} xl={10}>
             <Card className={classes.card}>
-              <LinkWrapper link={``}>
+              <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
                     <img src={RaTier1Icon} className={classes.tierIcon}  alt="Tier 1 NFT" />
@@ -186,7 +187,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
           </Grid>
           <Grid item xs={4} sm={8} md={6} lg={10} xl={10}>
             <Card className={classes.card}>
-              <LinkWrapper link={``}>
+              <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
                     <img src={RaTier2Icon} className={classes.tierIcon}  alt="Tier 2 NFT" />
@@ -209,7 +210,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
           </Grid>
           <Grid item xs={4} sm={8} md={12} lg={10} xl={10}>
             <Card className={classes.card}>
-              <LinkWrapper link={``}>
+              <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
                     <img src={RaTier3Icon} className={classes.tierIcon} alt="Tier 3 NFT" />
