@@ -46,6 +46,7 @@ import {
   TOKEN_NAME_PREFIX,
   TOKEN_NAME_HIDE_ID,
   PROPY_LIGHT_BLUE,
+  MINT_AN_ADDRESS_NFT_ADDRESSES,
 } from '../utils/constants';
 
 import {
@@ -106,6 +107,13 @@ const MetadataPRO = {
       value: '57,896,591',
     }
   ]
+}
+
+const getTimelineTitle = (tokenAddress: string | undefined) => {
+  if(tokenAddress && MINT_AN_ADDRESS_NFT_ADDRESSES.indexOf(tokenAddress) > -1) {
+    return "Timeline";
+  }
+  return "Transaction Timeline";
 }
 
 const SingleTokenPage = () => {
@@ -259,7 +267,7 @@ const SingleTokenPage = () => {
                     }
                     {tokenMetadata?.timeline && tokenMetadata?.timeline.length > 0 &&
                       <>
-                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Transaction Timeline"/>
+                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title={getTimelineTitle(tokenAddress)} />
                         <TokenMetadataTimelineContainer timeline={tokenMetadata?.timeline} />
                       </>
                     }

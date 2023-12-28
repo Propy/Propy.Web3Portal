@@ -56,6 +56,11 @@ const COLLECTIONS_ENTRIES_DEV = [
 
 const COLLECTIONS_ENTRIES_PROD = [
   {
+    network: "base",
+    address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+    slug: "propykeys",
+  },
+  {
     network: "ethereum",
     address: "0x2dbC375B35c5A2B6E36A386c8006168b686b70D3",
     slug: "propy-real-world-assets",
@@ -71,6 +76,10 @@ const COLLECTIONS_ENTRIES_PROD = [
     slug: "meta-agents",
   },
 ]
+
+export const MINT_AN_ADDRESS_NFT_ADDRESSES = ["0x45C395851c9BfBd3b7313B35E6Ee460D461d585c", "0xa239b9b3E00637F29f6c7C416ac95127290b950E"];
+
+export const MINT_AN_ADDRESS_LINK = process?.env?.REACT_APP_ENV === 'prod' ? 'https://propykeys.com' : 'https://stage.pk.propy.com';
 
 export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
 	1: 'ethereum',
