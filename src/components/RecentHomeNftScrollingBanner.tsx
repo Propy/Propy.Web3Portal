@@ -15,7 +15,7 @@ import {
 
 import HorizontalScrollingTextBannerContainer from '../containers/HorizontalScrollingTextBannerContainer';
 
-let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propy-home-nft' : 'propy-home-nft-dev-testnet'));
+let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-testnet'));
 
 let maxScrollingEntries = 8;
 
