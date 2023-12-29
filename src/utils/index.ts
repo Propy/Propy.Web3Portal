@@ -57,8 +57,8 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId | ExtraChainId]?: strin
 	42161: 'arbiscan.io',
 	421611: '',
 	11155111: 'sepolia.etherscan.io',
-	84532: 'base-sepolia.blockscout.com',
-	8453: 'basescan.org/',
+	84532: 'sepolia.basescan.org',
+	8453: 'basescan.org',
 }
 
 export function getEtherscanLinkByChainId(
@@ -91,7 +91,9 @@ const ETHERSCAN_PREFIXES_NETWORK_NAME: { [networkName in NetworkName]?: string }
 	'rinkeby': 'rinkeby.etherscan.io',
 	'goerli': 'goerli.etherscan.io',
 	'arbitrum': 'arbiscan.io',
-	'sepolia': 'sepolia.etherscan.io'
+	'sepolia': 'sepolia.etherscan.io',
+	'base-sepolia': 'sepolia.basescan.org',
+	'base': 'basescan.org'
 }
   
 export function getEtherscanLinkByNetworkName(
