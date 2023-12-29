@@ -1,7 +1,7 @@
 import React, {useState, Fragment} from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import makeStyles from '@mui/styles/makeStyles';
 import Drawer from '@mui/material/Drawer';
@@ -13,6 +13,8 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
+import StakingIcon from '@mui/icons-material/Diversity2';
+// import BridgeIcon from '@mui/icons-material/CompareArrows';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
 import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -27,11 +29,14 @@ import useCurrentPath from '../hooks/useCurrentPath';
 
 import {
   PROPY_LIGHT_BLUE,
+  IS_GLOBAL_TOP_BANNER_ENABLED,
+  GLOBAL_TOP_BANNER_HEIGHT,
 } from '../utils/constants';
 
 interface IMenuEntry {
   text: string
   path?: string
+  pathExtended?: string
   icon: any
   externalLink?: string
   onlyConnected?: boolean
@@ -50,6 +55,17 @@ const navigationMenu : IMenuEntry[] = [
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
   },
+  {
+    text: 'Stake',
+    path: '/stake',
+    icon: <StakingIcon />,
+  },
+  // {
+  //   text: 'Bridge',
+  //   path: '/bridge',
+  //   pathExtended: '/bridge/:bridgeSelection',
+  //   icon: <BridgeIcon />,
+  // },
   {
     text: 'Asset Browser',
     path: '/collections',
@@ -144,7 +160,7 @@ const useStyles = makeStyles({
 function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
   const classes = useStyles();
 
-  const { account } = useEthers();
+  const { address } = useAccount();
 
   const {
     darkMode,
@@ -199,7 +215,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 '& .MuiDrawer-paper': {
                   borderRadius: 0,
                   zIndex: 1,
-                  top: 61,
+                  top: IS_GLOBAL_TOP_BANNER_ENABLED ? (61 + GLOBAL_TOP_BANNER_HEIGHT) : 61,
                   backgroundColor: darkMode ? '#141618' : '#F3F3F3',
                 },
               }}
@@ -210,7 +226,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                 >
                   <List>
                       {navigationMenu.map((item, index) => 
-                          (!item.onlyConnected || (item.onlyConnected && account)) ?
+                          (!item.onlyConnected || (item.onlyConnected && address)) ?
                             <Fragment key={`parent-${index}`}>
                               <div
                                 className={classes.entryContainerMargin}
@@ -222,13 +238,15 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <ListItemButton
                                     onClick={() => {
                                       if(item.path) {
-                                        navigate(item.path)
+                                        if(!item.externalLink) {
+                                          navigate(item.path)
+                                        }
                                         props.setShowLeftMenu(false)
                                       } else if (item.children) {
                                         toggleOpenCollapseState(index)
                                       }
                                     }}
-                                    className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                    className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                     sx={{
                                       "&:hover": {
                                         backgroundColor: darkMode ? "transparent" : "#ffffff",
@@ -237,7 +255,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                     }}
                                     disableRipple
                                   >
-                                      <ListItemIcon className={[(item.path && (pathMatch === item.path)) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
                                       <ListItemText sx={{
                                         "& .MuiTypography-root": {
                                           fontWeight: 'inherit'
@@ -259,12 +277,14 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                         <div
-                                          className={[(item.path && (pathMatch === item.path)) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
+                                          className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
                                         >
                                           <ListItemButton
                                             onClick={() => {
                                               if(child.path && child.path.length > 0) {
-                                                navigate(child.path)
+                                                if(!item.externalLink) {
+                                                  navigate(child.path)
+                                                }
                                                 props.setShowLeftMenu(false)
                                               }
                                             }}

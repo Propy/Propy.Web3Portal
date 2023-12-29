@@ -21,7 +21,7 @@ export interface IEVMTransactionRecord {
     value: string;
 }
 
-export type SupportedNetworks = 'ethereum' | 'arbitrum';
+export type SupportedNetworks = 'ethereum' | 'arbitrum' | 'base' | 'base-sepolia' | 'base-goerli' | 'goerli' | 'sepolia' | 'unsupported';
 
 export type TokenStandard = "ERC-20" | "ERC-721";
 
@@ -112,8 +112,15 @@ export interface INFTRecord {
     metadata: string,
     balances?: IBalanceRecord[],
     asset?: IAssetRecord,
+    longitude?: number,
+    latitude?: number,
     transfer_events_erc721?: ITransferEventERC721Record[];
-  }
+}
+
+export interface ICoordinate {
+    longitude: number
+    latitude: number
+}
 
 export interface IPagination {
     total?: number
@@ -140,6 +147,18 @@ export interface IRecentlyMintedResult {
     }
 }
 
+export interface INFTCoordinateResponse {
+    data: INFTCoordinateEntry[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
+export interface INFTCoordinateEntry {
+    longitude: string;
+    latitude: string;
+}
+
 export interface IOwnedBalancesResult {
     data: {
         [key: string]: {
@@ -162,6 +181,7 @@ export interface IAttribute {
 export interface ITokenMetadataTimelineEntry {
     milestone: string;
     due_date?: number;
+    date?: number;
     complete: boolean;
     is_estimate?: boolean;
 }
@@ -173,4 +193,36 @@ export interface ITokenMetadata {
     image: string;
     attributes: IAttribute[];
     timeline?: ITokenMetadataTimelineEntry[];
+}
+
+export interface ISignMessageError {
+    code: number;
+    message: string;
+}
+
+export interface INonceResponse {
+    data: {
+        nonce: number;
+        salt: string;
+    }
+}
+
+export interface IOfferRecord {
+    asset_address: string;
+    offer_token_address: string;
+    offer_token_amount: string;
+    timestamp_unix: number; 
+    token_id: string; 
+    user_address: string;
+    offer_token: IAssetRecord;
+}
+
+export interface ILeafletMapMarker {
+    longitude: number;
+    latitude: number;
+}
+
+export interface IHorizontalScrollingTextEntry {
+    string: string;
+    link?: string;
 }

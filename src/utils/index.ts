@@ -20,12 +20,17 @@ export const centerShortenLongString = (string: string, maxLength: number) => {
 	}
 }
 
-const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
-	1: '',
-	3: 'ropsten.',
-	4: 'rinkeby.',
-	5: 'goerli.',
-	42: 'kovan.',
+enum ExtraChainId {
+	Base = 8453,
+	BaseSepolia = 84532,
+}
+
+const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId | ExtraChainId]?: string } = {
+	1: 'etherscan.io',
+	3: 'ropsten.etherscan.io',
+	4: 'rinkeby.etherscan.io',
+	5: 'goerli.etherscan.io',
+	42: 'kovan.etherscan.io',
 	100: '',
 	1337: '',
 	56: '',
@@ -49,8 +54,11 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId]?: string } = {
 	588: '',
 	69: '',
 	10: '',
-	42161: '',
+	42161: 'arbiscan.io',
 	421611: '',
+	11155111: 'sepolia.etherscan.io',
+	84532: 'base-sepolia.blockscout.com',
+	8453: 'basescan.org/',
 }
 
 export function getEtherscanLinkByChainId(
@@ -58,7 +66,7 @@ export function getEtherscanLinkByChainId(
 	data: string,
 	type: 'transaction' | 'token' | 'address' | 'block'
 ): string {
-	const prefix = `https://${ETHERSCAN_PREFIXES_CHAIN_ID[chainId] || ETHERSCAN_PREFIXES_CHAIN_ID[1]}etherscan.io`
+	const prefix = `https://${ETHERSCAN_PREFIXES_CHAIN_ID[chainId] || ETHERSCAN_PREFIXES_CHAIN_ID[1]}`
 
 	switch (type) {
 		case 'transaction': {
@@ -169,7 +177,7 @@ const getDynamicFormat = (currentFormat = '0,0.00', number: number) => {
 	return dynamicFormat;
 }
 
-export const priceFormat = (number: number, decimals = 2, currency = "$", prefix = true) => {
+export const priceFormat = (number: number | string, decimals = 2, currency = "$", prefix = true) => {
 	let decimalString = "";
 	for(let i = 0; i < decimals; i++){
 			decimalString += "0";
@@ -178,8 +186,8 @@ export const priceFormat = (number: number, decimals = 2, currency = "$", prefix
 			prefix = false;
 	}
 	let format = '0,0.' + decimalString;
-	if(number < 10) {
-			format = getDynamicFormat(format, number);
+	if(Number(number) < 10) {
+			format = getDynamicFormat(format, Number(number));
 	}
 	let result = numeral(number).format(format);
 	if(result === 'NaN') {
@@ -218,3 +226,24 @@ export const parseJwt = (token: string) => {
 export const getCookieValue = (name: string) => (
   document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 )
+
+export const constructSignerMessage = (
+	signerAccount: string,
+	nonce: number,
+	salt: string,
+	actionType: string,
+	metadata: any
+) => {
+	if(!isNaN(nonce) && salt && actionType) {
+		return JSON.stringify({
+			account: signerAccount,
+			action: actionType,
+			metadata,
+			timestamp: Math.floor(new Date().getTime() / 1000),
+			nonce,
+			salt,
+		}, null, 4);
+	} else {
+		return false;
+	}
+}

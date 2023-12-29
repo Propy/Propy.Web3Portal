@@ -119,14 +119,16 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
     }
 
     const renderAttribute = (value: string) => {
-      if(value.indexOf("https://") === 0) {
-        return (
-          <LinkWrapper external={true} link={value}>
-            <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px', color: PROPY_LIGHT_BLUE}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
-          </LinkWrapper>
-        )
+      if(value) {
+        if(value.indexOf("https://") === 0) {
+          return (
+            <LinkWrapper external={true} link={value}>
+              <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px', color: PROPY_LIGHT_BLUE}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
+            </LinkWrapper>
+          )
+        }
+        return <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
       }
-      return <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px'}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
     }
 
     return (
@@ -163,13 +165,20 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                     >
                       {item.sectionId === 'attributes' && tokenMetadata?.attributes && (tokenMetadata?.attributes.length > 0) && 
                         <Grid container spacing={2} columns={12}>
-                          {tokenMetadata?.attributes.map((attributeEntry, attributeIndex) => 
-                            <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
-                              <div className={classes.attributeContainer}>
-                                <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
-                                {renderAttribute(attributeEntry.value)}
-                              </div>
-                            </Grid>
+                          {tokenMetadata?.attributes.map((attributeEntry, attributeIndex) => {
+                            let attributeValue = renderAttribute(attributeEntry.value);
+                            if(attributeValue) {
+                              return (
+                                <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
+                                  <div className={classes.attributeContainer}>
+                                    <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
+                                    {attributeValue}
+                                  </div>
+                                </Grid>
+                              )
+                            }
+                            return null;
+                          }
                           )}
                         </Grid>
                       }

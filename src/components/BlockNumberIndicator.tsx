@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import styled, { keyframes } from 'styled-components'
 import Typography from '@mui/material/Typography';
-import { useBlockNumber, useEthers } from '@usedapp/core'
+import { useBlockNumber, useNetwork } from 'wagmi';
 
 import { getEtherscanLinkByChainId } from '../utils';
 
@@ -79,8 +79,13 @@ const BlockNumberContainer = styled.div`
 `
 
 const BlockNumberIndicator = () => {
-    const blockNumber = useBlockNumber()
-    const { chainId } = useEthers()
+
+    const { data: blockNumber } = useBlockNumber({
+      watch: true,
+      cacheTime: 5_000,
+    });
+    const { chain } = useNetwork();
+
     const [showSpinner, setShowSpinner] = useState(false)
     const [blockSyncStatus, setBlockSyncStatus] = useState('connecting');
 
@@ -114,9 +119,9 @@ const BlockNumberIndicator = () => {
         }
     }, [blockNumber])
     return (blockNumber ?
-        <ExternalLink href={chainId && blockNumber ? getEtherscanLinkByChainId(chainId, blockNumber.toString(), 'block') : ''}>
+        <ExternalLink href={blockNumber && chain?.id ? getEtherscanLinkByChainId(chain.id, blockNumber.toString(), 'block') : ''}>
             <BlockNumberContainer>
-                <StyledPollingDot blockSyncStatus={blockSyncStatus}>{showSpinner && <Spinner/>}</StyledPollingDot><span style={{opacity: !showSpinner ? '0.6' : '0.8'}}><Typography variant="overline" style={{fontFamily: 'monospace', lineHeight: 0}}>{blockNumber}</Typography></span>
+                <StyledPollingDot blockSyncStatus={blockSyncStatus}>{showSpinner && <Spinner/>}</StyledPollingDot><span style={{opacity: !showSpinner ? '0.6' : '0.8'}}><Typography variant="overline" style={{fontFamily: 'monospace', lineHeight: 0}}>{blockNumber.toString()}</Typography></span>
             </BlockNumberContainer>
         </ExternalLink> : null
     )

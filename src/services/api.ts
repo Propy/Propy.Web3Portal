@@ -117,6 +117,14 @@ export const NFTService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
   },
+  async getCoordinatesPaginated(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    perPage: number,
+    page: number,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
+  },
   async getRecentlyMintedPaginated(
     perPage: number,
     page: number,
@@ -132,5 +140,20 @@ export const AccountBalanceService = {
     page: number,
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/balances`, `${account}?perPage=${perPage}&page=${page}`)
+  }
+}
+
+export const SignerService = {
+  async getSignerNonce(signerAddress: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`/signature/nonce`, {
+      signer_address: signerAddress,
+    });
+  },
+  async validateSignedMessageAndPerformAction(plaintextMessage: string, signedMessage: string, signerAddress: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`/signature/perform-action`, {
+      signer_address: signerAddress,
+      plaintext_message: plaintextMessage,
+      signed_message: signedMessage,
+    });
   }
 }

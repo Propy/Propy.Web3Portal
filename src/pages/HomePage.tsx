@@ -4,7 +4,7 @@ import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import {
     COLLECTIONS_PAGE_ENTRIES,
@@ -14,6 +14,7 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 import RecentlyMintedTokensBannerContainer from '../containers/RecentlyMintedTokensBannerContainer';
 import CollectionBannerContainer from '../containers/CollectionBannerContainer';
+import ReserveAnAddressHomeBannerContainer from '../containers/ReserveAnAddressHomeBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,16 +45,19 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const HomePage = () => {
     const classes = useStyles();
-    const { account } = useEthers()
+    const { address } = useAccount();
 
     return (
         <>
             <GenericPageContainer
-                title="Dashboard"
+                // title="Dashboard"
             >
-                {account &&
+                <div className={classes.sectionSpacer}>
+                    <ReserveAnAddressHomeBannerContainer />
+                </div>
+                {address &&
                     <div className={classes.sectionSpacer}>
-                        <AccountTokensBannerContainer account={account} maxRecords={5} showTitle={true} />
+                        <AccountTokensBannerContainer account={address} maxRecords={5} showTitle={true} />
                     </div>
                 }
                 <div className={classes.sectionSpacer}>
@@ -61,7 +65,14 @@ const HomePage = () => {
                 </div>
                 {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry) => 
                     <div className={classes.sectionSpacer}>
-                        <CollectionBannerContainer showCollectionLink={true} maxRecords={5} showTitle={true} network={entry.network} contractNameOrCollectionNameOrAddress={entry.address} collectionSlug={entry.slug} />
+                        <CollectionBannerContainer
+                            showCollectionLink={true}
+                            maxRecords={5}
+                            showTitle={true}
+                            network={entry.network}
+                            contractNameOrCollectionNameOrAddress={entry.address}
+                            collectionSlug={entry.slug}
+                        />
                     </div>
                 )}
             </GenericPageContainer>

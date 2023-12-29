@@ -81,7 +81,7 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
       <div className={getChildContainerClass(isConsideredMobile, isConsideredMedium, title)}>
         {title &&
           <div className={classes.titleContainer}>
-            <Typography variant="h2" component="h2" className={[classes.title].join(" ")}>
+            <Typography variant="h3" component="h2" className={[classes.title].join(" ")}>
               {title}
             </Typography>
           </div>

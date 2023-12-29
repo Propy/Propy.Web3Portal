@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useEthers } from '@usedapp/core'
+import { useAccount } from 'wagmi';
 
 import { Theme } from '@mui/material/styles';
 
@@ -53,7 +53,7 @@ const AllTokensBanner = (props: IAllTokensBanner) => {
   const [allTokenBalances, setAllTokenBalances] = useState<IBalanceRecord[]>([]);
   const [allTokenAssets, setAllTokenAssets] = useState<IAllTokenAssets>({});
 
-  const { account } = useEthers();
+  const { address } = useAccount();
 
   const classes = useStyles();
 
@@ -92,7 +92,7 @@ const AllTokensBanner = (props: IAllTokensBanner) => {
     return () => {
       isMounted = false;
     }
-  }, [account])
+  }, [address])
 
   return (
     <>

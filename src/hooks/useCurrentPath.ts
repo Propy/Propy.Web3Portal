@@ -4,6 +4,9 @@ const routes = [
   { path: "/" },
   { path: "/my-assets" },
   { path: "/collections" },
+  { path: "/stake" },
+  { path: "/bridge" },
+  { path: "/bridge/:bridgeSelection" },
   // { path: "/example/:exampleParam" },
 ]
 
