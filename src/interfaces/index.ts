@@ -33,6 +33,8 @@ export enum NetworkName {
     sepolia = "sepolia",
     optimism = "optimism",
     arbitrum = "arbitrum",
+    base = "base",
+    'base-sepolia' = 'base-sepolia',
 }
 
 export interface ITransferEventERC721Record {
