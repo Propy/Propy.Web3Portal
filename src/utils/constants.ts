@@ -42,7 +42,7 @@ const COLLECTIONS_ENTRIES_DEV = [
   {
     network: "base-sepolia",
     address: "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c",
-    slug: "propy-home-nft-dev-testnet",
+    slug: "propy-home-nft-dev-base-testnet",
   },
   {
     network: "goerli",
