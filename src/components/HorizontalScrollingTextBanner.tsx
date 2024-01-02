@@ -6,6 +6,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 import { Typography } from '@mui/material';
 
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+
 import Marquee from "react-fast-marquee";
 
 import LinkWrapper from './LinkWrapper';
@@ -58,12 +60,13 @@ const HorizontalScrollingTextBanner = (props: IHorizontalScrollingTextBannerProp
       >
         {entries && entries.map((entry, index) => 
           <div style={{display: 'flex', alignItems: 'center'}}>
+            &nbsp;&nbsp;<DoubleArrowIcon style={{fontSize: 14}}/>&nbsp;&nbsp;
             <LinkWrapper link={entry.link}>
               <Typography variant="body1" style={{fontSize: '0.8rem', fontWeight: 'bold'}} key={`horizontal-text-scroller-banner-entry-${index}`} className="marquee-proto-span">
                 {entry.string}
               </Typography>
             </LinkWrapper>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
+            &nbsp;&nbsp;<DoubleArrowIcon style={{transform: 'rotate(-180deg)', fontSize: 14}}/>&nbsp;&nbsp;
           </div>
          )}
       </Marquee>
