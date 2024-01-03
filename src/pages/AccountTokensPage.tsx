@@ -10,7 +10,15 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 import { Web3ModalButtonWagmi } from '../components/Web3ModalButtonWagmi';
 
-const AccountTokensPage = () => {
+interface IProps {
+    darkMode?: boolean;
+}
+
+const AccountTokensPage = (props: IProps) => {
+    
+    let {
+        darkMode = false,
+    } = props;
 
     const { address } = useAccount();
 
@@ -34,7 +42,7 @@ const AccountTokensPage = () => {
                         <Typography variant="h6" style={{marginBottom: 16, fontWeight: 400}}>
                             Please connect your wallet to view your assets
                         </Typography>
-                        <Web3ModalButtonWagmi variant="outlined" overrideConnectText={"Connect Wallet"} darkMode={false} hideNetworkSwitch={true}/>
+                        <Web3ModalButtonWagmi variant="outlined" overrideConnectText={"Connect Wallet"} darkMode={darkMode} hideNetworkSwitch={true}/>
                     </>
                 }
             </GenericPageContainer>
