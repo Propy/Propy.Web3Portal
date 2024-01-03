@@ -156,7 +156,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
           doubleClickZoom={true}
           scrollWheelZoom={true}
           // center={[38.171368, -95.430112]} // US center
-          center={[24.424473, 10.059095]}
+          center={[24.424473, -80]}
           markers={nftCoordinates}
       />
       </div>
