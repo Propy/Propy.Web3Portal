@@ -92,7 +92,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
     isConsideredMobile,
   } = props;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-testnet'));
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-base-testnet'));
 
   const [nftCoordinates, setNftCoordinates] = useState<ICoordinate[]>([]);
 
