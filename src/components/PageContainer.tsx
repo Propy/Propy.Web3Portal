@@ -45,6 +45,7 @@ const PageContainer = (props: PropsFromRedux) => {
 
     const {
       isConsideredMobile,
+      darkMode,
     } = props;
 
     const classes = useStyles();
@@ -73,10 +74,10 @@ const PageContainer = (props: PropsFromRedux) => {
                 {isLayoutInitialized &&
                   <Routes>
                       <Route path="/" element={<HomePage/>} />
-                      <Route path="/my-assets" element={<AccountTokensPage/>} />
+                      <Route path="/my-assets" element={<AccountTokensPage darkMode={darkMode}/>} />
                       <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
                       <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
-                      <Route path="/account/:accountAddress" element={<AccountTokensPage/>} />
+                      <Route path="/account/:accountAddress" element={<AccountTokensPage darkMode={darkMode} />} />
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
