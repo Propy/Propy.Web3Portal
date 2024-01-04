@@ -51,7 +51,7 @@ const RecentHomeNftScrollingBanner = () => {
                   let secondsSinceMint = (Math.floor(new Date().getTime() / 1000) - Number(reservationEntryTimeline.date))
                   isReservationWithinBannerTimeframe = secondsSinceMint < (60 * maxTimeframeMinutesSinceMinted);
                 }
-                if(cityAttribute && isReservationWithinBannerTimeframe && (renderResults.length < maxScrollingEntries)) {
+                if(cityAttribute && cityAttribute.value && isReservationWithinBannerTimeframe && (renderResults.length < maxScrollingEntries)) {
                   renderResults.push({string: `New address minted in ${cityAttribute.value}`, link: `token/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`});
                 }
               }
