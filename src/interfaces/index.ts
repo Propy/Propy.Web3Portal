@@ -122,6 +122,7 @@ export interface INFTRecord {
 export interface ICoordinate {
     longitude: number
     latitude: number
+    link: string
 }
 
 export interface IPagination {
@@ -159,6 +160,9 @@ export interface INFTCoordinateResponse {
 export interface INFTCoordinateEntry {
     longitude: string;
     latitude: string;
+    asset_address: string;
+    token_id: string;
+    network_name: string;
 }
 
 export interface IOwnedBalancesResult {
@@ -222,6 +226,7 @@ export interface IOfferRecord {
 export interface ILeafletMapMarker {
     longitude: number;
     latitude: number;
+    link?: string;
 }
 
 export interface IHorizontalScrollingTextEntry {

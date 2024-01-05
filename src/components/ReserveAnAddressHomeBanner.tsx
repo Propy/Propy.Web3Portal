@@ -115,7 +115,8 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
               if(nftRecord.longitude && nftRecord.latitude && (renderResults.length < maxEntries)) {
                 renderResults.push({
                   latitude: Number(nftRecord.latitude),
-                  longitude: Number(nftRecord.longitude)
+                  longitude: Number(nftRecord.longitude),
+                  link: `token/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
                 });
               }
             }
