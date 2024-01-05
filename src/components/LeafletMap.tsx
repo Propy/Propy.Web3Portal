@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { latLngBounds, latLng } from 'leaflet';
 
 import MarkerClusterGroup from 'react-leaflet-cluster'
 
-import markerIconPropyBlue from "../assets/svg/map_marker_propy_blue_stroked.svg";
+// import markerIconPropyBlue from "../assets/svg/map_marker_propy_blue_stroked.svg";
+import markerIconPropy3D from "../assets/img/map-marker-3d-compressed.png";
 import {Icon} from 'leaflet'
 
 import {
@@ -46,9 +48,9 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
   // zoom = 6 = US zoom on desktop
   // center = [38.171368, -95.430112] = middle area US
 
-  // let corner1 = leaflet.latLng(53.466832, -133.789535);
-  // let corner2 = leaflet.latLng(21.583438, -57.764142);
-  // let bounds = leaflet.latLngBounds(corner1, corner2);
+  let corner1 = latLng(85, -180);
+  let corner2 = latLng(-85, 180);
+  let bounds = latLngBounds(corner1, corner2);
 
   return (
     <MapContainer
@@ -61,7 +63,7 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       scrollWheelZoom={scrollWheelZoom}
       center={center}
       boundsOptions={{padding: [50, 50]}}
-      // maxBounds={bounds}
+      maxBounds={bounds}
       minZoom={2}
       maxBoundsViscosity={0.7}
     >
@@ -72,9 +74,23 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       <MarkerClusterGroup
         chunkedLoading
         // iconCreateFunction={createClusterCustomIcon}
+        maxClusterRadius={(zoom: number) => {
+          if(zoom === 18) {
+            return 10;
+          }
+          return 80;
+        }}
       >
         {markers && markers.map((marker) =>
-          <Marker position={[marker.latitude, marker.longitude]} icon={new Icon({iconUrl: markerIconPropyBlue, iconSize: [25, 41], iconAnchor: [12, 41]})}>
+          <Marker 
+            position={[marker.latitude, marker.longitude]} 
+            icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
+            eventHandlers={{
+              click: (e) => {
+                window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
+              },
+            }}
+          >
             {/* <Popup>
               A pretty CSS3 popup. <br /> Easily customizable.
             </Popup> */}
