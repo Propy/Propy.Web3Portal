@@ -87,7 +87,9 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
             icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
             eventHandlers={{
               click: (e) => {
-                window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
+                if(marker?.link) {
+                  window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
+                }
               },
             }}
           >
