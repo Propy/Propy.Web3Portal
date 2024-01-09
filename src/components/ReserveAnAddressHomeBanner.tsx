@@ -197,7 +197,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Tier 2
                   </Typography>
                   <Typography variant="h5" className={classes.cardSubtitle}>
-                    Upload Deed
+                    Deed NFT
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Have your deed record uploaded to IPFS and associated with your NFT

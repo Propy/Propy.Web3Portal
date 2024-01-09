@@ -26,6 +26,8 @@ import {
 
 import {
   isAddress,
+  isIPFSMultiHash,
+  getResolvableIpfsLinkFromPlainMultiHash,
 } from '../utils';
 
 import {
@@ -123,6 +125,13 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
         if(value.indexOf("https://") === 0) {
           return (
             <LinkWrapper external={true} link={value}>
+              <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px', color: PROPY_LIGHT_BLUE}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
+            </LinkWrapper>
+          )
+        }
+        if(isIPFSMultiHash(value)) {
+          return (
+            <LinkWrapper external={true} link={getResolvableIpfsLinkFromPlainMultiHash(value)}>
               <Typography className={classes.attributeText} style={{fontWeight: 'bold', fontSize: '18px', color: PROPY_LIGHT_BLUE}} variant="subtitle2">{formatPropertyValue(value)}</Typography>
             </LinkWrapper>
           )
