@@ -1,5 +1,6 @@
 import { ChainId, shortenAddress } from '@usedapp/core'
 import numeral from "numeral";
+import * as isIPFS from 'is-ipfs';
 
 import {
 	NetworkName,
@@ -207,6 +208,14 @@ export const priceFormat = (number: number | string, decimals = 2, currency = "$
 
 export function getResolvableIpfsLink(ipfsUrl: string) {
 	return ipfsUrl.replace('ipfs://', 'https://propy.mypinata.cloud/ipfs/');
+}
+
+export function isIPFSMultiHash(value: string) {
+	return isIPFS.multihash(value);
+}
+
+export function getResolvableIpfsLinkFromPlainMultiHash(ipfsMultiHash: string) {
+	return getResolvableIpfsLink(`ipfs://${ipfsMultiHash}`);
 }
 
 export const parseJwt = (token: string) => {
