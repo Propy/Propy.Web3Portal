@@ -279,6 +279,22 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     watch: true,
   });
 
+  console.log({balance})
+
+  const { 
+    data: testBalance2,
+    // isError,
+    // isLoading
+  } = useContractRead({
+    address: originAssetAddress,
+    abi: ERC20ABI,
+    functionName: 'balanceOf',
+    watch: true,
+    args: [address],
+  })
+
+  console.log({testBalance2})
+
   // L1 BRIDGING METHODS BELOW
 
   const { 
