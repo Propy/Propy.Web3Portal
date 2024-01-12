@@ -14,7 +14,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
 import StakingIcon from '@mui/icons-material/Diversity2';
-// import BridgeIcon from '@mui/icons-material/CompareArrows';
+import BridgeIcon from '@mui/icons-material/CompareArrows';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
 import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -60,12 +60,12 @@ const navigationMenu : IMenuEntry[] = [
     path: '/stake',
     icon: <StakingIcon />,
   },
-  // {
-  //   text: 'Bridge',
-  //   path: '/bridge',
-  //   pathExtended: '/bridge/:bridgeSelection',
-  //   icon: <BridgeIcon />,
-  // },
+  {
+    text: 'Bridge',
+    path: '/bridge',
+    pathExtended: '/bridge/:bridgeSelection',
+    icon: <BridgeIcon />,
+  },
   {
     text: 'Asset Browser',
     path: '/collections',

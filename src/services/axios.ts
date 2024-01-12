@@ -14,8 +14,12 @@ const $axios = axios.create(axiosConfig);
 $axios.interceptors.request.use(AuthInterceptor.beforeRequestSuccess, AuthInterceptor.beforeRequestError);
 $axios.interceptors.response.use(AuthInterceptor.onSuccess, AuthInterceptor.onError);
 
+const $axiosNoIntercept = axios.create(axiosConfig);
+
 const $axiosCustom = axios.create({});
 $axiosCustom.interceptors.request.use(AuthInterceptor.beforeRequestSuccessCustom, AuthInterceptor.beforeRequestError);
 $axiosCustom.interceptors.response.use(AuthInterceptor.onSuccess, AuthInterceptor.onError);
 
-export { $axios, $axiosCustom }
+
+
+export { $axios, $axiosCustom, $axiosNoIntercept }

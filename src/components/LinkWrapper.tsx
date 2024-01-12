@@ -13,6 +13,7 @@ interface ILinkWrapper {
   children: React.ReactNode,
   onClick?: () => void,
   showExternalLinkIcon?: boolean,
+  style?: {[key: string]: string},
 }
 
 // we use this component to dynamically handle internal links and external links
@@ -25,10 +26,11 @@ const LinkWrapper = (props: ILinkWrapper) => {
     children,
     onClick,
     showExternalLinkIcon = false,
+    style = {},
   } = props;
   if(external && link) {
     return (
-      <ExternalLink className={[className, 'no-decorate', 'inherit-color'].join(" ")} style={{display: 'flex', alignItems: 'center'}} href={link}>
+      <ExternalLink className={[className, 'no-decorate', 'inherit-color'].join(" ")} style={{display: 'flex', alignItems: 'center', ...style}} href={link}>
         {children}
         {showExternalLinkIcon &&
           <ExternalLinkIcon style={{marginLeft: 4}} />
@@ -38,7 +40,7 @@ const LinkWrapper = (props: ILinkWrapper) => {
   }
   if(!external && link) {
     return (
-      <Link onClick={() => onClick && onClick()} className={[className, 'no-decorate', 'inherit-color'].join(" ")} to={`/${link}`}>
+      <Link onClick={() => onClick && onClick()} style={style} className={[className, 'no-decorate', 'inherit-color'].join(" ")} to={`/${link}`}>
         {children}
       </Link>
     )
