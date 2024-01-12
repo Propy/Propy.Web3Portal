@@ -50,6 +50,9 @@ export function usePrepareProveWithdrawal(
   l2L1MessagePasserAddress: `0x${string}`,
   l1OptimismPortalProxyAddress: `0x${string}`,
   l2OutputOracleAddress: `0x${string}`,
+  prepErrorHandler: (isPrepError: boolean) => void,
+  alreadyProvenHandler: (isWithdrawalAlreadyProven: boolean) => void,
+  initCompleteHandler: (isInitComplete: boolean) => void,
 ) {
   const [withdrawalForTx, setWithdrawalForTx] = useState<WithdrawalMessage | null>(null);
   const [proofForTx, setProofForTx] = useState<BedrockCrossChainMessageProof | null>(null);
@@ -78,7 +81,13 @@ export function usePrepareProveWithdrawal(
 
   const shouldPrepare = withdrawalForTx && proofForTx
 
-  const { config } = usePrepareContractWrite({
+  useEffect(() => {
+    if(shouldPrepare) {
+      initCompleteHandler(true);
+    }
+  }, [shouldPrepare, initCompleteHandler])
+
+  const { config, error: usePrepareContractWriteError } = usePrepareContractWrite({
     address: shouldPrepare ? l1OptimismPortalProxyAddress : undefined,
     abi: OptimismPortal,
     functionName: 'proveWithdrawalTransaction',
@@ -106,6 +115,22 @@ export function usePrepareProveWithdrawal(
         : undefined,
     dataSuffix: undefined,
   });
+
+  useEffect(() => {
+    if(usePrepareContractWriteError) {
+      //@ts-ignore
+      if(usePrepareContractWriteError?.cause?.reason?.indexOf("withdrawal hash has already been proven") > -1) {
+        alreadyProvenHandler(true);
+        prepErrorHandler(false);
+      } else {
+        alreadyProvenHandler(false);
+        prepErrorHandler(true);
+      }
+    } else {
+      alreadyProvenHandler(false);
+      prepErrorHandler(false);
+    }
+  }, [usePrepareContractWriteError, prepErrorHandler, alreadyProvenHandler])
 
   useEffect(() => {
     void (async () => {

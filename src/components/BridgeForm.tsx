@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 
 import { animated, useSpring } from '@react-spring/web';
 
@@ -42,31 +42,19 @@ import {
 import {
   NETWORK_NAME_TO_DISPLAY_NAME,
   PROPY_LIGHT_BLUE,
-  NETWORK_NAME_TO_ID,
-  L2_TO_L1_MESSAGE_PASSER_ADDRESS,
-  OPTIMISM_PORTAL_ADDRESS,
-  L2_OUTPUT_ORACLE,
+  BASE_BRIDGE_L1_NETWORK,
+  BASE_BRIDGE_L2_NETWORK,
 } from '../utils/constants';
 
 import ERC20ABI from '../abi/ERC20ABI.json';
 import L1StandardBridgeABI from '../abi/L1StandardBridgeABI.json';
 import L2StandardBridgeABI from '../abi/L2StandardBridgeABI.json';
 
-import { usePrepareProveWithdrawal } from '../hooks/usePrepareProveWithdrawal';
-import { usePrepareFinalizeWithdrawal } from '../hooks/usePrepareFinalizeWithdrawal';
-import { useBlockNumberOfLatestL2OutputProposal } from '../base-bridge/hooks/useBlockNumberOfLatestL2OutputProposal';
+import {
+  BridgeService,
+} from '../services/api';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
-
-interface IBridgeForm {
-  bridgeAddress: `0x${string}`
-  origin: SupportedNetworks
-  destination: SupportedNetworks
-  originAssetAddress: `0x${string}`
-  originAssetDecimals: number
-  destinationAssetAddress: `0x${string}`
-  destinationAssetDecimals: number
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -171,21 +159,12 @@ const HelperTextTop = (props: IHelperTextMaxSelection) => {
     balance,
     setFieldValue,
     origin,
-    rawBalance,
-    destinationAssetDecimals,
-    originAssetDecimals,
   } = props;
   return (
     <div style={{display: 'flex', justifyContent: 'right', marginBottom: 4, flexDirection: 'column'}}>
       <Typography variant="subtitle2" style={{textAlign: 'right', fontWeight: 400, cursor: 'pointer'}} onClick={() => setFieldValue('proAmount', balance)}>
-        Balance: {balance}{origin && ['base','base-sepolia','base-goerli'].indexOf(origin) > -1 ? ' Base' : ''} PRO
+        Balance: <strong>{priceFormat(balance, 2, origin && ['base','base-sepolia','base-goerli'].indexOf(origin) > -1 ? 'PRO (Base)' : 'PRO')}</strong>
       </Typography>
-      {
-        (origin && (Number(balance) > 0) && destinationAssetDecimals && originAssetDecimals && (['base','base-sepolia','base-goerli'].indexOf(origin) > -1)) &&
-        <Typography variant="subtitle2" style={{textAlign: 'right', cursor: 'pointer', fontWeight: 'bold'}} onClick={() => setFieldValue('proAmount', balance)}>
-          ≈ {priceFormat(utils.formatUnits(new BigNumber(rawBalance ? rawBalance.toString() : "0").shiftedBy((destinationAssetDecimals - originAssetDecimals) * -1).toString(), 18), 2, 'L1 PRO')}
-        </Typography>
-      }
     </div>
   )
 }
@@ -257,6 +236,17 @@ const getTransitTime = (origin: string, destination: string) => {
   }
 }
 
+interface IBridgeForm {
+  bridgeAddress: `0x${string}`
+  origin: SupportedNetworks
+  destination: SupportedNetworks
+  originAssetAddress: `0x${string}`
+  originAssetDecimals: number
+  destinationAssetAddress: `0x${string}`
+  destinationAssetDecimals: number
+  postBridgeSuccess?: () => void
+}
+
 const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   let {
@@ -267,6 +257,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     originAssetDecimals,
     destinationAssetAddress,
     destinationAssetDecimals,
+    postBridgeSuccess,
   } = props;
 
   const classes = useStyles();
@@ -279,33 +270,6 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
   const { 
     address,
   } = useAccount();
-
-  const blockNumberOfLatestL2OutputProposal = useBlockNumberOfLatestL2OutputProposal(
-    L2_OUTPUT_ORACLE,
-    NETWORK_NAME_TO_ID[destination].toString()
-  );
-
-  console.log({blockNumberOfLatestL2OutputProposal, blockNumberOfLatestL2OutputProposalString: blockNumberOfLatestL2OutputProposal?.toString() })
-
-  const proveWithdrawalConfig = usePrepareProveWithdrawal(
-    "0xa16ec296fbbee911764c83af54a0061b03e184e1c9d2e15cf58a3e7f9f1a11e3",
-    blockNumberOfLatestL2OutputProposal ? blockNumberOfLatestL2OutputProposal : BigInt(0),
-    NETWORK_NAME_TO_ID[origin].toString(),
-    NETWORK_NAME_TO_ID[destination].toString(),
-    L2_TO_L1_MESSAGE_PASSER_ADDRESS,
-    OPTIMISM_PORTAL_ADDRESS,
-    L2_OUTPUT_ORACLE
-  );
-
-  const { writeAsync: submitProof } = useContractWrite(proveWithdrawalConfig);
-
-  const finalizeWithdrawalConfig = usePrepareFinalizeWithdrawal(
-    "0xa16ec296fbbee911764c83af54a0061b03e184e1c9d2e15cf58a3e7f9f1a11e3",
-    NETWORK_NAME_TO_ID[origin].toString(),
-    NETWORK_NAME_TO_ID[destination].toString(),
-    OPTIMISM_PORTAL_ADDRESS,
-  )
-  const { writeAsync: submitFinalizeWithdrawal } = useContractWrite(finalizeWithdrawalConfig);
 
   const formikRef = useRef<FormikProps<{[field: string]: any}>>();
 
@@ -381,6 +345,13 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     onSuccess() {
       formikRef?.current?.resetForm();
       toast.success(`Bridge success! Please note that it may take 20-60 minutes for your PRO tokens to arrive on ${NETWORK_NAME_TO_DISPLAY_NAME[destination]}`);
+      const refreshBridge = async () => {
+        await BridgeService.triggerBaseBridgeOptimisticSync(BASE_BRIDGE_L1_NETWORK, BASE_BRIDGE_L2_NETWORK);
+        if(postBridgeSuccess) {
+          postBridgeSuccess();
+        }
+      }
+      refreshBridge();
     }
   })
 
@@ -451,7 +422,14 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     },
     onSuccess() {
       formikRef?.current?.resetForm();
-      toast.success(`Bridge success! Please note that it will take ~ 1 week for your PRO tokens to arrive on ${NETWORK_NAME_TO_DISPLAY_NAME[destination]}`);
+      toast.success(`Withdrawal initiation success! Please note that you will need to submit a withdrawal proof before the ~ 1 week timeline to withdraw to ${NETWORK_NAME_TO_DISPLAY_NAME[destination]} begins`);
+      const refreshBridge = async () => {
+        await BridgeService.triggerBaseBridgeOptimisticSync(BASE_BRIDGE_L1_NETWORK, BASE_BRIDGE_L2_NETWORK);
+        if(postBridgeSuccess) {
+          postBridgeSuccess();
+        }
+      }
+      refreshBridge();
     },
   })
 
@@ -490,44 +468,6 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     },
     delay: 150,
   })
-
-  console.log('balance?.data', balance?.data);
-
-  const handleProveWithdrawal = useCallback(() => {
-    // setModalProveTxHash(undefined);
-    // onOpenProveWithdrawalModal();
-    void (async () => {
-      try {
-        const proveResult = await submitProof?.();
-        console.log({proveResult})
-        if (proveResult?.hash) {
-          // const proveTxHash = proveResult.hash;
-        }
-      } catch {
-        // onCloseProveWithdrawalModal();
-      }
-    })();
-  }, [
-    submitProof,
-  ]);
-
-  const handleFinalizeWithdrawal = useCallback(() => {
-    // setModalProveTxHash(undefined);
-    // onOpenProveWithdrawalModal();
-    void (async () => {
-      try {
-        const proveResult = await submitFinalizeWithdrawal?.();
-        console.log({proveResult})
-        if (proveResult?.hash) {
-          // const proveTxHash = proveResult.hash;
-        }
-      } catch {
-        // onCloseProveWithdrawalModal();
-      }
-    })();
-  }, [
-    submitFinalizeWithdrawal,
-  ]);
 
   return (
     <div className={classes.root}>
@@ -645,7 +585,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                         <FloatingActionButton
                           className={classes.submitButton}
                           buttonColor="secondary"
-                          disabled={isSubmitting || !values.proAmount || isLoadingApproveBridgeL1 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
+                          disabled={isSubmitting || !values.proAmount || (Number(values.proAmount) === 0) || isLoadingApproveBridgeL1 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
                           onClick={submitForm}
                           showLoadingIcon={isSubmitting || isLoadingApproveBridgeL1 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
                           text={getBridgeButtonText(origin, destination, Number(dataL1BridgePROAllowance ? dataL1BridgePROAllowance : 0), values.proAmount ? values.proAmount.toString() : "0", originAssetDecimals, isAwaitingWalletInteraction, isAwaitingApproveTx, isAwaitingPerformTx)}
@@ -655,7 +595,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                         <FloatingActionButton
                           className={classes.submitButton}
                           buttonColor="secondary"
-                          disabled={isSubmitting || !values.proAmount || isLoadingApproveBridgeL2 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
+                          disabled={isSubmitting || !values.proAmount || (Number(values.proAmount) === 0) || isLoadingApproveBridgeL2 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
                           onClick={submitForm}
                           showLoadingIcon={isSubmitting || isLoadingApproveBridgeL2 || isLoadingPerformBridgeL1 || isAwaitingApproveTx || isAwaitingPerformTx || isAwaitingWalletInteraction}
                           text={getBridgeButtonText(origin, destination, Number(dataL1BridgePROAllowance ? dataL1BridgePROAllowance : 0), values.proAmount ? values.proAmount.toString() : "0", originAssetDecimals, isAwaitingWalletInteraction, isAwaitingApproveTx, isAwaitingPerformTx)}
@@ -667,8 +607,6 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
               </Form>
             )}
           </Formik>
-          <button onClick={handleProveWithdrawal}>Submit Proof</button>
-          <button onClick={handleFinalizeWithdrawal}>Finalize Withdrawal</button>
           {/* <Typography variant="subtitle1" className={classes.cardSubtitle}>Bridge time: ~ 20 minutes</Typography> */}
         </div>
       </Card>

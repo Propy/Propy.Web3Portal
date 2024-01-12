@@ -15,9 +15,10 @@ import SingleTokenPage from '../pages/SingleTokenPage';
 import RecentlyMintedPage from '../pages/RecentlyMintedPage';
 import CollectionPage from '../pages/CollectionPage';
 import CollectionsPage from '../pages/CollectionsPage';
-import StakePage from '../pages/StakePage';
-// import BridgeOptionsPage from '../pages/BridgeOptionsPage';
-// import BridgePage from '../pages/BridgePage';
+// import StakePage from '../pages/StakePage';
+import BridgeOptionsPage from '../pages/BridgeOptionsPage';
+import BridgePage from '../pages/BridgePage';
+import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -81,9 +82,10 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
-                      <Route path="/stake" element={<StakePage/>} />
-                      {/* <Route path="/bridge" element={<BridgeOptionsPage />} />
-                      <Route path="/bridge/:bridgeSelection" element={<BridgePage />} /> */}
+                      {/* <Route path="/stake" element={<StakePage/>} /> */}
+                      <Route path="/bridge" element={<BridgeOptionsPage />} />
+                      <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
+                      <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
                   </Routes>
                 }
             </div>

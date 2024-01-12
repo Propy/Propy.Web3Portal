@@ -10,6 +10,7 @@ export function useBlockNumberOfLatestL2OutputProposal(
     abi: L2OutputOracle,
     functionName: 'latestBlockNumber',
     chainId: parseInt(l1ChainID),
+    watch: true,
   });
 
   return blockNumberOfLatestL2OutputProposal;
