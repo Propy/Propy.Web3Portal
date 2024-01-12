@@ -273,16 +273,20 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const formikRef = useRef<FormikProps<{[field: string]: any}>>();
 
-  const balance = useBalance({
+  const {
+    data: balanceData,
+    error: balanceError,
+  } = useBalance({
     address: address,
     token: originAssetAddress,
     watch: true,
   });
 
-  console.log({balance})
+  console.log({balanceData, balanceError, failureReason})
 
   const { 
     data: testBalance2,
+    
     // isError,
     // isLoading
   } = useContractRead({
@@ -562,8 +566,8 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                   <Grid item xs={12} sm={12} md={12} lg={12}>
                     <HelperTextTop 
                       setFieldValue={setFieldValue}
-                      balance={balance?.data?.formatted ? balance.data.formatted : 0}
-                      rawBalance={balance?.data?.value ? balance.data.value : 0}
+                      balance={balanceData?.formatted ? balanceData.formatted : 0}
+                      rawBalance={balanceData?.value ? balanceData.value : 0}
                       origin={origin}
                       destinationAssetDecimals={destinationAssetDecimals}
                       originAssetDecimals={originAssetDecimals}
@@ -580,7 +584,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                       }}
                       // helperText={}
                     />
-                    <HelperTextMaxSelection setFieldValue={setFieldValue} balance={balance?.data?.formatted ? balance.data.formatted : 0} />
+                    <HelperTextMaxSelection setFieldValue={setFieldValue} balance={balanceData?.formatted ? balanceData.formatted : 0} />
                   </Grid>
                   <div style={{display: 'none'}}>
                     <Field
