@@ -282,7 +282,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     watch: true,
   });
 
-  console.log({balanceData, balanceError, failureReason})
+  console.log({balanceData, balanceError})
 
   const { 
     data: testBalance2,
