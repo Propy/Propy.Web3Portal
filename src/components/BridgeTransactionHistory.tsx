@@ -34,6 +34,7 @@ import {
 import {
   IBaseWithdrawalProvenEvent,
   IBaseWithdrawalFinalizedEvent,
+  NetworkName,
 } from '../interfaces';
 
 import SortableTable from './SortableTable';
@@ -42,6 +43,7 @@ import {
   capitalizeFirstLetter,
   priceFormat,
   centerShortenLongString,
+  getEtherscanLinkByNetworkName,
 } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -134,6 +136,17 @@ const getTableHeading = (mode: string) => {
   return heading;
 }
 
+const getTableSubtitle = (mode: string) => {
+  let subTitle = "Updates may take a few minutes to reflect";
+  // if(mode === "withdrawals") {
+  //   heading = "Withdrawal History";
+  // }
+  // if(mode === "deposits") {
+  //   heading = "Deposit History";
+  // }
+  return subTitle;
+}
+
 const getProveWithdrawalLink = (
   transactionHash: string,
 ) => {
@@ -150,6 +163,7 @@ const BridgeTransactionHistory = (props: IBridgeTransactionHistory & PropsFromRe
 
   const classes = useStyles();
 
+  const [isFetchingTransactions, setIsFetchingTransactions] = useState(true);
   const [transactions, setTransactions] = useState([]);
 
   const { 
@@ -168,6 +182,10 @@ const BridgeTransactionHistory = (props: IBridgeTransactionHistory & PropsFromRe
   useEffect(() => {
     let isMounted = true;
     const loadBridgeTransactionHistory = async () => {
+      // for now, we don't set it to true on subsequent loads
+      // if(isMounted) {
+      //   setIsFetchingTransactions(true);
+      // }
       if(address && l1Network && l2Network && l1TokenAddress && l2TokenAddress) {
         if(mode === "withdrawals") {
           let results = await BridgeService.getBaseBridgeWithdrawalsOverviewByAccountAndTokenAddresses(l1Network, l2Network, l1TokenAddress, l2TokenAddress, address);
@@ -187,6 +205,9 @@ const BridgeTransactionHistory = (props: IBridgeTransactionHistory & PropsFromRe
             setTransactions(results.data);
           }
         }
+      }
+      if(isMounted) {
+        setIsFetchingTransactions(false);
       }
     };
     loadBridgeTransactionHistory();
@@ -286,7 +307,14 @@ const BridgeTransactionHistory = (props: IBridgeTransactionHistory & PropsFromRe
         valueKey: 'transaction_hash',
         numeric: false,
         disablePadding: false,
-        valueFormatter: (value: string) => centerShortenLongString(value, 16),
+        valueFormatterKeyArgs: ['transaction_hash', 'network_name'],
+        valueFormatterAsElement: (txHash: string, networkName: NetworkName) => {
+          return (
+            <LinkWrapper link={getEtherscanLinkByNetworkName(networkName, txHash, 'transaction')} external={true}>
+              <span style={{fontWeight: 'bold'}}>{centerShortenLongString(txHash, 16)}</span>
+            </LinkWrapper>
+          )
+        },
       },
       {
         id: 'timestamp',
@@ -307,10 +335,12 @@ const BridgeTransactionHistory = (props: IBridgeTransactionHistory & PropsFromRe
         <SortableTable
           tableData={transactions}
           tableHeading={getTableHeading(mode)}
+          tableSubtitle={getTableSubtitle(mode)}
           defaultSortValueKey="timestamp"
           columnConfig={getColumnConfig(mode)}
           uniqueRowKey="transaction_hash"
-          loadingRows={10}
+          loadingRows={isFetchingTransactions ? 10 : 0}
+          showNoRecordsFound={!isFetchingTransactions && (!transactions || transactions.length === 0)}
         />
       </div>
     </>

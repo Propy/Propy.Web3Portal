@@ -51,11 +51,13 @@ interface IColumnConfigEntry {
 }
 
 interface EnhancedTableProps {
+  showNoRecordsFound: boolean;
   columnConfig: IColumnConfigEntry[];
   onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
+  loadingRows: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -63,7 +65,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     columnConfig,
     order,
     orderBy,
-    onRequestSort
+    onRequestSort,
+    showNoRecordsFound,
+    loadingRows,
   } = props;
   const createSortHandler =
     (property: string) => (event: React.MouseEvent<unknown>) => {
@@ -73,7 +77,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        {columnConfig.map((columnConfigEntry) => (
+        {!showNoRecordsFound && (loadingRows === 0) && columnConfig.map((columnConfigEntry) => (
           <TableCell
             key={columnConfigEntry.id}
             align={'left'}
@@ -98,18 +102,23 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
+        {(showNoRecordsFound || loadingRows > 0) &&
+          <TableCell colSpan={6}/>
+        }
       </TableRow>
     </TableHead>
   );
 }
 
 interface EnhancedTableToolbarProps {
-  tableHeading: string;
+  tableHeading?: string;
+  tableSubtitle?: string;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const {
-    tableHeading
+    tableHeading,
+    tableSubtitle,
   } = props;
 
   return (
@@ -119,31 +128,48 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         pr: { xs: 1, sm: 1 },
       }}
     >
-      <Typography
-        sx={{ flex: '1 1 100%' }}
-        variant="h6"
-        id="tableTitle"
-        component="div"
-      >
-        {tableHeading}
-      </Typography>
+      <div style={{marginTop: 8, marginBottom: 8}}>
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          {tableHeading}
+        </Typography>
+        {tableSubtitle &&
+          <Typography
+          sx={{ flex: '1 1 100%' }}
+          style={{fontWeight: 400}}
+          variant="subtitle2"
+          id="tableSubtitle"
+          component="div"
+        >
+          {tableSubtitle}
+        </Typography>
+        }
+      </div>
     </Toolbar>
   );
 }
 
 interface ISortableTableProps {
   tableHeading?: string
+  tableSubtitle?: string
   defaultSortValueKey: string
   columnConfig: IColumnConfigEntry[]
   tableData: any[]
   uniqueRowKey: string
   loadingRows?: number
+  showNoRecordsFound?: boolean
 }
 
 export default function SortableTable(props: ISortableTableProps) {
 
   let {
     tableHeading,
+    tableSubtitle,
+    showNoRecordsFound = false,
     defaultSortValueKey,
     columnConfig,
     tableData,
@@ -185,7 +211,7 @@ export default function SortableTable(props: ISortableTableProps) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2, border: '1px solid #ffffff3b' }}>
-        {tableHeading && <EnhancedTableToolbar tableHeading={tableHeading} />}
+        {tableHeading && <EnhancedTableToolbar tableHeading={tableHeading} tableSubtitle={tableSubtitle} />}
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -193,6 +219,8 @@ export default function SortableTable(props: ISortableTableProps) {
             size={'medium'}
           >
             <EnhancedTableHead
+              showNoRecordsFound={showNoRecordsFound}
+              loadingRows={loadingRows}
               columnConfig={columnConfig}
               order={order}
               orderBy={orderBy}
@@ -290,15 +318,22 @@ export default function SortableTable(props: ISortableTableProps) {
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
-              {(loadingRows > 0) && (emptyRows === 0) && (!tableData || (tableData.length === 0)) && Array.from({length: loadingRows}).map(() =>
+              {(loadingRows > 0) && (emptyRows === 0) && (!tableData || (tableData.length === 0)) && (
                 <TableRow
                   style={{
-                    height: 53,
+                    height: 53 * loadingRows,
                   }}
                 >
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
+              {showNoRecordsFound && 
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    No Records Found
+                  </TableCell>
+                </TableRow>
+              }
             </TableBody>
           </Table>
         </TableContainer>

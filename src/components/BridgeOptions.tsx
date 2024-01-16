@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import { useAccount } from 'wagmi';
+
 import { animated, useSpring } from '@react-spring/web';
 
 import { Theme } from '@mui/material/styles';
@@ -93,6 +95,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const BridgingPage = (props: PropsFromRedux) => {
 
     const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
+    
+    const { address } = useAccount();
 
     const classes = useStyles();
 
@@ -199,16 +203,18 @@ const BridgingPage = (props: PropsFromRedux) => {
               l2TokenAddress={PRO_BASE_L2_ADDRESS}
             />
           </Grid> */}
-          <Grid item xs={4} sm={8} md={10} lg={12} xl={12}>
-            <BridgeTransactionHistoryContainer
-              mode={"all"}
-              l1Network={BASE_BRIDGE_L1_NETWORK}
-              l2Network={BASE_BRIDGE_L2_NETWORK}
-              l1TokenAddress={PRO_ETHEREUM_L1_ADDRESS}
-              l2TokenAddress={PRO_BASE_L2_ADDRESS}
-              triggerUpdateIndex={triggerUpdateIndex}
-            />
-          </Grid>
+          {address &&
+            <Grid item xs={4} sm={8} md={10} lg={12} xl={12}>
+              <BridgeTransactionHistoryContainer
+                mode={"all"}
+                l1Network={BASE_BRIDGE_L1_NETWORK}
+                l2Network={BASE_BRIDGE_L2_NETWORK}
+                l1TokenAddress={PRO_ETHEREUM_L1_ADDRESS}
+                l2TokenAddress={PRO_BASE_L2_ADDRESS}
+                triggerUpdateIndex={triggerUpdateIndex}
+              />
+            </Grid>
+          }
         </Grid>
       </>
     )
