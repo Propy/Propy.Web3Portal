@@ -17,7 +17,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import EastIcon from '@mui/icons-material/East';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base-solid.png';
+import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import { PropsFromRedux } from '../containers/BridgeOptionsContainer';
 import LinkWrapper from '../components/LinkWrapper';

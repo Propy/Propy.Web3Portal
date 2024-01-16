@@ -25,7 +25,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { PropsFromRedux } from '../containers/BridgeFinalizeWithdrawalFormContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base-solid.png';
+import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import FloatingActionButton from './FloatingActionButton';
 
