@@ -23,7 +23,7 @@ import { useContractWrite, useWaitForTransaction } from 'wagmi';
 import { PropsFromRedux } from '../containers/BridgeProveWithdrawalFormContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base-solid.png';
+import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import FloatingActionButton from './FloatingActionButton';
 

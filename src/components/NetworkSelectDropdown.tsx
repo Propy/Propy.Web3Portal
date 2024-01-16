@@ -11,7 +11,7 @@ import { PropsFromRedux } from '../containers/NetworkSelectDropdownContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
 import ArbitrumLogo from '../assets/img/arbitrum.png';
-import BaseLogo from '../assets/img/base-solid.png';
+import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import { SupportedNetworks } from '../interfaces';
 
