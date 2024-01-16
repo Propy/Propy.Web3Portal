@@ -36,7 +36,7 @@ import {
 interface IMenuEntry {
   text: string
   path?: string
-  pathExtended?: string
+  pathExtended?: string[]
   icon: any
   externalLink?: string
   onlyConnected?: boolean
@@ -63,7 +63,7 @@ const navigationMenu : IMenuEntry[] = [
   {
     text: 'Bridge',
     path: '/bridge',
-    pathExtended: '/bridge/:bridgeSelection',
+    pathExtended: ['/bridge/:bridgeSelection', '/bridge/:bridgeSelection/:bridgeAction/:transactionHash'],
     icon: <BridgeIcon />,
   },
   {
@@ -236,9 +236,9 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                         toggleOpenCollapseState(index)
                                       }
                                     }}
-                                    className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                    className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                   >
-                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
                                       <ListItemText primary={item.text} />
                                       {item.externalLink &&
                                         <ExternalLinkIcon style={{opacity: 0.5}} />

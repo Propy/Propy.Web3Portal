@@ -7,6 +7,7 @@ const routes = [
   { path: "/stake" },
   { path: "/bridge" },
   { path: "/bridge/:bridgeSelection" },
+  { path: "/bridge/:bridgeSelection/:bridgeAction/:transactionHash" },
   // { path: "/example/:exampleParam" },
 ]
 

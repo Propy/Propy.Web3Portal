@@ -275,29 +275,11 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const {
     data: balanceData,
-    error: balanceError,
   } = useBalance({
     address: address,
     token: originAssetAddress,
     watch: true,
   });
-
-  console.log({balanceData, balanceError})
-
-  const { 
-    data: testBalance2,
-    
-    // isError,
-    // isLoading
-  } = useContractRead({
-    address: originAssetAddress,
-    abi: ERC20ABI,
-    functionName: 'balanceOf',
-    watch: true,
-    args: [address],
-  })
-
-  console.log({testBalance2})
 
   // L1 BRIDGING METHODS BELOW
 
