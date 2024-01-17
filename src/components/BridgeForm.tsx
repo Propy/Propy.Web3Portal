@@ -133,6 +133,9 @@ const useStyles = makeStyles((theme: Theme) =>
     submitButton: {
       width: '100%',
     },
+    innerSpacingTop: {
+      marginTop: theme.spacing(2),
+    },
   }),
 );
 
@@ -604,6 +607,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                         />
                       }
                     </div>
+                    <Typography variant="caption" component="p" style={{textAlign: 'center', fontSize: '0.8rem'}} className={classes.innerSpacingTop}><span style={{fontWeight: 'bold'}}>Trying to bridge ETH?</span><br/>Please use the official <a style={{color: PROPY_LIGHT_BLUE}} className="no-decorate" href="https://bridge.base.org/deposit" target="_blank" rel="noopener noreferrer">Base Bridge</a></Typography>
                   </Grid>
                 </Grid>
               </Form>
