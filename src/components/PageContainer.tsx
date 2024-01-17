@@ -83,7 +83,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
                       {/* <Route path="/stake" element={<StakePage/>} /> */}
-                      <Route path="/bridge" element={<BridgeOptionsPage />} />
+                      <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
                   </Routes>
