@@ -15,7 +15,7 @@ import SingleTokenPage from '../pages/SingleTokenPage';
 import RecentlyMintedPage from '../pages/RecentlyMintedPage';
 import CollectionPage from '../pages/CollectionPage';
 import CollectionsPage from '../pages/CollectionsPage';
-// import StakePage from '../pages/StakePage';
+import StakePage from '../pages/StakePage';
 import BridgeOptionsPage from '../pages/BridgeOptionsPage';
 import BridgePage from '../pages/BridgePage';
 import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
@@ -82,7 +82,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
-                      {/* <Route path="/stake" element={<StakePage/>} /> */}
+                      <Route path="/stake" element={<StakePage/>} />
                       <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
