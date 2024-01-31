@@ -5,7 +5,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 import { WagmiConfig, createConfig, configureChains } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
-import { base, mainnet, sepolia, baseSepolia, goerli, baseGoerli } from 'wagmi/chains'
+import { base, mainnet, sepolia, baseSepolia } from 'wagmi/chains'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
