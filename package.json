@@ -29,7 +29,7 @@
     "@usedapp/core": "1.2.10",
     "@walletconnect/web3-provider": "1.8.0",
     "@web3modal/wagmi": "3.5.6",
-    "@web3modal/wagmi1": "^4.0.0-544a28f1",
+    "@web3modal/wagmi1": "^4.0.0-alpha.0",
     "assert": "^2.0.0",
     "axios": "^1.4.0",
     "bignumber.js": "^9.1.2",
@@ -67,6 +67,9 @@
     "web-vitals": "^1.0.1",
     "web3modal": "^1.9.5",
     "yup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.0-placeholder-for-preset-env.2"
   },
   "scripts": {
     "start": "export PORT=4200 && react-app-rewired start",
