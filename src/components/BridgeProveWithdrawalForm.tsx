@@ -184,10 +184,10 @@ const getBridgeProveWithdrawalButtonText = (
 }
 
 const getTransitTime = (origin: string, destination: string) => {
-  if(['ethereum', 'sepolia', 'goerli'].indexOf(origin) > -1 && ['base', 'base-sepolia', 'base-goerli'].indexOf(destination)) {
+  if(['ethereum', 'sepolia', 'goerli'].indexOf(origin) > -1 && ['base', 'base-sepolia', 'base-goerli'].indexOf(destination) > -1) {
     return `~ 20 minutes`;
   }
-  if(['base', 'base-sepolia', 'base-goerli'].indexOf(origin) > -1 && ['ethereum', 'sepolia', 'base-goerli'].indexOf(destination)) {
+  if(['base', 'base-sepolia', 'base-goerli'].indexOf(origin) > -1 && ['ethereum', 'sepolia', 'base-goerli'].indexOf(destination) > -1) {
     return `~ 1 week`;
   }
 }
