@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Button from '@mui/material/Button';
 
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useWeb3Modal } from '@web3modal/wagmi1/react';
 
 import { useNetwork } from 'wagmi';
 

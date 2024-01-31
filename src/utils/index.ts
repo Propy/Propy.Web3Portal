@@ -180,7 +180,7 @@ const getDynamicFormat = (currentFormat = '0,0.00', number: number) => {
 	return dynamicFormat;
 }
 
-export const priceFormat = (number: number | string, decimals = 2, currency = "$", prefix = true) => {
+export const priceFormat = (number: number | string, decimals = 2, currency = "$", prefix = true, roundDown = false) => {
 	let decimalString = "";
 	for(let i = 0; i < decimals; i++){
 			decimalString += "0";
@@ -193,6 +193,9 @@ export const priceFormat = (number: number | string, decimals = 2, currency = "$
 			format = getDynamicFormat(format, Number(number));
 	}
 	let result = numeral(number).format(format);
+	if(roundDown) {
+		result = numeral(number).format(format, Math.floor);
+	}
 	if(result === 'NaN') {
 		result = '0.00';
 	}
