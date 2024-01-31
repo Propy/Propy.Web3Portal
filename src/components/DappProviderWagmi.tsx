@@ -1,12 +1,23 @@
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
+import { createWeb3Modal, EIP6963Connector } from '@web3modal/wagmi1/react'
+import { walletConnectProvider } from '@web3modal/wagmi1'
+import { publicProvider } from 'wagmi/providers/public'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
-import { WagmiConfig } from 'wagmi'
+import { WagmiConfig, createConfig, configureChains } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
-import { base, mainnet, sepolia, baseSepolia, goerli, baseGoerli } from 'wagmi/chains'
+import { base, mainnet, sepolia, baseSepolia } from 'wagmi/chains'
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+
 import BaseLogo from '../assets/img/base-web3modal-logo.png';
 import PropyHouseOnlyLogo from '../assets/img/propy-house-only.png';
 
 import AppContainer from '../containers/AppContainer';
+
+import {
+  NETWORK_ID_TO_RPC,
+} from '../utils/constants';
 
 // 1. Get projectId at https://cloud.walletconnect.com
 const projectId = '40a62032057258c14ebfdc9c25bfe42e'
@@ -29,17 +40,38 @@ const chains =
     base,
     sepolia,
     baseSepolia,
-    goerli,
-    baseGoerli,
   ];
 
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+const { chains: configuredChains, publicClient } = configureChains(
+  chains,
+  [jsonRpcProvider({
+    rpc: (chain) => {
+      let rpcUrl = NETWORK_ID_TO_RPC[chain.id] || "";
+      return {
+        http: rpcUrl,
+      }
+    },
+  }), walletConnectProvider({ projectId }), publicProvider()]
+)
+
+// const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: [
+    new InjectedConnector({ chains, options: { shimDisconnect: true } }),
+    new WalletConnectConnector({ chains, options: { projectId, showQrModal: false, metadata } }),
+    new EIP6963Connector({ chains }),
+    new CoinbaseWalletConnector({ chains, options: { appName: metadata.name } })
+  ],
+  publicClient
+})
 
 // 3. Create modal
 createWeb3Modal({ 
   wagmiConfig,
   projectId,
-  chains,
+  chains: configuredChains,
   themeMode: 'light',
   chainImages: {
     8453: BaseLogo,
