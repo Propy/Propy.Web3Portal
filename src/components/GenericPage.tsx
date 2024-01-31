@@ -41,12 +41,16 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       fontWeight: 500,
+    },
+    subtitle: {
+      fontWeight: 400,
     }
   }),
 );
 
 interface IGenericBannerPage {
   title?: string,
+  subtitle?: string,
   children: React.ReactNode,
 }
 
@@ -56,6 +60,7 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
 
   const {
     title,
+    subtitle,
     children,
     isConsideredMobile,
     isConsideredMedium,
@@ -84,6 +89,12 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
             <Typography variant="h3" component="h2" className={[classes.title].join(" ")}>
               {title}
             </Typography>
+            {
+              subtitle &&
+              <Typography variant="h6" component="h3" className={[classes.subtitle].join(" ")}>
+                {subtitle}
+              </Typography>
+            }
           </div>
         }
         {children}

@@ -47,7 +47,6 @@ const DappProvider = (props: PropsFromRedux) => {
       [ChainId.Arbitrum]: arbitrumReadOnlyUrl(),
     },
     autoConnect: true,
-    // noMetamaskDeactivate: true,
     connectors: {
       metamask: new MetamaskConnector(),
       coinbase: new CoinbaseWalletConnector(),

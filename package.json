@@ -28,7 +28,7 @@
     "@types/styled-components": "^5.1.0",
     "@usedapp/core": "1.2.10",
     "@walletconnect/web3-provider": "1.8.0",
-    "@web3modal/wagmi": "^3.4.0",
+    "@web3modal/wagmi": "3.5.6",
     "assert": "^2.0.0",
     "axios": "^1.4.0",
     "bignumber.js": "^9.1.2",
@@ -61,7 +61,7 @@
     "typescript": "^4.1.2",
     "url": "^0.11.0",
     "util": "^0.12.5",
-    "viem": "1.20.1",
+    "viem": "1.21.4",
     "wagmi": "^1.4.12",
     "web-vitals": "^1.0.1",
     "web3modal": "^1.9.5",
@@ -82,6 +82,8 @@
   "browserslist": {
     "production": [
       ">0.2%",
+      "not ie <= 99",
+      "not android <= 4.4.4",
       "not dead",
       "not op_mini all"
     ],

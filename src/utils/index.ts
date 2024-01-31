@@ -234,6 +234,11 @@ export const parseJwt = (token: string) => {
 	return JSON.parse(jsonPayload);
 }
 
+export const capitalizeFirstLetter = (str: string): string => {
+	if (!str) return str;
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export const getCookieValue = (name: string) => (
   document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 )

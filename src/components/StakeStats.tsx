@@ -31,7 +31,7 @@ import { TextField } from 'formik-mui';
 import { PropsFromRedux } from '../containers/BridgeFormContainer';
 
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base-solid.png';
+import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import FloatingActionButton from './FloatingActionButton';
 

@@ -1,4 +1,4 @@
-import { $axios, $axiosCustom } from './axios';
+import { $axios, $axiosCustom, $axiosNoIntercept } from './axios';
 import { AxiosResponse } from 'axios';
 // import SnackbarUtils from '../utils/SnackbarUtilsConfigurator';
 
@@ -7,7 +7,14 @@ import {
   // API_IDENTITY_SERVER_URL,
 } from '../utils/constants';
 
+import {
+  L1Networks,
+  L2Networks,
+} from '../interfaces';
+
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
+$axiosCustom.defaults.baseURL = `${API_ENDPOINT}/`;
+$axiosNoIntercept.defaults.baseURL = `${API_ENDPOINT}/`;
 
 export interface IApiResponse {
     data?: any;
@@ -41,7 +48,11 @@ export const ApiService = {
 
   patch(url: string, data: any, config?: {[key: string]: any}) {
     return $axios.patch(url, data, config);
-  }
+  },
+
+  postNoIntercept(resource: string, params: any, config?: {[key: string]: any}) {
+    return $axiosNoIntercept.post(`${resource}`, params, config);
+  },
 
   // update(resource, slug, params) {
   //     return $axios.put(`${resource}/${slug}`, params);
@@ -156,4 +167,59 @@ export const SignerService = {
       signed_message: signedMessage,
     });
   }
+}
+
+export const BridgeService = {
+  async getBaseBridgeTransactionsOverviewByAccountAndTokenAddresses(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+    l1TokenAddress: string,
+    l2TokenAddress: string,
+    accountAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/bridge/base/transactions`, `overview?accountAddress=${accountAddress}&l1Network=${l1Network}&l2Network=${l2Network}&l1TokenAddress=${l1TokenAddress}&l2TokenAddress=${l2TokenAddress}`);
+  },
+  async getBaseBridgeWithdrawalsOverviewByAccountAndTokenAddresses(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+    l1TokenAddress: string,
+    l2TokenAddress: string,
+    accountAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/bridge/base/withdrawals`, `overview?accountAddress=${accountAddress}&l1Network=${l1Network}&l2Network=${l2Network}&l1TokenAddress=${l1TokenAddress}&l2TokenAddress=${l2TokenAddress}`);
+  },
+  async getBaseBridgeDepositsOverviewByAccountAndTokenAddresses(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+    l1TokenAddress: string,
+    l2TokenAddress: string,
+    accountAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/bridge/base/deposits`, `overview?accountAddress=${accountAddress}&l1Network=${l1Network}&l2Network=${l2Network}&l1TokenAddress=${l1TokenAddress}&l2TokenAddress=${l2TokenAddress}`);
+  },
+  async getBaseBridgeTransactionOverviewByTransactionHash(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+    transactionHash: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/bridge/base/transaction`, `overview?l1Network=${l1Network}&l2Network=${l2Network}&transactionHash=${transactionHash}`);
+  },
+  async triggerBaseBridgeSync(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`/bridge/sync`, {
+      l1_network: l1Network,
+      l2_network: l2Network
+    })
+  },
+  async triggerBaseBridgeOptimisticSync(
+    l1Network: L1Networks,
+    l2Network: L2Networks,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.postNoIntercept(`/bridge/sync`, {
+      l1_network: l1Network,
+      l2_network: l2Network
+    })
+  },
 }

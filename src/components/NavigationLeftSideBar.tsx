@@ -14,7 +14,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
 import StakingIcon from '@mui/icons-material/Diversity2';
-// import BridgeIcon from '@mui/icons-material/CompareArrows';
+import BridgeIcon from '@mui/icons-material/CompareArrows';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
 import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -36,7 +36,7 @@ import {
 interface IMenuEntry {
   text: string
   path?: string
-  pathExtended?: string
+  pathExtended?: string[]
   icon: any
   externalLink?: string
   onlyConnected?: boolean
@@ -60,12 +60,12 @@ const navigationMenu : IMenuEntry[] = [
     path: '/stake',
     icon: <StakingIcon />,
   },
-  // {
-  //   text: 'Bridge',
-  //   path: '/bridge',
-  //   pathExtended: '/bridge/:bridgeSelection',
-  //   icon: <BridgeIcon />,
-  // },
+  {
+    text: 'Bridge',
+    path: '/bridge',
+    pathExtended: ['/bridge/:bridgeSelection', '/bridge/:bridgeSelection/:bridgeAction/:transactionHash'],
+    icon: <BridgeIcon />,
+  },
   {
     text: 'Asset Browser',
     path: '/collections',
@@ -236,9 +236,9 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                         toggleOpenCollapseState(index)
                                       }
                                     }}
-                                    className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                    className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                   >
-                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (pathMatch === item.pathExtended))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
+                                      <ListItemIcon className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? classes.selectedIcon : "", classes.menuIcon, darkMode ? classes.menuIconDarkMode : classes.menuIconLightMode].join(" ")}>{item.icon}</ListItemIcon>
                                       <ListItemText primary={item.text} />
                                       {item.externalLink &&
                                         <ExternalLinkIcon style={{opacity: 0.5}} />

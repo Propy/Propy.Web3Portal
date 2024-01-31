@@ -3,6 +3,8 @@ import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
 import { WagmiConfig } from 'wagmi'
 // import { arbitrum, mainnet } from 'viem/chains'
 import { base, mainnet, sepolia, baseSepolia, goerli, baseGoerli } from 'wagmi/chains'
+import BaseLogo from '../assets/img/base-web3modal-logo.png';
+import PropyHouseOnlyLogo from '../assets/img/propy-house-only.png';
 
 import AppContainer from '../containers/AppContainer';
 
@@ -11,10 +13,10 @@ const projectId = '40a62032057258c14ebfdc9c25bfe42e'
 
 // 2. Create wagmiConfig
 const metadata = {
-  name: 'Web3Modal',
-  description: 'Web3Modal Example',
-  url: 'https://web3modal.com',
-  icons: ['https://avatars.githubusercontent.com/u/37784886']
+  name: 'Propy dApp',
+  description: 'Interfacing with Propy\'s on-chain systems',
+  url: 'https://dapp.propy.com',
+  icons: [PropyHouseOnlyLogo]
 }
 
 const chains = 
@@ -39,10 +41,9 @@ createWeb3Modal({
   projectId,
   chains,
   themeMode: 'light',
-  // chainImages: {
-  //   1: EthLogo,
-  //   42161: ArbitrumLogo
-  // }
+  chainImages: {
+    8453: BaseLogo,
+  }
 })
 
 export default function DappProviderWagmi() {
