@@ -5,7 +5,7 @@ import { animated, useSpring } from '@react-spring/web'
 import { toast } from 'sonner';
 
 import { useAccount, useSwitchNetwork } from 'wagmi'
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useWeb3Modal } from '@web3modal/wagmi1/react'
 
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';

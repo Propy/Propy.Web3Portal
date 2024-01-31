@@ -1,4 +1,4 @@
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useWeb3Modal } from '@web3modal/wagmi1/react'
 import { useAccount, useDisconnect } from 'wagmi'
 
 import styled from 'styled-components'
