@@ -68,6 +68,9 @@
     "web3modal": "^1.9.5",
     "yup": "^1.0.0"
   },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.0-placeholder-for-preset-env.2"
+  },
   "scripts": {
     "start": "export PORT=4200 && react-app-rewired start",
     "build": "react-app-rewired build",
