@@ -94,6 +94,16 @@ export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
   })
 }
 
+export const NETWORK_ID_TO_RPC : {[key: number]: string | undefined} = {
+  1: process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET ? process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET : "",
+  42161: process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM ? process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM : "",
+  8453: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE : "",
+  ...(process?.env?.REACT_APP_ENV !== 'prod' && {
+    84532: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA : "",
+    11155111: process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA : "",
+  })
+}
+
 export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
 	'ethereum': 'Ethereum',
 	'arbitrum': 'Arbitrum',
