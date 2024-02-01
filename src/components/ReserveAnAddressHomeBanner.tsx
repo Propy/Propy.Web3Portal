@@ -180,7 +180,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Create an on-chain token which symbolically represents the chosen address
                   </Typography>
                   <Button variant="outlined" color="secondary">
-                    10 PRO
+                    20 PRO
                   </Button>
                 </CardActionArea>
               </LinkWrapper>
