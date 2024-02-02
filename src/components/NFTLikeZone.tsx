@@ -44,7 +44,11 @@ const useStyles = makeStyles((theme: Theme) =>
     likeButton: {
       border: '1px solid #efefef',
       marginRight: theme.spacing(1),
-    }
+    },
+    likeButtonCompact: {
+      border: '1px solid #efefef',
+      marginRight: theme.spacing(0.5),
+    },
   }),
 );
 
@@ -54,6 +58,7 @@ interface INFTLikeZone {
   tokenId: string,
   tokenNetwork: string,
   onSuccess?: () => void,
+  compact?: boolean,
 }
 
 const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
@@ -80,6 +85,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     tokenId,
     tokenNetwork,
     onSuccess,
+    compact = false,
   } = props;
 
   useEffect(() => {
@@ -151,14 +157,14 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
               if(triggerSignedMessageActionResponse.status) {
                 if(onSuccess) {
                   onSuccess();
-                  setReloadIndex(reloadIndex + 1);
-                  if(type === 'add_like_nft') {
-                    setIsLiked(true);
-                    setLikeCount(likeCount + 1);
-                  } else {
-                    setIsLiked(false);
-                    setLikeCount(likeCount - 1);
-                  }
+                }
+                setReloadIndex(reloadIndex + 1);
+                if(type === 'add_like_nft') {
+                  setIsLiked(true);
+                  setLikeCount(likeCount + 1);
+                } else {
+                  setIsLiked(false);
+                  setLikeCount(likeCount - 1);
                 }
                 toast.success(`Like ${type === 'add_like_nft' ? "added" : "removed"} successfully!`);
               } else {
@@ -183,7 +189,15 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
         {!address && 
           <Web3ModalButtonWagmi renderCustomConnectButton={(onClickFn: () => void) => (
             <Tooltip title="Add like">
-              <IconButton className={classes.likeButton} color="primary" onClick={() => onClickFn()}>
+              <IconButton 
+                className={classes.likeButton}
+                color="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onClickFn();
+                }}
+              >
                 {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </IconButton>
             </Tooltip>
@@ -191,13 +205,25 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
         }
         {address &&
           <Tooltip title={isLiked ? "Remove like" : "Add like"}>
-            <IconButton className={classes.likeButton} color="primary" onClick={() => signLike(isLiked ? 'remove_like_nft' : 'add_like_nft')}>
-              {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            <IconButton 
+              size={compact ? 'small' : 'medium'}
+              className={compact ? classes.likeButtonCompact : classes.likeButton}
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                signLike(isLiked ? 'remove_like_nft' : 'add_like_nft')
+              }}
+              onTouchStart={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {isLiked ? <FavoriteIcon fontSize="inherit" /> : <FavoriteBorderIcon fontSize="inherit" />}
             </IconButton>
           </Tooltip>
         }
-        <Typography>
-          {likeCount} {(likeCount && (likeCount === 1)) ? 'Like' : 'Likes'}
+        <Typography variant={compact ? "subtitle2" : "subtitle1"}>
+          {likeCount} 
+          {!compact && <>{(likeCount && (likeCount === 1)) ? ' Like' : ' Likes'}</>}
         </Typography>
     </div>
   )
