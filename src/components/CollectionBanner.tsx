@@ -106,12 +106,6 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         perPage,
         page,
       )
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      }
       setIsLoading(false);
       if(collectionResponse?.status && collectionResponse?.data && isMounted) {
         let renderResults : INFTRecord[] = [];
@@ -142,6 +136,12 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       } else {
         setNftRecords([]);
         setNftAssets({});
+      }
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
       }
     }
     fetchCollection();

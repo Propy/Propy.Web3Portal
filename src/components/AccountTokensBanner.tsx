@@ -93,12 +93,6 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         page,
       )
       setIsLoading(false);
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      }
       if(apiResponse?.status && apiResponse?.data?.data && isMounted) {
         let renderResults: IBalanceRecord[] = [];
         let assetResults : IAllTokenAssets = {};
@@ -131,6 +125,12 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
       } else {
         setOwnedTokenBalances([]);
         setOwnedTokenAssets({});
+      }
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
       }
     }
     fetchMixedTokens();
