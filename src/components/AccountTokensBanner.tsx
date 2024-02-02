@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { useSearchParams } from "react-router-dom";
+
 import { Theme } from '@mui/material/styles';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -61,9 +63,11 @@ interface IAllTokenAssets {
 
 const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
 
+  let [searchParams, setSearchParams] = useSearchParams();
+
   const [ownedTokenBalances, setOwnedTokenBalances] = useState<IBalanceRecord[]>([]);
   const [ownedTokenAssets, setOwnedTokenAssets] = useState<IAllTokenAssets>({});
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
@@ -89,6 +93,12 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         page,
       )
       setIsLoading(false);
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
+      }
       if(apiResponse?.status && apiResponse?.data?.data && isMounted) {
         let renderResults: IBalanceRecord[] = [];
         let assetResults : IAllTokenAssets = {};
@@ -127,7 +137,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
     return () => {
       isMounted = false;
     }
-  }, [account, perPage, page])
+  }, [account, perPage, page, setSearchParams])
 
   return (
     <>
@@ -164,7 +174,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
       </Grid>
       {paginationTotalPages > 1 && showPagination &&
         <div className={classes.paginationContainer}>
-          <Pagination onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+          <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
         </div>
       }
     </>
