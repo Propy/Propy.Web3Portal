@@ -189,7 +189,15 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
         {!address && 
           <Web3ModalButtonWagmi renderCustomConnectButton={(onClickFn: () => void) => (
             <Tooltip title="Add like">
-              <IconButton className={classes.likeButton} color="primary" onClick={() => onClickFn()}>
+              <IconButton 
+                className={classes.likeButton}
+                color="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onClickFn();
+                }}
+              >
                 {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </IconButton>
             </Tooltip>
