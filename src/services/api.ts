@@ -136,6 +136,21 @@ export const NFTService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
   },
+  async getLikedByStatus(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+    likerAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/liked-by-status/${network}`, `${assetAddress}/${tokenId}/${likerAddress}`)
+  },
+  async getLikeCount(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/like-count/${network}`, `${assetAddress}/${tokenId}`)
+  },
   async getRecentlyMintedPaginated(
     perPage: number,
     page: number,
