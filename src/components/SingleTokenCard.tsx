@@ -79,12 +79,12 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 'bold',
     },
     likeContainer: {
-
+      marginBottom: theme.spacing(0.5),
     },
     textFirstLine: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'end',
     }
   }),
 );
@@ -172,7 +172,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   return (
     <Card style={{
       width: '100%',
-      height: '290px',
+      height: '298px',
       ...(selected && {border: `3px solid ${PROPY_LIGHT_BLUE}`}),
       ...((!selected && selectable) && {border: `3px solid white`}),
     }} onClick={() => {
