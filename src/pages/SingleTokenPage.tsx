@@ -20,6 +20,7 @@ import EventHistoryContainer from '../containers/EventHistoryContainer';
 import TokenMetadataTimelineContainer from '../containers/TokenMetadataTimelineContainer';
 import SignalInterestContainer from '../containers/SignalInterestContainer';
 import OfferListContainer from '../containers/OfferListContainer';
+import NFTLikeZoneContainer from '../containers/NFTLikeZoneContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
@@ -85,6 +86,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     actionInfoEntryText: {
       fontWeight: 500,
+    },
+    likeContainer: {
+      marginTop: theme.spacing(3),
     }
   }),
 );
@@ -259,6 +263,11 @@ const SingleTokenPage = () => {
                         <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
                       </div>
                     </div>
+                    {tokenId && tokenAddress && network && 
+                      <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                        <NFTLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+                      </div>
+                    }
                     {tokenMetadata?.description &&
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>

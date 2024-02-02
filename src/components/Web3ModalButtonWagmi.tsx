@@ -1,3 +1,4 @@
+import React from 'react';
 import { useWeb3Modal } from '@web3modal/wagmi1/react'
 import { useAccount, useDisconnect } from 'wagmi'
 
@@ -18,6 +19,7 @@ interface IWeb3ModalButtonProps {
   overrideConnectText?: string
   variant?: "text" | "outlined" | "contained"
   color?: "primary" | "secondary" | "info" | "success" | "error"
+  renderCustomConnectButton?: (onClickFn: () => void) => JSX.Element
 }
 
 export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
@@ -28,6 +30,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
     overrideConnectText,
     variant,
     color,
+    renderCustomConnectButton,
   } = props;
 
   // 4. Use modal hook
@@ -52,7 +55,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
           <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => disconnect()}>Disconnect</Button>
         </>
       ) : (
-        <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => open()}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
+        renderCustomConnectButton ? renderCustomConnectButton(() => open()) : <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => open()}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
       )}
     </>
   )

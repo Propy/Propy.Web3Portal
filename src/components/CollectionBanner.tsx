@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { useSearchParams } from "react-router-dom";
+
 import { Theme } from '@mui/material/styles';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -66,9 +68,11 @@ interface INftAssets {
 
 const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
 
+  let [searchParams, setSearchParams] = useSearchParams();
+
   const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
   const [nftAssets, setNftAssets] = useState<INftAssets>({});
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
@@ -133,12 +137,18 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         setNftRecords([]);
         setNftAssets({});
       }
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
+      }
     }
     fetchCollection();
     return () => {
       isMounted = false;
     }
-  }, [contractNameOrCollectionNameOrAddress, network, perPage, page])
+  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams])
 
   return (
     <>
@@ -182,7 +192,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       </Grid>
       {paginationTotalPages > 1 && showPagination &&
         <div className={classes.paginationContainer}>
-          <Pagination onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+          <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
         </div>
       }
     </>
