@@ -91,12 +91,6 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
         perPage,
         page,
       )
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      }
       setIsLoading(false);
       if(recentlyMintedResponse?.status && recentlyMintedResponse?.data && isMounted) {
         let renderResults : INFTRecord[] = [];
@@ -118,6 +112,12 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
       } else {
         setNftRecords([]);
         setNftAssets({});
+      }
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
       }
     }
     fetchMixedTokens();
