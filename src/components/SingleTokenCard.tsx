@@ -13,6 +13,8 @@ import Chip from '@mui/material/Chip';
 
 import { utils } from "ethers";
 
+import NFTLikeZoneContainer from '../containers/NFTLikeZoneContainer';
+
 import DefaultTokenImage from '../assets/img/default-token.webp';
 import PlaceholderImage from '../assets/img/placeholder.webp';
 
@@ -26,6 +28,10 @@ import {
   getResolvableIpfsLink,
   priceFormat,
 } from '../utils';
+
+import {
+  PROPY_LIGHT_BLUE,
+} from '../utils/constants';
 
 import LinkWrapper from './LinkWrapper';
 
@@ -71,6 +77,14 @@ const useStyles = makeStyles((theme: Theme) =>
     chip: {
       color: 'white',
       fontWeight: 'bold',
+    },
+    likeContainer: {
+
+    },
+    textFirstLine: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     }
   }),
 );
@@ -79,6 +93,9 @@ interface ISingleTokenCardProps {
   balanceRecord?: IBalanceRecord,
   assetRecord: IAssetRecord,
   nftRecord?: INFTRecord,
+  selectable?: boolean,
+  onBalanceRecordSelected?: (balanceRecord: IBalanceRecord) => void,
+  selected?: boolean,
 }
 
 const SingleTokenCard = (props: ISingleTokenCardProps) => {
@@ -87,17 +104,21 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     assetRecord,
     balanceRecord,
     nftRecord,
+    selectable,
+    onBalanceRecordSelected,
+    selected,
   } = props;
 
   const [tokenImage, setTokenImage] = useState(PlaceholderImage);
   const [tokenTitle, setTokenTitle] = useState('');
   const [tokenId, setTokenId] = useState('');
   const [tokenCollectionName, setTokenCollectionName] = useState('');
+  const [tokenContractAddress, setTokenContractAddress] = useState<false | string>(false);
+  const [tokenNetwork, setTokenNetwork] = useState<false | string>(false);
   const [tokenStandard, setTokenStandard] = useState('');
   const [tokenLink, setTokenLink] = useState('');
 
   useEffect(() => {
-    console.log({assetRecord, balanceRecord})
     let tokenRecordMetadata;
     let useRecord;
     if(balanceRecord) {
@@ -116,6 +137,8 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     if(useRecord) {
       if(useRecord.asset?.standard) {
         setTokenStandard(useRecord.asset.standard);
+        setTokenContractAddress(useRecord.asset.address);
+        setTokenNetwork(useRecord.network_name);
       }
       if(assetRecord?.standard === "ERC-721") {
         if(tokenRecordMetadata?.image) {
@@ -127,10 +150,13 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
           setTokenTitle(tokenRecordMetadata?.name);
         }
         if(useRecord.token_id) {
-          setTokenId(`# ${useRecord.token_id}`);
+          setTokenId(useRecord.token_id);
         }
         setTokenLink(`token/${useRecord.network_name}/${useRecord.asset_address}/${useRecord.token_id}`);
       }
+    } else {
+      setTokenContractAddress(false);
+      setTokenNetwork(false);
     }
     if(assetRecord) {
       if(assetRecord?.collection_name) {
@@ -144,8 +170,17 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   const classes = useStyles();
 
   return (
-    <Card style={{width: '100%', height: '290px'}}>
-      <LinkWrapper link={tokenLink ? tokenLink : `./`}>
+    <Card style={{
+      width: '100%',
+      height: '290px',
+      ...(selected && {border: `3px solid ${PROPY_LIGHT_BLUE}`}),
+      ...((!selected && selectable) && {border: `3px solid white`}),
+    }} onClick={() => {
+      if(balanceRecord && selectable && onBalanceRecordSelected) {
+        onBalanceRecordSelected(balanceRecord);
+      }
+    }}>
+      <LinkWrapper link={(tokenLink && !selectable) ? tokenLink : undefined}>
         <CardActionArea className={classes.actionArea}>
           <CardMedia
             component="img"
@@ -164,15 +199,22 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
               {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
             </div>
             <div className={classes.rightChips}>
-              {tokenId && <Chip className={classes.chip} color="primary" label={tokenId} size="small" />}
+              {tokenId && <Chip className={classes.chip} color="primary" label={`# ${tokenId}`} size="small" />}
             </div>
           </div>
           <div className={classes.typographyZone}>
-            {tokenCollectionName &&
-              <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
-                {tokenCollectionName}
-              </Typography>
-            }
+            <div className={classes.textFirstLine}>
+              {tokenCollectionName &&
+                <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
+                  {tokenCollectionName}
+                </Typography>
+              }
+              {tokenId && tokenContractAddress && tokenNetwork && 
+                <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                  <NFTLikeZoneContainer compact={true} tokenId={tokenId} tokenAddress={tokenContractAddress} tokenNetwork={tokenNetwork} />
+                </div>
+              }
+            </div>
             <Typography variant="h6" className={[classes.title].join(" ")}>
               {tokenTitle}
             </Typography>
