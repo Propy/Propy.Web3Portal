@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     childContainerMobile: {
       margin: theme.spacing(2),
       marginTop: 0,
+      marginBottom: theme.spacing(10),
     },
     titleContainer: {
       marginBottom: theme.spacing(4),
@@ -36,8 +37,17 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingBottom: theme.spacing(2),
       borderBottom: '2px solid #DBDBDB',
     },
+    titleContainerMobile: {
+      marginBottom: theme.spacing(4),
+      marginTop: theme.spacing(4),
+      paddingBottom: theme.spacing(2),
+      borderBottom: '2px solid #DBDBDB',
+    },
     noTitleContainer: {
       marginTop: theme.spacing(7),
+    },
+    noTitleContainerMobile: {
+      marginTop: theme.spacing(4),
     },
     title: {
       fontWeight: 500,
@@ -76,7 +86,7 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
       childClasses.push(classes.childContainerLarge);
     }
     if(!title) {
-      childClasses.push(classes.noTitleContainer);
+      childClasses.push(isMobile ? classes.noTitleContainerMobile : classes.noTitleContainer);
     }
     return childClasses.join(" ");
   }
@@ -85,7 +95,7 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
     <div className={classes.root}>
       <div className={getChildContainerClass(isConsideredMobile, isConsideredMedium, title)}>
         {title &&
-          <div className={classes.titleContainer}>
+          <div className={isConsideredMobile ? classes.titleContainerMobile : classes.titleContainer}>
             <Typography variant="h3" component="h2" className={[classes.title].join(" ")}>
               {title}
             </Typography>
