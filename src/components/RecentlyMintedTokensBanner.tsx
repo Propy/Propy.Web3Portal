@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { useSearchParams } from "react-router-dom";
+
 import { Theme } from '@mui/material/styles';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -62,9 +64,11 @@ interface IRecentlyMintedTokenAssets {
 
 const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFromRedux) => {
 
+  let [searchParams, setSearchParams] = useSearchParams();
+
   const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
   const [nftAssets, setNftAssets] = useState<IRecentlyMintedTokenAssets>({});
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
@@ -109,12 +113,18 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
         setNftRecords([]);
         setNftAssets({});
       }
+      if(page > 1) {
+        setSearchParams((params => {
+          params.set("page", page.toString());
+          return params;
+        }));
+      }
     }
     fetchMixedTokens();
     return () => {
       isMounted = false;
     }
-  }, [perPage, page])
+  }, [perPage, page, setSearchParams])
 
   return (
     <>
@@ -153,7 +163,7 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
         </Grid>
         {paginationTotalPages > 1 && showPagination &&
           <div className={classes.paginationContainer}>
-            <Pagination onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
           </div>
         }
     </>
