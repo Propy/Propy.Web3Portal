@@ -166,7 +166,25 @@ export const AccountBalanceService = {
     page: number,
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/balances`, `${account}?perPage=${perPage}&page=${page}`)
-  }
+  },
+  async getAccountBalancesByAsset(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}`)
+  },
+  async getAccountBalancesByAssetIncludeStakingStatus(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true`)
+  },
+  async getAccountBalancesByAssetOnlyStaked(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true`)
+  },
 }
 
 export const SignerService = {
@@ -236,5 +254,11 @@ export const BridgeService = {
       l1_network: l1Network,
       l2_network: l2Network
     })
+  },
+}
+
+export const StakeService = {
+  async triggerStakeOptimisticSync() : Promise<AxiosResponse["data"]> {
+    return ApiService.postNoIntercept(`/stake/sync`, {});
   },
 }
