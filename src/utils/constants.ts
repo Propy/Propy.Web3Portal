@@ -10,8 +10,8 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "prod": "https://dappapi.propy.com/",
 }
 
-export const API_ENDPOINT = "http://localhost:8420";
-// export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
+// export const API_ENDPOINT = "http://localhost:8420";
+export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
 export const PRO_TOKEN_DECIMALS = 8;
