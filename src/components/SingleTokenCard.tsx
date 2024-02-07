@@ -85,6 +85,10 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'end',
+    },
+    disabledActionArea: {
+      opacity: 0.5,
+      pointerEvents: 'none',
     }
   }),
 );
@@ -96,6 +100,7 @@ interface ISingleTokenCardProps {
   selectable?: boolean,
   onBalanceRecordSelected?: (balanceRecord: IBalanceRecord) => void,
   selected?: boolean,
+  disabled?: boolean,
 }
 
 const SingleTokenCard = (props: ISingleTokenCardProps) => {
@@ -107,6 +112,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     selectable,
     onBalanceRecordSelected,
     selected,
+    disabled,
   } = props;
 
   const [tokenImage, setTokenImage] = useState(PlaceholderImage);
@@ -170,7 +176,9 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
   const classes = useStyles();
 
   return (
-    <Card style={{
+    <Card 
+      className={disabled ? classes.disabledActionArea : ""}
+      style={{
       width: '100%',
       height: '298px',
       ...(selected && {border: `3px solid ${PROPY_LIGHT_BLUE}`}),
@@ -209,7 +217,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
                   {tokenCollectionName}
                 </Typography>
               }
-              {tokenId && tokenContractAddress && tokenNetwork && 
+              {tokenId && tokenContractAddress && tokenNetwork && !selectable && 
                 <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
                   <NFTLikeZoneContainer compact={true} tokenId={tokenId} tokenAddress={tokenContractAddress} tokenNetwork={tokenNetwork} />
                 </div>

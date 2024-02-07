@@ -10,8 +10,8 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "prod": "https://dappapi.propy.com/",
 }
 
-// export const API_ENDPOINT = "http://localhost:8420";
-export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
+export const API_ENDPOINT = "http://localhost:8420";
+// export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
 export const PRO_TOKEN_DECIMALS = 8;
@@ -38,6 +38,16 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
 const COLLECTIONS_ENTRIES_DEV = [
+  {
+    network: "base-sepolia",
+    address: "0x07922CDe9e58fb590ffB59BB8777cF4b737fE2a3",
+    slug: "propykeys-staking-sepolia"
+  },
+  {
+    network: "base-sepolia",
+    address: "0x4ebCEb82B5940E10c301A33261Af13222A38d974",
+    slug: "propykeys-og-staking-sepolia",
+  },
   {
     network: "base-sepolia",
     address: "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c",
@@ -93,6 +103,12 @@ export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
     11155111: 'sepolia',
   })
 }
+
+// REACT_APP_QUICKNODE_RPC_URL_MAINNET="https://fittest-cosmological-grass.quiknode.pro/9cf41930fbbefb9874249ef10b64e4f311847524/"
+// REACT_APP_QUICKNODE_RPC_URL_ARBITRUM="https://methodical-cosmological-county.arbitrum-mainnet.quiknode.pro/0338e1b5f17fa07a19974e2943651afe27114da1/"
+// REACT_APP_QUICKNODE_RPC_URL_BASE="https://black-stylish-film.base-mainnet.quiknode.pro/485c59e4fe0210ea66a56ad320b0cd7de255a93b/"
+// REACT_APP_QUICKNODE_RPC_URL_SEPOLIA="https://wandering-light-lambo.ethereum-sepolia.quiknode.pro/619fe77ab58eeca41650532e19818572938ec8f7"
+// REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA="https://bold-ancient-card.base-sepolia.quiknode.pro/be656259bcf0f5ca0de9302aa1b5c09be5a428a5"
 
 export const NETWORK_ID_TO_RPC : {[key: number]: string | undefined} = {
   1: process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET ? process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET : "",
@@ -153,6 +169,10 @@ export const PRO_BASE_L2_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x1
 export const L2_TO_L1_MESSAGE_PASSER_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x4200000000000000000000000000000000000016" : "0x4200000000000000000000000000000000000016";
 export const OPTIMISM_PORTAL_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x49048044D57e1C92A77f79988d21Fa8fAF74E97e" : "0x49f53e41452C74589E85cA1677426Ba426459e85";
 export const L2_OUTPUT_ORACLE = process?.env?.REACT_APP_ENV === 'prod' ? "0x56315b90c40730925ec5485cf004d835058518A0" : "0x84457ca9D0163FbC4bbfe4Dfbb20ba46e48DF254";
+export const BASE_L2_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia';
+export const BASE_PROPYKEYS_STAKING_CONTRACT = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0x3504Bf24Ff9fC43b41628153742907C9fb20ccA1";
+export const BASE_PROPYKEYS_STAKING_NFT = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0x07922CDe9e58fb590ffB59BB8777cF4b737fE2a3";
+export const BASE_OG_STAKING_NFT = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0x4ebCEb82B5940E10c301A33261Af13222A38d974";
 
 export const BRIDGE_SELECTION_TO_ORIGIN_AND_DESTINATION_NETWORK : {[key: string]: {
   bridgeAddress: `0x${string}`,
