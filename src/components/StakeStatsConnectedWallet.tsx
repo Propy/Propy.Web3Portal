@@ -27,6 +27,7 @@ import {
 
 import {
   BASE_PROPYKEYS_STAKING_CONTRACT,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import { 
@@ -251,9 +252,12 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             <div className={classes.cardInner}>
               {pieChartData && 
                 <PieChart
+                colors={["#80c8ff", PROPY_LIGHT_BLUE]}
                   series={[
                     {
                       data: pieChartData,
+                      innerRadius: 50,
+                      valueFormatter: (entry) => `${entry.value.toFixed(2)} %`
                     },
                   ]}
                   width={isConsideredMobile ? 400 : 700}
