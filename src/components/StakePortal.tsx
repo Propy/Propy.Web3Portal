@@ -309,8 +309,19 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       transform: 'translateY(100%)',
     },
     to: {
-      bottom: selectedTokenIds.length > 0 ? '100px' : '0px',
-      transform: `translateY(${selectedTokenIds.length > 0 ? '0%' : '100%'})`,
+      bottom: (selectedTokenIds.length > 0 && !isSyncingStaking) ? '100px' : '0px',
+      transform: `translateY(${(selectedTokenIds.length > 0 && !isSyncingStaking) ? '0%' : '100%'})`,
+    },
+  })
+
+  const actionZoneSyncingSpring = useSpring({
+    from: {
+      bottom: '0px',
+      transform: 'translateY(100%)',
+    },
+    to: {
+      bottom: isSyncingStaking ? '100px' : '0px',
+      transform: `translateY(${isSyncingStaking ? '0%' : '100%'})`,
     },
   })
 
@@ -976,6 +987,27 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                 </div>
               </>
             }
+        </Card>
+      </animated.div>
+      <animated.div className={classes.floatingActionZone} style={actionZoneSyncingSpring}>
+        <Card className={classes.floatingActionZoneCard} elevation={6}>
+            <Typography variant="h6">
+              Syncing Staking Contract
+            </Typography>
+            <>
+              <div className={classes.submitButtonContainer}>
+                  <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
+                    <FloatingActionButton
+                      className={classes.submitButton}
+                      buttonColor="secondary"
+                      disabled={true}
+                      // onClick={() => runStake()}
+                      showLoadingIcon={true}
+                      text={'Syncing Staking Contract...'}
+                    />
+                  </div>
+              </div>
+            </>
         </Card>
       </animated.div>
     </div>

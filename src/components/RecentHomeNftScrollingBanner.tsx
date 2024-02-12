@@ -43,9 +43,9 @@ const RecentHomeNftScrollingBanner = () => {
           if(collectionResponse?.status && apiResponseData?.data) {
             for(let nftRecord of apiResponseData?.data) {
               if(nftRecord.metadata) {
-                let parsedMetadata = JSON.parse(nftRecord.metadata);
+                let parsedMetadata = nftRecord.metadata;
                 let cityAttribute = parsedMetadata?.attributes?.find((entry: {trait_type: string, value: string}) => entry.trait_type === 'City');
-                let reservationEntryTimeline = parsedMetadata?.timeline?.find((entry: {milestone: string, date: string, completed: boolean}) => entry.milestone === 'Reserved');
+                let reservationEntryTimeline = parsedMetadata?.timeline?.find((entry) => entry.milestone === 'Reserved');
                 let isReservationWithinBannerTimeframe = false;
                 if(reservationEntryTimeline && reservationEntryTimeline.date && !isNaN(reservationEntryTimeline.date)) {
                   let secondsSinceMint = (Math.floor(new Date().getTime() / 1000) - Number(reservationEntryTimeline.date))

@@ -128,7 +128,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     let tokenRecordMetadata;
     let useRecord;
     if(balanceRecord) {
-      tokenRecordMetadata = balanceRecord.nft?.metadata ? JSON.parse(balanceRecord.nft?.metadata) : {};
+      tokenRecordMetadata = balanceRecord.nft?.metadata ? balanceRecord.nft?.metadata : {};
       useRecord = balanceRecord;
       if (assetRecord?.standard === "ERC-20") {
         setTokenImage(DefaultTokenImage);
@@ -137,7 +137,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
         setTokenLink(`token/${useRecord.network_name}/${useRecord.asset_address}`);
       }
     } else if (nftRecord) {
-      tokenRecordMetadata = nftRecord.metadata ? JSON.parse(nftRecord.metadata) : {};
+      tokenRecordMetadata = nftRecord.metadata ? nftRecord.metadata : {};
       useRecord = nftRecord;
     }
     if(useRecord) {

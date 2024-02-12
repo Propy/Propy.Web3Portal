@@ -165,7 +165,7 @@ const SingleTokenPage = () => {
             setTokenOfferList(tokenRecordQueryResponse?.data?.offchain_offers);
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
-            let metadata = JSON.parse(tokenRecordQueryResponse?.data?.metadata);
+            let metadata = tokenRecordQueryResponse?.data?.metadata ? tokenRecordQueryResponse?.data?.metadata : {};
             // // temp timeline shim for testing design
             // if(network === 'goerli') {
             //   metadata.timeline = [
