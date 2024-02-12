@@ -136,6 +136,8 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
         totalPercent = totalPercent - individualPercent;
       }
       newPieChartData.push({ id: 0, value: totalPercent, label: address ? 'Other\'s Stake' : 'Network Stake' });
+    } else {
+      newPieChartData.push({ id: 0, value: 1, label: 'Network Stake' });
     }
 
     if(address && stakerShares && (Number(stakerShares) > 0)) {
@@ -157,6 +159,24 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             {leaveAmountFromShares && stakedPROByStaker && `Available Reward: ${priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares.toString()).minus(stakedPROByStaker.toString()).toString(), 8)), 2, 'PRO')}`}
           </pre>
         </Grid> */}
+        <Grid item xs={12} md={6} lg={3}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {(isLoadingLeaveAmountFromShares || isLoadingStakedPROByStaker) && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingLeaveAmountFromShares && !isLoadingStakedPROByStaker && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Available Extra PRO</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares ? leaveAmountFromShares.toString() : 0).minus(stakedPROByStaker ? stakedPROByStaker.toString() : 0).toString(), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
         <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
@@ -229,24 +249,6 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             </div>
           </Card>
         </Grid> */}
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {(isLoadingLeaveAmountFromShares || isLoadingStakedPROByStaker) && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingLeaveAmountFromShares && !isLoadingStakedPROByStaker && (
-                <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Available Reward</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares ? leaveAmountFromShares.toString() : 0).minus(stakedPROByStaker ? stakedPROByStaker.toString() : 0).toString(), 8)), 2, 'PRO', false, true)}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
         <Grid item xs={12} lg={12}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>

@@ -114,7 +114,7 @@ export interface INFTRecord {
     network_name: string,
     asset_address: string,
     token_id: string,
-    metadata: string,
+    metadata: ITokenMetadata,
     balances?: IBalanceRecord[],
     asset?: IAssetRecord,
     longitude?: number,
@@ -181,6 +181,11 @@ export interface IOwnedBalancesResult {
     metadata: {
         pagination: IPagination,
     }
+}
+
+export interface ICollectionQueryFilter {
+    filter_type: string;
+    value: string | boolean;
 }
 
 export interface IAttribute {

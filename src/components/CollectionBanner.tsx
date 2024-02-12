@@ -22,6 +22,7 @@ import {
   IAssetRecord,
   INFTRecord,
   IRecentlyMintedResult,
+  ICollectionQueryFilter,
 } from '../interfaces';
 
 import {
@@ -100,11 +101,22 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   useEffect(() => {
     let isMounted = true;
     const fetchCollection = async () => {
+      let additionalFilters : ICollectionQueryFilter[] = [];
+      if(searchParams.get("city")) {
+        additionalFilters.push({filter_type: "city", value: `${searchParams.get("city")}`});
+      }
+      if(searchParams.get("country")) {
+        additionalFilters.push({filter_type: "country", value: `${searchParams.get("country")}`});
+      }
+      if(searchParams.get("landmark")) {
+        additionalFilters.push({filter_type: "landmark", value: true});
+      }
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
         contractNameOrCollectionNameOrAddress,
         perPage,
         page,
+        additionalFilters,
       )
       setIsLoading(false);
       if(collectionResponse?.status && collectionResponse?.data && isMounted) {
@@ -148,7 +160,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     return () => {
       isMounted = false;
     }
-  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams])
+  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParams])
 
   return (
     <>

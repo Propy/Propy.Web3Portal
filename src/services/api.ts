@@ -10,6 +10,7 @@ import {
 import {
   L1Networks,
   L2Networks,
+  ICollectionQueryFilter,
 } from '../interfaces';
 
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
@@ -125,8 +126,9 @@ export const NFTService = {
     contractNameOrCollectionNameOrAddress: string,
     perPage: number,
     page: number,
+    additionalFilters?: ICollectionQueryFilter[],
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
+    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"])}` : ''}`)
   },
   async getCoordinatesPaginated(
     network: string,
