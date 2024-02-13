@@ -108,6 +108,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("country")) {
         additionalFilters.push({filter_type: "country", value: `${searchParams.get("country")}`});
       }
+      if(searchParams.get("owner")) {
+        additionalFilters.push({filter_type: "owner", value: `${searchParams.get("owner")}`});
+      }
       if(searchParams.get("landmark")) {
         additionalFilters.push({filter_type: "landmark", value: true});
       }
