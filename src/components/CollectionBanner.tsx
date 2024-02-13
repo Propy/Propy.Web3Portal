@@ -111,6 +111,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("landmark")) {
         additionalFilters.push({filter_type: "landmark", value: true});
       }
+      if(searchParams.get("attached_deed")) {
+        additionalFilters.push({filter_type: "attached_deed", value: true});
+      }
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
         contractNameOrCollectionNameOrAddress,

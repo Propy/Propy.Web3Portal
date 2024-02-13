@@ -128,7 +128,7 @@ export const NFTService = {
     page: number,
     additionalFilters?: ICollectionQueryFilter[],
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"])}` : ''}`)
+    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"]).join("&")}` : ''}`)
   },
   async getCoordinatesPaginated(
     network: string,
