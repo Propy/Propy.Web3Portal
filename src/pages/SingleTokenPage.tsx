@@ -89,6 +89,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     likeContainer: {
       marginTop: theme.spacing(3),
+    },
+    descriptionSpacerMobile: {
+      marginBottom: theme.spacing(2),
     }
   }),
 );
@@ -120,7 +123,16 @@ const getTimelineTitle = (tokenAddress: string | undefined) => {
   return "Transaction Timeline";
 }
 
-const SingleTokenPage = () => {
+interface ISingleTokenPage {
+  isConsideredMobile: boolean,
+}
+
+const SingleTokenPage = (props: ISingleTokenPage) => {
+
+    const {
+      isConsideredMobile,
+    } = props;
+
     const classes = useStyles();
 
     const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
@@ -226,11 +238,54 @@ const SingleTokenPage = () => {
       setIsMetadataRefreshing(false);
     }
 
+    const renderPrimaryContent = () => {
+      if(tokenRecord) {
+        return (
+          <>
+            <LinkWrapper link={`collection/${tokenRecord.network_name}/${tokenRecord.slug}`}>
+              <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
+                {
+                  `${tokenRecord.collection_name ? tokenRecord.collection_name : tokenRecord.name} `
+                }
+              </Typography>
+            </LinkWrapper>
+            <Typography variant="h3" style={{fontWeight: 'bold'}}>
+              {
+                tokenMetadata && `${TOKEN_NAME_PREFIX[tokenRecord.address] ? `${TOKEN_NAME_PREFIX[tokenRecord.address]} ${tokenMetadata.name}` : tokenMetadata.name}`
+              }
+              {
+                TOKEN_NAME_HIDE_ID[tokenRecord.address] && tokenMetadata ? '' : ` #${tokenId}`
+              }
+            </Typography>
+            <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
+              <div className={[classes.actionInfoEntry, 'clickable', isMetadataRefreshing ? 'disable-click' : ''].join(" ")} onClick={() => refreshTokenMetadata()}>
+                {!isMetadataRefreshing && <RefreshIcon className={classes.actionInfoEntryIcon} />}
+                {isMetadataRefreshing && <CircularProgress className={classes.actionInfoProgressIcon} style={{width: 18, height: 18}} color="inherit"/>}
+                <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
+              </div>
+            </div>
+            {tokenId && tokenAddress && network && 
+              <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                <NFTLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+              </div>
+            }
+            {tokenMetadata?.description &&
+              <>
+                <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
+                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : ''}>{tokenMetadata?.description}</Typography>
+              </>
+            }
+          </>
+        )
+      }
+    }
+
     return (
         <GenericPageContainer>
           {(!tokenStandard || tokenStandard === 'ERC-721') &&
             <Grid container spacing={6} columns={12}>
-              <Grid item xs={12} md={5}>
+              <Grid item xs={12} sm={12} md={12} lg={5}>
+                {isConsideredMobile && renderPrimaryContent()}
                 <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : PlaceholderImage}")`}}/>
                 {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
                   <div className={classes.sectionSpacer}>
@@ -238,42 +293,10 @@ const SingleTokenPage = () => {
                   </div>
                 }
               </Grid>
-              <Grid item xs={12} md={7}>
+              <Grid item xs={12} sm={12} md={12} lg={7}>
                 {tokenRecord &&
                   <>
-                    <LinkWrapper link={`collection/${tokenRecord.network_name}/${tokenRecord.slug}`}>
-                      <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
-                        {
-                          `${tokenRecord.collection_name ? tokenRecord.collection_name : tokenRecord.name} `
-                        }
-                      </Typography>
-                    </LinkWrapper>
-                    <Typography variant="h3" style={{fontWeight: 'bold'}}>
-                      {
-                        tokenMetadata && `${TOKEN_NAME_PREFIX[tokenRecord.address] ? `${TOKEN_NAME_PREFIX[tokenRecord.address]} ${tokenMetadata.name}` : tokenMetadata.name}`
-                      }
-                      {
-                        TOKEN_NAME_HIDE_ID[tokenRecord.address] && tokenMetadata ? '' : ` #${tokenId}`
-                      }
-                    </Typography>
-                    <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
-                      <div className={[classes.actionInfoEntry, 'clickable', isMetadataRefreshing ? 'disable-click' : ''].join(" ")} onClick={() => refreshTokenMetadata()}>
-                        {!isMetadataRefreshing && <RefreshIcon className={classes.actionInfoEntryIcon} />}
-                        {isMetadataRefreshing && <CircularProgress className={classes.actionInfoProgressIcon} style={{width: 18, height: 18}} color="inherit"/>}
-                        <Typography variant="body1" className={classes.actionInfoEntryText}>Refresh Metadata</Typography>
-                      </div>
-                    </div>
-                    {tokenId && tokenAddress && network && 
-                      <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                        <NFTLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
-                      </div>
-                    }
-                    {tokenMetadata?.description &&
-                      <>
-                        <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
-                        <Typography variant="body1">{tokenMetadata?.description}</Typography>
-                      </>
-                    }
+                    {!isConsideredMobile && renderPrimaryContent()}
                     {tokenMetadata?.timeline && tokenMetadata?.timeline.length > 0 &&
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title={getTimelineTitle(tokenAddress)} />
