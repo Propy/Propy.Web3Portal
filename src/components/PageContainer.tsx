@@ -82,8 +82,8 @@ const PageContainer = (props: PropsFromRedux) => {
                   <Routes>
                       <Route path="/" element={<HomePage/>} />
                       <Route path="/my-assets" element={<AccountTokensPage darkMode={darkMode}/>} />
-                      <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
-                      <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
+                      <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage isConsideredMobile={isConsideredMobile} />} />
+                      <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage isConsideredMobile={isConsideredMobile}/>} />
                       <Route path="/account/:accountAddress" element={<AccountTokensPage darkMode={darkMode} />} />
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
