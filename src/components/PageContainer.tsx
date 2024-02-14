@@ -1,5 +1,5 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {Routes, Route} from 'react-router-dom';
+import React, {useState, useLayoutEffect, useEffect} from 'react';
+import {Routes, Route, useLocation} from 'react-router-dom';
 
 import { Theme } from '@mui/material/styles';
 
@@ -49,6 +49,8 @@ const PageContainer = (props: PropsFromRedux) => {
       darkMode,
     } = props;
 
+    const { pathname } = useLocation();
+
     const classes = useStyles();
 
     const windowSize = useWindowSize();
@@ -67,6 +69,10 @@ const PageContainer = (props: PropsFromRedux) => {
           setIsLayoutInitialized(true);
         }
     }, [windowSize.width, windowSize.height, setShowDesktopMenu]);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
 
     return (
         <Navigation>

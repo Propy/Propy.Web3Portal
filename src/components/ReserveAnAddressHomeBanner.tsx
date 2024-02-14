@@ -144,10 +144,10 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
           Home Address Registry
         </Typography>
         <Typography variant="h6" className={[classes.subtitle, isConsideredMobile ? "full-width" : ""].join(" ")}>
-          Become part of a world-first movement of creating an on-chain registry of homes
+          Become part of a world-first movement of creating an onchain registry of homes
         </Typography>
         <Typography variant="body1" className={[classes.titleSpacing, isConsideredMobile ? "full-width" : ""].join(" ")}>
-          Inching closer to a future where tokenized real-estate could be used as collateral in on-chain protocols
+          Inching closer to a future where tokenized real-estate could be used as collateral in onchain protocols
         </Typography>
         <MapCard 
           height="550px"
@@ -177,7 +177,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Mint Address
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Create an on-chain token which symbolically represents the chosen address
+                    Create an onchain token which symbolically represents the chosen address
                   </Typography>
                   <Button variant="outlined" color="secondary">
                     20 PRO
@@ -223,7 +223,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     RWA
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Speed up the buying & selling process, potentially use NFT as on-chain collateral
+                    Speed up the buying & selling process, potentially use NFT as onchain collateral
                   </Typography>
                   <Button variant="outlined" color="secondary">
                     2000 PRO
