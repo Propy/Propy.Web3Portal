@@ -104,6 +104,20 @@ const App = (props: PropsFromRedux) => {
                 borderRadius: 30,
               }
             }
+          },
+          MuiStepIcon: {
+            styleOverrides: {
+              root: {
+                text: {
+                  fill: '#FFFFFF',
+                  fontWeight: 'bold',
+                },
+              },
+              text: {
+                fill: '#FFFFFF',
+                fontWeight: 'bold',
+              },
+            }
           }
         }
       }),

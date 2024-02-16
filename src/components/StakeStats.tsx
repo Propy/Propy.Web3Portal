@@ -1,18 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-
-import { animated, useSpring } from '@react-spring/web';
-
-import { PieChart } from '@mui/x-charts/PieChart';
+import React from 'react';
 
 import { utils } from 'ethers';
 
 import BigNumber from 'bignumber.js';
-
-import { toast } from 'sonner';
-
-import * as yup from 'yup';
-
-import EastIcon from '@mui/icons-material/East';
 
 import { Theme } from '@mui/material/styles';
 
@@ -22,33 +12,26 @@ import createStyles from '@mui/styles/createStyles';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { useAccount, useBalance, useContractRead, useContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
 
-import { Formik, Form, Field, FormikProps } from 'formik';
-import { TextField } from 'formik-mui';
-
-import { PropsFromRedux } from '../containers/BridgeFormContainer';
-
-import EthLogo from '../assets/img/ethereum-web3-modal.png';
-import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
-
-import FloatingActionButton from './FloatingActionButton';
-
-import { SupportedNetworks } from '../interfaces';
+import { PropsFromRedux } from '../containers/StakeStatsContainer';
 
 import {
   priceFormat,
 } from '../utils';
 
 import {
-  NETWORK_NAME_TO_DISPLAY_NAME,
-  PROPY_LIGHT_BLUE,
+  BASE_PROPYKEYS_STAKING_CONTRACT,
+  PRO_BASE_L2_ADDRESS,
+  BASE_PROPYKEYS_STAKING_NFT,
+  BASE_OG_STAKING_NFT,
 } from '../utils/constants';
 
-import ERC20ABI from '../abi/ERC20ABI.json';
-import L1StandardBridgeABI from '../abi/L1StandardBridgeABI.json';
-import L2StandardBridgeABI from '../abi/L2StandardBridgeABI.json';
+import StakeStatsConnectedWalletContainer from '../containers/StakeStatsConnectedWalletContainer';
+
+import { useTotalStakingShareSupply, useTotalStakedPRO, useStakedTokenCount, useTotalStakingBalancePRO } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -76,20 +59,17 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(4),
       width: '100%',
     },
+    personalStatsSpacer: {
+      marginBottom: theme.spacing(2),
+    }
   }),
 );
 
-interface IPieChartEntry {
-  id: number
-  value: number
-  label: string
-}
-
 const StakeStats = (props: PropsFromRedux & IStakeStats) => {
 
-  let {
+  // let {
 
-  } = props;
+  // } = props;
 
   const classes = useStyles();
 
@@ -97,77 +77,174 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     address,
   } = useAccount();
 
-  const [pieChartData, setPieChartData] = useState<false | IPieChartEntry[]>(false);
+  const { chain } = useNetwork();
 
-  const originSpring = useSpring({
-    from: {
-      transform: 'translateX(25%)',
-    },
-    to: {
-      transform: 'translateX(0%)',
-    },
-  })
+  const { 
+    data: stakerShares,
+    isLoading: isLoadingStakerShares,
+  } = useTotalStakingShareSupply(
+    BASE_PROPYKEYS_STAKING_CONTRACT,
+    chain ? chain.id : undefined
+  );
 
-  const destinationSpring = useSpring({
-    from: {
-      transform: 'translateX(-25%)',
-    },
-    to: {
-      transform: 'translateX(0%)',
-    },
-  })
+  const { 
+    data: totalStakedPRO,
+    isLoading: isLoadingTotalStakedPRO,
+  } = useTotalStakedPRO(
+    BASE_PROPYKEYS_STAKING_CONTRACT,
+    chain ? chain.id : undefined
+  )
 
-  const arrowSpring = useSpring({
-    from: {
-      opacity: 0,
-    },
-    to: {
-      opacity: 1,
-    },
-    delay: 150,
-  })
+  const { 
+    data: totalStakingBalancePRO,
+    isLoading: isLoadingTotalStakingBalancePRO,
+  } = useTotalStakingBalancePRO(
+    BASE_PROPYKEYS_STAKING_CONTRACT,
+    PRO_BASE_L2_ADDRESS,
+    chain ? chain.id : undefined
+  )
 
-  useEffect(() => {
-    let newPieChartData = [];
+  const { 
+    data: stakedPropyKeysCount,
+    isLoading: isLoadingStakedPropyKeysCount,
+  } = useStakedTokenCount(
+    BASE_PROPYKEYS_STAKING_CONTRACT,
+    BASE_PROPYKEYS_STAKING_NFT,
+    chain ? chain.id : undefined
+  )
 
-    if(address) {
-      newPieChartData.push({ id: 1, value: 5, label: 'Your Stake' });
-    }
+  const { 
+    data: stakedOGCount,
+    isLoading: isLoadingStakedOGCount,
+  } = useStakedTokenCount(
+    BASE_PROPYKEYS_STAKING_CONTRACT,
+    BASE_OG_STAKING_NFT,
+    chain ? chain.id : undefined
+  )
 
-    newPieChartData.push({ id: 0, value: 100, label: address ? 'Other\'s Stake' : 'Network Stake' });
-
-    setPieChartData(newPieChartData);
-
-  }, [address])
-
+  console.log({isLoadingStakerShares})
+  
   return (
     <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} lg={6}>
+      <div style={{width: '100%'}}>
+      {/* {address &&
+        <Grid container spacing={2}>
+          <StakeStatsConnectedWalletContainer totalShares={stakerShares} />
+        </Grid>
+      } */}
+      {address &&
+        <div className={classes.personalStatsSpacer}>
+          <StakeStatsConnectedWalletContainer totalShares={stakerShares} />
+        </div>
+      }
+      <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>
+        <Grid item xs={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
-              {pieChartData && 
-                <PieChart
-                  series={[
-                    {
-                      data: pieChartData,
-                    },
-                  ]}
-                  width={400}
-                  height={200}
-                />
-              }
+              {isLoadingStakerShares && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingStakerShares && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staking Power</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
-              <div style={{height: 290}} />
+              {isLoadingTotalStakedPRO && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingStakerShares && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staked PRO</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
             </div>
           </Card>
         </Grid>
+        <Grid item xs={6} lg={2}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {isLoadingTotalStakingBalancePRO && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingTotalStakingBalancePRO && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Total PRO Balance</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakingBalancePRO ? totalStakingBalancePRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
+        <Grid item xs={6} lg={2}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {isLoadingStakedPropyKeysCount && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingStakedPropyKeysCount && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyKeys</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
+        <Grid item xs={6} lg={2}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {isLoadingStakedOGCount && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingStakedOGCount && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyOG</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakedOGCount ? stakedOGCount : 0), 8)), 0, 'pOGs')}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
+        {/* <Grid item xs={12} lg={12}>
+          <pre>
+            {`stakerShares: ${stakerShares}`}<br/>
+            {`totalStakingBalancePRO: ${totalStakingBalancePRO}`}<br/>
+            {`totalStakedPRO: ${totalStakedPRO}`}<br/>
+            {`stakedPropyKeysCount: ${stakedPropyKeysCount}`}<br/>
+            {`stakedOGCount: ${stakedOGCount}`}<br/>
+            {stakerShares && `totalShares: ${priceFormat(Number(utils.formatUnits(Number(stakerShares), 8)), 2, 'PRO')}`}<br/>
+            {totalStakingBalancePRO && `totalStakingBalancePRO: ${priceFormat(Number(utils.formatUnits(Number(totalStakingBalancePRO), 8)), 2, 'PRO')}`}<br/>
+            {totalStakedPRO && `totalStakedPRO: ${priceFormat(Number(utils.formatUnits(Number(totalStakedPRO), 8)), 2, 'PRO')}`}<br/>
+            {stakedPropyKeysCount && `stakedPropyKeysCount: ${priceFormat(Number(utils.formatUnits(Number(stakedPropyKeysCount), 8)), 0, 'pKEYs')}`}<br/>
+            {stakedOGCount && `stakedOGCount: ${priceFormat(Number(utils.formatUnits(Number(stakedOGCount), 8)), 0, 'pOGs')}`}<br/>
+            {totalStakingBalancePRO && totalStakedPRO && `Reward: ${priceFormat(Number(utils.formatUnits(new BigNumber(totalStakingBalancePRO.toString()).minus(totalStakedPRO.toString()).toString(), 8)), 2, 'PRO')}`}
+          </pre>
+        </Grid> */}
       </Grid>
+      </div>
     </div>
   );
 }

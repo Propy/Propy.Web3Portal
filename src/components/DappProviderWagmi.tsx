@@ -25,7 +25,7 @@ const projectId = '40a62032057258c14ebfdc9c25bfe42e'
 // 2. Create wagmiConfig
 const metadata = {
   name: 'Propy dApp',
-  description: 'Interfacing with Propy\'s on-chain systems',
+  description: 'Interfacing with Propy\'s onchain systems',
   url: 'https://dapp.propy.com',
   icons: [PropyHouseOnlyLogo]
 }

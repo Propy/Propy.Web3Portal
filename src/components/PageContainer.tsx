@@ -1,5 +1,5 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {Routes, Route} from 'react-router-dom';
+import React, {useState, useLayoutEffect, useEffect} from 'react';
+import {Routes, Route, useLocation} from 'react-router-dom';
 
 import { Theme } from '@mui/material/styles';
 
@@ -49,6 +49,8 @@ const PageContainer = (props: PropsFromRedux) => {
       darkMode,
     } = props;
 
+    const { pathname } = useLocation();
+
     const classes = useStyles();
 
     const windowSize = useWindowSize();
@@ -68,6 +70,10 @@ const PageContainer = (props: PropsFromRedux) => {
         }
     }, [windowSize.width, windowSize.height, setShowDesktopMenu]);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+
     return (
         <Navigation>
             <div className={[classes.root, isConsideredMobile ? classes.rootMobile : ""].join(" ")}>
@@ -76,8 +82,8 @@ const PageContainer = (props: PropsFromRedux) => {
                   <Routes>
                       <Route path="/" element={<HomePage/>} />
                       <Route path="/my-assets" element={<AccountTokensPage darkMode={darkMode}/>} />
-                      <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage/>} />
-                      <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage/>} />
+                      <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage isConsideredMobile={isConsideredMobile} />} />
+                      <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage isConsideredMobile={isConsideredMobile}/>} />
                       <Route path="/account/:accountAddress" element={<AccountTokensPage darkMode={darkMode} />} />
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />

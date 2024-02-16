@@ -10,6 +10,7 @@ import {
 import {
   L1Networks,
   L2Networks,
+  ICollectionQueryFilter,
 } from '../interfaces';
 
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
@@ -125,8 +126,9 @@ export const NFTService = {
     contractNameOrCollectionNameOrAddress: string,
     perPage: number,
     page: number,
+    additionalFilters?: ICollectionQueryFilter[],
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
+    return ApiService.get(`/nft/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"]).join("&")}` : ''}`)
   },
   async getCoordinatesPaginated(
     network: string,
@@ -166,7 +168,25 @@ export const AccountBalanceService = {
     page: number,
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/balances`, `${account}?perPage=${perPage}&page=${page}`)
-  }
+  },
+  async getAccountBalancesByAsset(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}`)
+  },
+  async getAccountBalancesByAssetIncludeStakingStatus(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true`)
+  },
+  async getAccountBalancesByAssetOnlyStaked(
+    account: `0x${string}`,
+    assetAddress: `0x${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true`)
+  },
 }
 
 export const SignerService = {
@@ -236,5 +256,11 @@ export const BridgeService = {
       l1_network: l1Network,
       l2_network: l2Network
     })
+  },
+}
+
+export const StakeService = {
+  async triggerStakeOptimisticSync() : Promise<AxiosResponse["data"]> {
+    return ApiService.postNoIntercept(`/stake/sync`, {});
   },
 }
