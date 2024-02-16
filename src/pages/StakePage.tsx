@@ -1,41 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+// import Tabs from '@mui/material/Tabs';
+// import Tab from '@mui/material/Tab';
+// import Box from '@mui/material/Box';
+import { Typography } from '@mui/material';
 
 import {
-  BASE_L2_NETWORK,
+  // BASE_L2_NETWORK,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import GenericPageContainer from '../containers/GenericPageContainer';
-import NetworkGateContainer from '../containers/NetworkGateContainer';
-import StakeStatsContainer from '../containers/StakeStatsContainer';
-import StakePortalContainer from '../containers/StakePortalContainer';
+// import NetworkGateContainer from '../containers/NetworkGateContainer';
+// import StakeStatsContainer from '../containers/StakeStatsContainer';
+// import StakePortalContainer from '../containers/StakePortalContainer';
 
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+import LinkWrapper from '../components/LinkWrapper';
+
+// function a11yProps(index: number) {
+//   return {
+//     id: `simple-tab-${index}`,
+//     'aria-controls': `simple-tabpanel-${index}`,
+//   };
+// }
 
 const StakePage = () => {
 
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  // const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTabIndex(newValue);
-  };
+  // const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  //   setSelectedTabIndex(newValue);
+  // };
 
   return (
     <GenericPageContainer>
-      <NetworkGateContainer
+      {/* <NetworkGateContainer
         requiredNetwork={BASE_L2_NETWORK}
         requireConnected={true}
-      >
+      > */}
         <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
+          {/* <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
             <Tabs 
               value={selectedTabIndex}
               onChange={handleChange}
@@ -56,9 +60,9 @@ const StakePage = () => {
           }
           {(selectedTabIndex === 2) &&
             <StakePortalContainer mode="leave" />
-          }
-          {/* <Typography variant="h6" style={{fontWeight: 400}}>
-            We are working hard to make staking live in January, please check back regularly or join our waitlist to be notified once staking goes live.
+          } */}
+          <Typography variant="h6" style={{fontWeight: 400}}>
+            We are working hard to make staking live in March, please check back regularly or join our waitlist to be notified once staking goes live.
           </Typography>
           <br/>
           <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
@@ -69,9 +73,9 @@ const StakePage = () => {
           <br/>
           <Typography variant="body1" style={{fontWeight: 400}}>
             Want to earn rewards for holding your Propy NFTs? Staking is the way to go! Simply deposit your NFTs along with some PRO into the staking contract and receive an ERC-20 token as a representation of your stake. You can withdraw your NFTs & PRO at any time after a minimum staking period, along with any accumulated PRO rewards. More details will be provided once staking goes live.
-          </Typography> */}
+          </Typography>
         </>
-      </NetworkGateContainer>
+      {/* </NetworkGateContainer> */}
     </GenericPageContainer>
   )
 };
