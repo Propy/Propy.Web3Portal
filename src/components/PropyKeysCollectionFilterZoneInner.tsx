@@ -61,11 +61,15 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   let [selectedLandmarksOnly, setSelectedLandmarksOnly] = useState<boolean>(Boolean(searchParams.get("landmark")));
   let [selectedDeedsAttachedOnly, setSelectedDeedsAttachedOnly] = useState<boolean>(Boolean(searchParams.get("attached_deed")));
 
+  let isSomeFilterSet = Boolean(selectedCity || selectedCountry || selectedLandmarksOnly || selectedDeedsAttachedOnly);
+
   const classes = useStyles();
 
   const handleClose = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
-    if (reason && reason === "backdropClick")
-        return;
+    if(isSomeFilterSet) {
+      if (reason && (reason === "backdropClick" || reason === "escapeKeyDown"))
+          return;
+    }
 
     setOpen(false);
   };
@@ -140,7 +144,6 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
         onClose={(event, reason) => handleClose(event, reason)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        disableEscapeKeyDown={true}
       >
         <DialogTitle id="alert-dialog-title">
           {"PropyKeys Collection Filters"}
@@ -202,7 +205,14 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
           }
         </DialogContent>
         <DialogActions style={{display: 'flex', justifyContent: 'space-between'}}>
-          <Button onClick={handleClearFilters} color="error">Clear Filters</Button>
+          {
+            (isSomeFilterSet) &&
+            <Button onClick={handleClearFilters} color="error">Clear Filters</Button>
+          }
+          {
+            (!isSomeFilterSet) &&
+            <Button onClick={() => setOpen(false)}>Close</Button>
+          }
           <Button onClick={handleApplyFilters} autoFocus>
             Apply Filters
           </Button>
