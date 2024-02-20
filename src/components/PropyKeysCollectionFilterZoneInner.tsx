@@ -18,6 +18,11 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import {
+  centerShortenLongString,
+  toChecksumAddress,
+} from '../utils'
+
+import {
   NFTService,
 } from '../services/api';
 
@@ -43,6 +48,7 @@ interface ICollectionFilterZone {
   open: boolean,
   setOpen: (open: boolean) => void
   isLoading: boolean
+  isConsideredMobile: boolean
 }
 
 const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
@@ -50,18 +56,21 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   let {
     open,
     setOpen,
+    isConsideredMobile,
   } = props;
 
   let [searchParams, setSearchParams] = useSearchParams();
   let [uniqueCities, setUniqueCities] = useState<string[]>([]);
   let [uniqueCountries, setUniqueCountries] = useState<string[]>([]);
+  let [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
 
   let [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
   let [selectedCountry, setSelectedCountry] = useState<string>(searchParams.get("country") || "");
+  let [selectedOwner, setSelectedOwner] = useState<string>(searchParams.get("owner") || "");
   let [selectedLandmarksOnly, setSelectedLandmarksOnly] = useState<boolean>(Boolean(searchParams.get("landmark")));
   let [selectedDeedsAttachedOnly, setSelectedDeedsAttachedOnly] = useState<boolean>(Boolean(searchParams.get("attached_deed")));
 
-  let isSomeFilterSet = Boolean(selectedCity || selectedCountry || selectedLandmarksOnly || selectedDeedsAttachedOnly);
+  let isSomeFilterSet = Boolean(selectedCity || selectedCountry || selectedLandmarksOnly || selectedDeedsAttachedOnly || selectedOwner);
 
   const classes = useStyles();
 
@@ -77,6 +86,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   const handleClearFilters = () => {
     setSelectedCity("");
     setSelectedCountry("");
+    setSelectedOwner("");
     setSelectedLandmarksOnly(false);
     setSelectedDeedsAttachedOnly(false);
     setSearchParams((params => {
@@ -84,6 +94,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       params.delete("city");
       params.delete("landmark");
       params.delete("attached_deed");
+      params.delete("owner");
       return params;
     }));
     setOpen(false);
@@ -111,6 +122,11 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       } else {
         params.delete("attached_deed");
       }
+      if(selectedOwner) {
+        params.set("owner", toChecksumAddress(selectedOwner).toString());
+      } else {
+        params.delete("owner");
+      }
       return params;
     }));
     setOpen(false);
@@ -123,15 +139,23 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
 
   useEffect(() => {
     const fetchUniqueFieldValues = async () => {
-      let [uniqueCityRequest, uniqueCountryRequest] = await Promise.all([
+      let [
+        uniqueCityRequest,
+        uniqueCountryRequest,
+        uniqueOwnerRequest,
+      ] = await Promise.all([
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "City"),
-        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Country")
+        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Country"),
+        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner")
       ]);
       if(uniqueCityRequest?.data?.length > 0) {
         setUniqueCities(uniqueCityRequest?.data);
       }
       if(uniqueCountryRequest?.data?.length > 0) {
         setUniqueCountries(uniqueCountryRequest?.data);
+      }
+      if(uniqueOwnerRequest?.data?.length > 0) {
+        setUniqueOwners(uniqueOwnerRequest?.data);
       }
     }
     fetchUniqueFieldValues();
@@ -154,11 +178,11 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               <Autocomplete
                 id="country-filter"
                 options={uniqueCountries}
-                sx={{ width: 300, maxWidth: '100%' }}
+                disabled={uniqueCountries.length === 0}
+                sx={{ width: 420, maxWidth: '100%' }}
                 className={classes.inputSpacerSmall}
                 renderInput={(params) => <TextField {...params} label="Country" />}
                 onChange={(event, value, reason, details) => {
-                  console.log({event, value, reason, details})
                   if(value) {
                     setSelectedCountry(value);
                   } else {
@@ -170,7 +194,8 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               <Autocomplete
                 id="city-filter"
                 options={uniqueCities}
-                sx={{ width: 300, maxWidth: '100%' }}
+                disabled={uniqueCities.length === 0}
+                sx={{ width: 420, maxWidth: '100%' }}
                 className={classes.inputSpacer}
                 onChange={(event, value, reason, details) => {
                   if(value) {
@@ -181,6 +206,28 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
                 }}
                 renderInput={(params) => <TextField {...params} label="City" />}
                 value={selectedCity}
+              />
+              <Autocomplete
+                id="owner-filter"
+                options={uniqueOwners}
+                disabled={uniqueOwners.length === 0}
+                sx={{ width: 420, maxWidth: '100%' }}
+                className={classes.inputSpacer}
+                renderInput={(params) => <TextField {...params} label="Owner" />}
+                onChange={(event, value, reason, details) => {
+                  if(value) {
+                    setSelectedOwner(value);
+                  } else {
+                    setSelectedOwner("");
+                  }
+                }}
+                value={selectedOwner}
+                getOptionLabel={(option: string) => toChecksumAddress(option)}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    <span>{isConsideredMobile ? centerShortenLongString(toChecksumAddress(option), 20) : toChecksumAddress(option)}</span>
+                  </li>
+                )}
               />
               <FormControlLabel 
                 className={classes.inputSpacerSmall}
