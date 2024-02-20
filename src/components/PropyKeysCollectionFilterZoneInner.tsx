@@ -154,7 +154,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               <Autocomplete
                 id="country-filter"
                 options={uniqueCountries}
-                sx={{ width: 300 }}
+                sx={{ width: 300, maxWidth: '100%' }}
                 className={classes.inputSpacerSmall}
                 renderInput={(params) => <TextField {...params} label="Country" />}
                 onChange={(event, value, reason, details) => {
@@ -170,7 +170,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               <Autocomplete
                 id="city-filter"
                 options={uniqueCities}
-                sx={{ width: 300 }}
+                sx={{ width: 300, maxWidth: '100%' }}
                 className={classes.inputSpacer}
                 onChange={(event, value, reason, details) => {
                   if(value) {
