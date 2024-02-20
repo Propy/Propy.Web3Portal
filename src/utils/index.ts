@@ -1,6 +1,7 @@
 import { ChainId, shortenAddress } from '@usedapp/core'
 import numeral from "numeral";
 import * as isIPFS from 'is-ipfs';
+import { utils } from "ethers";
 
 import {
 	NetworkName,
@@ -19,6 +20,16 @@ export const centerShortenLongString = (string: string, maxLength: number) => {
 	}else{
 		return '';
 	}
+}
+
+export const toChecksumAddress = (string: string) => {
+	let checksumHolderAddress = string;
+	try {
+		checksumHolderAddress = utils.getAddress(string);
+	} catch (error) {
+		return string;
+	}
+	return checksumHolderAddress;
 }
 
 enum ExtraChainId {
