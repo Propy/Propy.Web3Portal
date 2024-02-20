@@ -48,7 +48,7 @@ const PropyKeysCollectionFilterZone = (props: ICollectionFilterZone & PropsFromR
     <>
       <Button className={isConsideredMobile ? classes.filterButtonSpacerMobile : ''} disabled={isLoading} variant={'outlined'} color={"primary"} onClick={() => handleClickOpen()} startIcon={<FilterListIcon />}>{"Filters"}</Button>
       {open &&
-        <PropyKeysCollectionFilterZoneInner isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} open={open} setOpen={setOpen} />
+        <PropyKeysCollectionFilterZoneInner isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} open={open} setOpen={setOpen} />
       }
     </>
   )
