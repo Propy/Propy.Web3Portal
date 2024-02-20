@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 import LinkWrapper from './LinkWrapper';
+import PropyKeysCollectionFilterZoneContainer from '../containers/PropyKeysCollectionFilterZoneContainer';
 
 import { PropsFromRedux } from '../containers/CollectionBannerContainer';
 
@@ -47,6 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
     paginationContainer: {
       display: 'flex',
       justifyContent: 'center',
+    },
+    loadingZone: {
+      opacity: 0.5,
     }
   }),
 );
@@ -60,7 +64,8 @@ interface ICollectionBanner {
   collectionSlug: string
   title?: string
   showPagination?: boolean
-  firstElementShim?: React.ReactNode
+  firstElementShim?: React.ReactNode,
+  showFilters?: boolean,
 }
 
 interface INftAssets {
@@ -78,6 +83,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
   const [title, setTitle] = useState("Loading...");
+  const [isInitialLoad, setIsInitialLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   const classes = useStyles();
@@ -92,6 +98,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     showPagination = false,
     isConsideredMobile,
     firstElementShim,
+    showFilters = false,
   } = props;
 
   if(firstElementShim && maxRecords) {
@@ -101,6 +108,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   useEffect(() => {
     let isMounted = true;
     const fetchCollection = async () => {
+      setIsLoading(true);
       let additionalFilters : ICollectionQueryFilter[] = [];
       if(searchParams.get("city")) {
         additionalFilters.push({filter_type: "city", value: `${searchParams.get("city")}`});
@@ -124,6 +132,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         page,
         additionalFilters,
       )
+      setIsInitialLoading(false);
       setIsLoading(false);
       if(collectionResponse?.status && collectionResponse?.data && isMounted) {
         let renderResults : INFTRecord[] = [];
@@ -147,6 +156,8 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
           if(apiResponseData?.metadata?.pagination?.totalPages) {
             setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
+          } else {
+            setPaginationTotalPages(0);
           }
         }
         setNftRecords(renderResults);
@@ -182,15 +193,25 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
               </Button>
             </LinkWrapper>
           }
+          {
+            showFilters &&
+            (["propykeys", "propy-home-nft-dev-base-testnet"].indexOf(collectionSlug) > -1) &&
+              <PropyKeysCollectionFilterZoneContainer
+                collectionSlug={collectionSlug}
+                contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}
+                network={network}
+                isLoading={isLoading}
+              />
+          }
         </div>
       }
-      <Grid className={classes.sectionSpacer} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
-        {!isLoading && nftRecords && firstElementShim && 
+      <Grid className={[classes.sectionSpacer, isLoading ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
+        {!isInitialLoad && nftRecords && firstElementShim && 
           <Grid key={`single-token-card-first-element-shim-${new Date().getTime()}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             {firstElementShim}
           </Grid>
         }
-        {!isLoading && nftRecords && nftRecords.sort((a, b) => {
+        {!isInitialLoad && nftRecords && nftRecords.sort((a, b) => {
           if(nftAssets[a?.asset_address]?.standard && nftAssets[b?.asset_address]?.standard) {
             return (nftAssets[a?.asset_address]?.standard).localeCompare(nftAssets[b?.asset_address]?.standard);
           }
@@ -200,7 +221,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
             <SingleTokenCard nftRecord={item} assetRecord={nftAssets[item?.asset_address]} />
           </Grid>
         )}
-        {isLoading && maxRecords &&
+        {isInitialLoad && maxRecords &&
           Array.from({length: maxRecords}).map((entry, index) => 
             <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCardLoading />
@@ -210,7 +231,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       </Grid>
       {paginationTotalPages > 1 && showPagination &&
         <div className={classes.paginationContainer}>
-          <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+          <Pagination disabled={isLoading} page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
         </div>
       }
     </>

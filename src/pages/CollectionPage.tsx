@@ -15,7 +15,7 @@ const CollectionPage = () => {
     return (
         <GenericPageContainer>
           {network && contractNameOrCollectionNameOrAddress &&
-            <CollectionBannerContainer maxRecords={20} showPagination={true} showTitle={true} network={network} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} collectionSlug={contractNameOrCollectionNameOrAddress} />
+            <CollectionBannerContainer showFilters={true} maxRecords={20} showPagination={true} showTitle={true} network={network} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} collectionSlug={contractNameOrCollectionNameOrAddress} />
           }
         </GenericPageContainer>
     )

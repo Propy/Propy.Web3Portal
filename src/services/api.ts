@@ -158,7 +158,14 @@ export const NFTService = {
     page: number,
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/recently-minted`, `?perPage=${perPage}&page=${page}`)
-  }
+  },
+  async getUniqueMetadataFieldValues(
+    network: string,
+    assetAddress: string,
+    metadataField: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/unique-metadata-values/${network}`, `${assetAddress}/${metadataField}`)
+  },
 }
 
 export const AccountBalanceService = {
