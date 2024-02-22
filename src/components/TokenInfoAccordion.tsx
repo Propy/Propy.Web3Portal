@@ -11,9 +11,11 @@ import createStyles from '@mui/styles/createStyles';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import IconButton from '@mui/material/IconButton';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import FilterIcon from '@mui/icons-material/FilterList';
 
 import { PropsFromRedux } from '../containers/TokenInfoAccordionContainer';
 
@@ -28,11 +30,13 @@ import {
   isAddress,
   isIPFSMultiHash,
   getResolvableIpfsLinkFromPlainMultiHash,
+  toChecksumAddress,
 } from '../utils';
 
 import {
   PROPY_LIGHT_BLUE,
   PROPY_LIGHT_GREY,
+  VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES,
 } from '../utils/constants';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -80,6 +84,11 @@ const useStyles = makeStyles((theme: Theme) =>
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
+    },
+    attributeNameAndPrefilterRow: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     }
   }),
 );
@@ -91,6 +100,23 @@ let sections = [
   },
 ]
 
+interface IPresetFilter {[key: string]: (arg0: string) => string};
+
+let propyKeysFilterableAttributes = {
+  'Owner': (owner: string) => `?owner=${toChecksumAddress(owner)}`,
+  'City': (city: string) => `?city=${city}`,
+  'Country': (country: string) => `?country=${country}`,
+  'Attached Deed': (attachedDeedValue: string) => isIPFSMultiHash(attachedDeedValue) ? `?attached_deed=true` : `?attached_deed=true`, // in the meantime setting both default filters to true, unless we decide to want to filter by records that don't have a deed attached
+  'Landmark': (landmarkValue: string) => `?landmark=${Boolean(landmarkValue)}`,
+  'Status': (status: string) => `?status=${status}`,
+}
+
+let collectionSlugToAttributeToPresetFilter : {[key: string]: IPresetFilter} = {};
+
+for(let slugOrAddress of VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES) {
+  collectionSlugToAttributeToPresetFilter[slugOrAddress] = propyKeysFilterableAttributes;
+}
+
 interface ITokenInfoAccordian {
   tokenRecord: IAssetRecord | null
   tokenMetadata: ITokenMetadata | null
@@ -100,6 +126,7 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
     const classes = useStyles();
 
     const {
+      tokenRecord,
       tokenMetadata,
     } = props;
 
@@ -180,7 +207,16 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                               return (
                                 <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
                                   <div className={classes.attributeContainer}>
-                                    <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
+                                    <div className={classes.attributeNameAndPrefilterRow}>
+                                      <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>
+                                      {tokenRecord && tokenRecord.slug && collectionSlugToAttributeToPresetFilter?.[tokenRecord.slug]?.[attributeEntry.trait_type] &&
+                                        <LinkWrapper external={false} link={`collection/${tokenRecord.network_name}/${tokenRecord.address}${collectionSlugToAttributeToPresetFilter[tokenRecord.slug][attributeEntry.trait_type](attributeEntry.value)}`}>
+                                          <IconButton aria-label="filter collection by value" size="small">
+                                            <FilterIcon fontSize="inherit" />
+                                          </IconButton>
+                                        </LinkWrapper>
+                                      }
+                                    </div>
                                     {attributeValue}
                                   </div>
                                 </Grid>
