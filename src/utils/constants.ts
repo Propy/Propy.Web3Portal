@@ -37,6 +37,8 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
+export const VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "propy-home-nft-dev-base-testnet", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
+
 const COLLECTIONS_ENTRIES_DEV = [
   {
     network: "base-sepolia",

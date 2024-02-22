@@ -195,8 +195,8 @@ const EventHistory = (props: PropsFromRedux & ITokenEventHistory) => {
               <div className={classes.content}>
                 {eventRecords && eventRecords.sort((a, b) => {
                   return Number(b.evm_transaction?.block_timestamp) - Number(a.evm_transaction?.block_timestamp)
-                }).map((eventRecord) => 
-                  <div className={classes.eventRecord}>
+                }).map((eventRecord, index) => 
+                  <div className={classes.eventRecord} key={`event-history-${eventRecord.transaction_hash}-${index}`}>
                     <div className={classes.eventIconOuterContainer}>
                       <div className={classes.eventIconInnerContainer}>
                         {getEventIcon(eventRecord)}
