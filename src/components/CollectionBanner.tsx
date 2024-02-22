@@ -30,6 +30,10 @@ import {
   NFTService,
 } from '../services/api';
 
+import {
+  VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES,
+} from '../utils/constants';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     titleContainer: {
@@ -119,6 +123,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("owner")) {
         additionalFilters.push({filter_type: "owner", value: `${searchParams.get("owner")}`});
       }
+      if(searchParams.get("status")) {
+        additionalFilters.push({filter_type: "status", value: `${searchParams.get("status")}`});
+      }
       if(searchParams.get("landmark")) {
         additionalFilters.push({filter_type: "landmark", value: true});
       }
@@ -195,7 +202,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
           {
             showFilters &&
-            (["propykeys", "propy-home-nft-dev-base-testnet"].indexOf(collectionSlug) > -1) &&
+            (VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
               <PropyKeysCollectionFilterZoneContainer
                 collectionSlug={collectionSlug}
                 contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}

@@ -63,10 +63,12 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   let [uniqueCities, setUniqueCities] = useState<string[]>([]);
   let [uniqueCountries, setUniqueCountries] = useState<string[]>([]);
   let [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
+  let [uniqueStatuses, setUniqueStatuses] = useState<string[]>([]);
 
   let [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
   let [selectedCountry, setSelectedCountry] = useState<string>(searchParams.get("country") || "");
   let [selectedOwner, setSelectedOwner] = useState<string>(searchParams.get("owner") || "");
+  let [selectedStatus, setSelectedStatus] = useState<string>(searchParams.get("status") || "");
   let [selectedLandmarksOnly, setSelectedLandmarksOnly] = useState<boolean>(Boolean(searchParams.get("landmark")));
   let [selectedDeedsAttachedOnly, setSelectedDeedsAttachedOnly] = useState<boolean>(Boolean(searchParams.get("attached_deed")));
 
@@ -87,6 +89,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
     setSelectedCity("");
     setSelectedCountry("");
     setSelectedOwner("");
+    setSelectedStatus("");
     setSelectedLandmarksOnly(false);
     setSelectedDeedsAttachedOnly(false);
     setSearchParams((params => {
@@ -95,6 +98,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       params.delete("landmark");
       params.delete("attached_deed");
       params.delete("owner");
+      params.delete("status");
       return params;
     }));
     setOpen(false);
@@ -127,6 +131,11 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       } else {
         params.delete("owner");
       }
+      if(selectedStatus) {
+        params.set("status", toChecksumAddress(selectedStatus).toString());
+      } else {
+        params.delete("status");
+      }
       return params;
     }));
     setOpen(false);
@@ -143,10 +152,12 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
         uniqueCityRequest,
         uniqueCountryRequest,
         uniqueOwnerRequest,
+        uniqueStatusRequest,
       ] = await Promise.all([
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "City"),
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Country"),
-        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner")
+        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner"),
+        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Status")
       ]);
       if(uniqueCityRequest?.data?.length > 0) {
         setUniqueCities(uniqueCityRequest?.data);
@@ -156,6 +167,9 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       }
       if(uniqueOwnerRequest?.data?.length > 0) {
         setUniqueOwners(uniqueOwnerRequest?.data);
+      }
+      if(uniqueStatusRequest?.data?.length > 0) {
+        setUniqueStatuses(uniqueStatusRequest?.data);
       }
     }
     fetchUniqueFieldValues();
@@ -206,6 +220,22 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
                 }}
                 renderInput={(params) => <TextField {...params} label="City" />}
                 value={selectedCity}
+              />
+              <Autocomplete
+                id="status-filter"
+                options={uniqueStatuses}
+                disabled={uniqueStatuses.length === 0}
+                sx={{ width: 420, maxWidth: '100%' }}
+                className={classes.inputSpacer}
+                onChange={(event, value, reason, details) => {
+                  if(value) {
+                    setSelectedStatus(value);
+                  } else {
+                    setSelectedStatus("");
+                  }
+                }}
+                renderInput={(params) => <TextField {...params} label="Status" />}
+                value={selectedStatus}
               />
               <Autocomplete
                 id="owner-filter"
