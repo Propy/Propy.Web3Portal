@@ -122,10 +122,10 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <animated.div className={classes.sectionSpacer} style={connectSpring}>
             <WalletIcon className={classes.mainGraphic} />
           </animated.div>
-          <Typography variant="h4" className={classes.title}>
+          <Typography variant="h4" style={{textAlign: 'center'}} className={classes.title}>
             Connect Wallet
           </Typography>
-          <Typography variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
+          <Typography style={{textAlign: 'center'}} variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
             Please connect your wallet to continue
           </Typography>
           <Button variant={'outlined'} color={"primary"} onClick={() => open()}>{"Connect Wallet"}</Button>
@@ -136,10 +136,10 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <animated.div className={classes.sectionSpacer} style={chainSpring}>
             <img className={classes.mainGraphic} src={NetworkGraphic} alt="Network Graphic"/>
           </animated.div>
-          <Typography variant="h4" className={classes.title}>
+          <Typography style={{textAlign: 'center'}} variant="h4" className={classes.title}>
             Network Checkpoint
           </Typography>
-          <Typography variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
+          <Typography style={{textAlign: 'center'}} variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
             Please switch to {NETWORK_NAME_TO_DISPLAY_NAME[requiredNetwork]} to continue
           </Typography>
           <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isLoading} onClickOverride={() => switchNetwork && switchNetwork(NETWORK_NAME_TO_ID[requiredNetwork])} />

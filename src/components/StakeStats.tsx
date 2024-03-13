@@ -138,7 +138,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
         </div>
       }
       <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>
-        <Grid item xs={6} lg={2}>
+        <Grid item xs={12} md={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakerShares && (
@@ -156,7 +156,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
             </div>
           </Card>
         </Grid>
-        <Grid item xs={6} lg={2}>
+        <Grid item xs={12} md={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingTotalStakedPRO && (
@@ -174,7 +174,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
             </div>
           </Card>
         </Grid>
-        <Grid item xs={6} lg={2}>
+        <Grid item xs={12} md={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingTotalStakingBalancePRO && (
@@ -192,7 +192,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
             </div>
           </Card>
         </Grid>
-        <Grid item xs={6} lg={2}>
+        <Grid item xs={12} md={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakedPropyKeysCount && (
@@ -210,7 +210,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
             </div>
           </Card>
         </Grid>
-        <Grid item xs={6} lg={2}>
+        <Grid item xs={12} md={6} lg={2}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakedOGCount && (
