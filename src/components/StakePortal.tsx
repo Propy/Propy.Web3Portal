@@ -588,7 +588,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       setIsAwaitingPStakeAllowanceTx(false);
     },
     onSuccess() {
-      toast.success(`Granted PRO Allowance!`);
+      toast.success(`Granted pSTAKE Allowance!`);
     },
   })
 
