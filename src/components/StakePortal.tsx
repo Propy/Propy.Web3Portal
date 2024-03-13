@@ -308,6 +308,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showRequireTenModal, setShowRequireTenModal] = useState(false);
   const [isSyncingStaking, setIsSyncingStaking] = useState(false);
+  const [lastSelectedPropyKeyTokenId, setLastSelectedPropyKeyTokenId] = useState(0);
 
   const { 
     address,
@@ -397,6 +398,11 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   }, [address, mode, triggerUpdateIndex])
 
   const handleBalanceRecordSelected = (balanceRecord: IBalanceRecord) => {
+    if(balanceRecord?.nft?.asset_address === BASE_PROPYKEYS_STAKING_NFT) {
+      setLastSelectedPropyKeyTokenId(Number(balanceRecord.nft.token_id));
+    } else {
+      setLastSelectedPropyKeyTokenId(0);
+    }
     let useCurrentSelection = balanceRecord.asset_address === selectedTokenAddress ? [...selectedTokenIds] : [];
     let indexOfCurrentEntry = useCurrentSelection.indexOf(Number(balanceRecord.token_id));
     if(indexOfCurrentEntry > -1) {
@@ -450,6 +456,26 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     watch: true,
     args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
   })
+
+  const { 
+    data: lastSelectedTokenTier,
+  } = useContractRead({
+    address: BASE_PROPYKEYS_STAKING_NFT,
+    abi: PropyNFTABI,
+    functionName: 'tokenTier',
+    watch: Number(lastSelectedPropyKeyTokenId) > 0 ? true : false,
+    args: [lastSelectedPropyKeyTokenId],
+  })
+
+  const { 
+    data: stakerToStakedCount,
+  } = useContractRead({
+    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    abi: PRONFTStakingABI,
+    functionName: 'stakerToStakedTokenCount',
+    watch: true,
+    args: [address],
+  });
 
   const { 
     data: dataPropyOGsIsStakingContractApproved,
@@ -519,6 +545,43 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     token: PRO_BASE_L2_ADDRESS,
     watch: true,
   });
+
+  const {
+    data: balanceDataPropyKeys,
+  } = useContractRead({
+    address: BASE_PROPYKEYS_STAKING_NFT,
+    abi: PropyNFTABI,
+    functionName: 'balanceOf',
+    watch: address ? true : false,
+    args: [address],
+  });
+
+  const {
+    data: balanceDataPropyOG,
+  } = useContractRead({
+    address: BASE_OG_STAKING_NFT,
+    abi: PropyNFTABI,
+    functionName: 'balanceOf',
+    watch: address ? true : false,
+    args: [address],
+  });
+
+  useEffect(() => {
+    let currentTotal = 0;
+    if(Number(stakerToStakedCount) > 0) {
+      currentTotal += Number(stakerToStakedCount);
+    }
+    if(Number(balanceDataPropyKeys) > 0) {
+      currentTotal += Number(balanceDataPropyKeys);
+    }
+    if(Number(balanceDataPropyOG) > 0) {
+      currentTotal += Number(balanceDataPropyOG);
+    }
+    if(Number(lastSelectedTokenTier) === 1 && lastSelectedPropyKeyTokenId && (currentTotal < 10)) {
+      setShowRequireTenModal(true);
+      setLastSelectedPropyKeyTokenId(0);
+    }
+  }, [lastSelectedTokenTier, lastSelectedPropyKeyTokenId, stakerToStakedCount, balanceDataPropyKeys, balanceDataPropyOG])
 
   // APPROVE PRO ON CHAIN CALLS BELOW
 
@@ -808,7 +871,6 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   // --------------------------------------
   
   useEffect(() => {
-    // todo use actual PRO required
     let latestActiveStep : 0|1|2 = getActiveStep(
       mode,
       selectedTokenAddress,
@@ -827,6 +889,13 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   return (
     <div className={classes.root}>
       <Grid className={isLoading ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
+        {!isLoading && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
+          <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+            <Typography variant="body1" style={{textAlign: 'left'}}>
+              Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
+            </Typography>
+          </Grid>
+        }
         {!isLoading && propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
           <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard disabled={(selectedTokenAddress === BASE_OG_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
@@ -838,11 +907,20 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
           </Grid>  
         ))}
         {isLoading && 
-          Array.from({length: 15}).map((entry, index) => 
-            <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-              <SingleTokenCardLoading />
+          <>
+            <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+              <Typography variant="body1" style={{textAlign: 'left'}}>
+                Loading...
+              </Typography>
             </Grid>
-          )
+            {
+              Array.from({length: 15}).map((entry, index) => 
+                <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+                  <SingleTokenCardLoading />
+                </Grid>
+              )
+            }
+          </>
         }
         {!isLoading && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
           <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
