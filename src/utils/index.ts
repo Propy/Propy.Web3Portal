@@ -141,6 +141,10 @@ export function isAddress(address: string | undefined): boolean {
 	}
 }
 
+export const sleep = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const getDynamicFormat = (currentFormat = '0,0.00', number: number) => {
 	let requestedDecimals = 0;
 	let preDecimalFormat;

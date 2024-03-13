@@ -207,7 +207,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               {!isLoadingStakerShares && (
                 <>
                   <Typography style={{marginBottom: '4px'}} variant="h6">Your Staking Power</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}
             </div>
