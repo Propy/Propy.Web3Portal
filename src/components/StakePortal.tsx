@@ -398,11 +398,6 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   }, [address, mode, triggerUpdateIndex])
 
   const handleBalanceRecordSelected = (balanceRecord: IBalanceRecord) => {
-    if(balanceRecord?.nft?.asset_address === BASE_PROPYKEYS_STAKING_NFT) {
-      setLastSelectedPropyKeyTokenId(Number(balanceRecord.nft.token_id));
-    } else {
-      setLastSelectedPropyKeyTokenId(0);
-    }
     let useCurrentSelection = balanceRecord.asset_address === selectedTokenAddress ? [...selectedTokenIds] : [];
     let indexOfCurrentEntry = useCurrentSelection.indexOf(Number(balanceRecord.token_id));
     if(indexOfCurrentEntry > -1) {
@@ -414,6 +409,11 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       }
       setSelectedPropyKeyTokenIds(newSelection);
     } else {
+      if(balanceRecord?.nft?.asset_address === BASE_PROPYKEYS_STAKING_NFT) {
+        setLastSelectedPropyKeyTokenId(Number(balanceRecord.nft.token_id));
+      } else {
+        setLastSelectedPropyKeyTokenId(0);
+      }
       let newSelection = [...useCurrentSelection, Number(balanceRecord.token_id)];
       if(newSelection?.length > 0) {
         setSelectedTokenAddress(balanceRecord.asset_address);
