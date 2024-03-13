@@ -13,6 +13,10 @@ import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -28,13 +32,14 @@ import { useAccount, useNetwork, useBalance, useContractRead, useContractWrite, 
 import { PropsFromRedux } from '../containers/StakeStatsContainer';
 
 import SingleTokenCard from './SingleTokenCard';
-// import SingleTokenCardLoading from './SingleTokenCardLoading';
+import SingleTokenCardLoading from './SingleTokenCardLoading';
 
 import FloatingActionButton from './FloatingActionButton';
 
 import {
   priceFormat,
   countdownToTimestamp,
+  sleep,
 } from '../utils';
 
 import {
@@ -136,6 +141,9 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonTitleSmallSpacing: {
       marginBottom: theme.spacing(0.5),
     },
+    loadingZone: {
+      opacity: 0.5,
+    }
   }),
 );
 
@@ -297,6 +305,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const [isAwaitingWalletInteraction, setIsAwaitingWalletInteraction] = useState(false);
   const [activeStep, setActiveStep] = useState<0|1|2>(0);
   const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showRequireTenModal, setShowRequireTenModal] = useState(false);
   const [isSyncingStaking, setIsSyncingStaking] = useState(false);
 
   const { 
@@ -375,6 +385,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             setNftAssets(assetResults);
             setPropyKeysNFT(propykeysRenderResults);
             setOGKeysNFT(ogRenderResults);
+            setIsLoading(false);
           }
         }
       }
@@ -693,7 +704,12 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     args: [selectedTokenAddress, selectedTokenIds],
     onError(error: any) {
       setIsAwaitingStakeTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+      if(error?.cause?.reason === 'TIER_1_STAKING_REQUIRES_10_PROPYKEYS') {
+        console.log("REQUIRES 10");
+        setShowRequireTenModal(true);
+      } else {
+        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+      }
     },
     onSettled() {
       setIsAwaitingWalletInteraction(false);
@@ -709,6 +725,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       toast.success(`Stake success!`);
       const syncStaking = async () => {
         setIsSyncingStaking(true);
+        StakeService.triggerStakeOptimisticSync();
+        await sleep(10000);
         await StakeService.triggerStakeOptimisticSync();
         setTriggerUpdateIndex(triggerUpdateIndex + 1);
         if(postStakeSuccess) {
@@ -761,7 +779,9 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     onSuccess() {
       toast.success(`Unstake success!`);
       const syncStaking = async () => {
-        setIsSyncingStaking(true)
+        setIsSyncingStaking(true);
+        StakeService.triggerStakeOptimisticSync();
+        await sleep(10000);
         await StakeService.triggerStakeOptimisticSync();
         setTriggerUpdateIndex(triggerUpdateIndex + 1);
         if(postStakeSuccess) {
@@ -806,17 +826,31 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
-        {propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
+      <Grid className={isLoading ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
+        {!isLoading && propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
           <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard disabled={(selectedTokenAddress === BASE_OG_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
           </Grid>  
         ))}
-        {ogKeysNFT && ogKeysNFT.map((balanceRecord, index) => (
+        {!isLoading && ogKeysNFT && ogKeysNFT.map((balanceRecord, index) => (
           <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard disabled={(selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_OG_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
           </Grid>  
         ))}
+        {isLoading && 
+          Array.from({length: 15}).map((entry, index) => 
+            <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+              <SingleTokenCardLoading />
+            </Grid>
+          )
+        }
+        {!isLoading && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
+          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+            <Typography variant="h6" style={{textAlign: 'left'}}>
+                {mode === "enter" ? "No unstaked tokens found" : "No staked tokens found"}
+            </Typography>
+          </Grid>
+        }
       </Grid>
       <animated.div className={classes.floatingActionZone} style={actionZoneSpring}>
         <Card className={classes.floatingActionZoneCard} elevation={6}>
@@ -1010,6 +1044,27 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             </>
         </Card>
       </animated.div>
+      {showRequireTenModal &&
+        <Dialog
+          open={showRequireTenModal}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Unmet Staking Requirement
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="subtitle2" style={{fontWeight: 400}}>
+              In order to stake a Tier 1 PropyKey, you must have at least 10 stakeable PropyKey NFTs (this is calculated by combining your PropyKey & PropyOG balances with the quantities of PropyKey & PropyOG tokens that you have already staked). This rule only applies when trying to stake a Tier 1 PropyKey. PropyOG NFTs and PropyKeys with a Tier higher than 1 can be staked without restriction.
+            </Typography>
+          </DialogContent>
+          <DialogActions style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Button onClick={() => setShowRequireTenModal(false)} autoFocus>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      }
     </div>
   );
 }
