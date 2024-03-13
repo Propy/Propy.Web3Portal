@@ -2,7 +2,7 @@
 
 # Propy dApp Frontend
 
-Welcome to Propy dApp, a window into all of Propy's on-chain activity. This dApp frontend can be used to view all of Propy's on-chain assets, link users to active governance proposals, DEX liquidity management as well as to connect your wallet via MetaMask or your preferred wallet application in order to view your own balances of Propy assets (from PRO to Propy-issued NFTs).
+Welcome to Propy dApp, a window into all of Propy's onchain activity. This dApp frontend can be used to view all of Propy's onchain assets, link users to active governance proposals, DEX liquidity management as well as to connect your wallet via MetaMask or your preferred wallet application in order to view your own balances of Propy assets (from PRO to Propy-issued NFTs).
 
 This repository works in tandem with the [Propy dApp backend](https://github.com/Propy/Propy.Web3Portal.Backend), both the frontend and backend have been constructed to be easily self-hosted, in alignment with the web3 ethos.
 
