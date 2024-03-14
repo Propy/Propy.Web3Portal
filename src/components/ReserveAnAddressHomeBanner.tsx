@@ -103,7 +103,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
         let collectionResponse = await NFTService.getCoordinatesPaginated(
           collectionConfigEntry.network,
           collectionConfigEntry.address,
-          1000,
+          8640,
           1,
         )
         // setIsLoading(false);
