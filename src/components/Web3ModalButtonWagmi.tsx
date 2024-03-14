@@ -20,6 +20,7 @@ interface IWeb3ModalButtonProps {
   variant?: "text" | "outlined" | "contained"
   color?: "primary" | "secondary" | "info" | "success" | "error"
   renderCustomConnectButton?: (onClickFn: () => void) => JSX.Element
+  showCompactNetworkSwitch?: boolean
 }
 
 export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
@@ -31,6 +32,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
     variant,
     color,
     renderCustomConnectButton,
+    showCompactNetworkSwitch,
   } = props;
 
   // 4. Use modal hook
@@ -46,7 +48,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
     <>
       {!hideNetworkSwitch && address &&
         <div style={{marginRight: 16}}>
-          <NetworkSelectDropdownContainer/>
+          <NetworkSelectDropdownContainer showCompactNetworkSwitch={showCompactNetworkSwitch} />
         </div>
       }
       {address ? (
