@@ -26,18 +26,20 @@ interface INetworkSelectButton {
   isLoading?: boolean
   color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined
   width?: string
+  showCompactNetworkSwitch?: boolean
 }
 
 const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => {
 
   let {
-    switchMode,
+    switchMode = false,
     activeNetwork,
     isLoading = false,
     setActiveNetwork,
     onClickOverride,
     color = "inherit",
     width = "auto",
+    showCompactNetworkSwitch = false,
   } = props;
 
   const { chain } = useNetwork();
@@ -56,7 +58,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     }
   }, [chain, setActiveNetwork, open]);
 
-  const activeNetworkToImage = (network: SupportedNetworks) => {
+  const activeNetworkToImage = (network: SupportedNetworks, showCompactNetworkSwitch: boolean) => {
     let networkImage;
     switch (network) {
       case 'ethereum':
@@ -82,7 +84,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
         break;
     }
     if(networkImage && NETWORK_NAME_TO_DISPLAY_NAME[network]) {
-      return <img src={networkImage} style={{height: 23, marginRight: 8, borderRadius: '50%'}} alt={`${NETWORK_NAME_TO_DISPLAY_NAME[network]} Network`} />;
+      return <img src={networkImage} style={{height: 23, marginRight: showCompactNetworkSwitch ? 0 : 8, borderRadius: '50%'}} alt={`${NETWORK_NAME_TO_DISPLAY_NAME[network]} Network`} />;
     }
   }
 
@@ -100,6 +102,16 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     return "";
   }
 
+  const getButtonInternalPaddingClass = (switchMode: boolean, showCompactNetworkSwitch: boolean) => {
+    if(switchMode) {
+      return '';
+    }
+    if(showCompactNetworkSwitch) {
+      return 'outlined-icon-button-no-text';
+    }
+    return 'outlined-icon-button';
+  }
+
   return (
     <Button
       onClick={
@@ -114,8 +126,11 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
       variant={'outlined'}
       color={color}
       disabled={isLoading}
-      style={{width: width}}
-      className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
+      style={{width: width, minWidth: showCompactNetworkSwitch ? 0 : 64}}
+      className={[
+        getBorderColorClass(color),
+        getButtonInternalPaddingClass(switchMode, showCompactNetworkSwitch)
+      ].join(" ")}
     >
       {switchMode && 
         <>
@@ -125,13 +140,13 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
       }
       {!switchMode && 
         <>
-          {NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork) &&
+          {NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork, showCompactNetworkSwitch) &&
             <>
-              {activeNetworkToImage(activeNetwork)}
-              {NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork]}
+              {activeNetworkToImage(activeNetwork, showCompactNetworkSwitch)}
+              {showCompactNetworkSwitch ? '' : NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork]}
             </>
           }
-          {!(NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork)) &&
+          {!(NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork, showCompactNetworkSwitch)) &&
             <>
               Unsupported Network
             </>

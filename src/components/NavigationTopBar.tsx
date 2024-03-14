@@ -109,7 +109,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
       {isConsideredMobile && 
         <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBarBottom} position="fixed">
           <Toolbar className={classes.mobileToolbar}>
-            <Web3ModalButtonWagmi darkMode={darkMode} hideNetworkSwitch={true}/>
+            <Web3ModalButtonWagmi darkMode={darkMode} hideNetworkSwitch={false} showCompactNetworkSwitch={true} />
           </Toolbar>
         </AppBar>
       }

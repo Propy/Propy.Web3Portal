@@ -434,7 +434,6 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       }
       if(selectedTokenAddress === BASE_OG_STAKING_NFT) {
         let newSelection = (ogKeysNFT && (ogKeysNFT?.length > 0)) ? ogKeysNFT.map((balanceRecord, index) => Number(balanceRecord.token_id)).slice(0, maxSelection) : [];
-        console.log({newSelection})
         setSelectedPropyKeyTokenIds(newSelection);
       }
     }
@@ -1039,7 +1038,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                       <FloatingActionButton
                         className={classes.submitButton}
                         buttonColor="secondary"
-                        disabled={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking || new BigNumber(balanceDataPRO?.value ? balanceDataPRO?.value.toString() : 0).isLessThanOrEqualTo(minimumRequiredPROAllowance ? minimumRequiredPROAllowance.toString() : 0)}
+                        disabled={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking || new BigNumber(balanceDataPRO?.value ? balanceDataPRO?.value.toString() : 0).isLessThan(minimumRequiredPROAllowance ? minimumRequiredPROAllowance.toString() : 0)}
                         onClick={() => runStake()}
                         showLoadingIcon={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking}
                         text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingStakeTx, isSyncingStaking)}
