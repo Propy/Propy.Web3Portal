@@ -607,6 +607,9 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                         />
                       }
                     </div>
+                    {(['base','base-sepolia','base-goerli'].indexOf(origin) > -1) &&
+                      <Typography variant="caption" component="p" style={{textAlign: 'center', fontSize: '0.8rem', color: '#ff4500'}} className={classes.innerSpacingTop}><span style={{fontWeight: 'bold'}}>Please note:</span> Withdrawing PRO to Ethereum (L1) will require two L1 transactions to be made (a proof and a finalization). At an L1 gas price of 50 gwei, this would lead to around ~ 0.02 ETH in L1 fees.</Typography>
+                    }
                     <Typography variant="caption" component="p" style={{textAlign: 'center', fontSize: '0.8rem'}} className={classes.innerSpacingTop}><span style={{fontWeight: 'bold'}}>Trying to bridge ETH?</span><br/>Please use the official <a style={{color: PROPY_LIGHT_BLUE}} className="no-decorate" href="https://bridge.base.org/deposit" target="_blank" rel="noopener noreferrer">Base Bridge</a></Typography>
                   </Grid>
                 </Grid>
