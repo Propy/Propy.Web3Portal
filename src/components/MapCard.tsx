@@ -37,7 +37,7 @@ const MapCard = (props: IMapCardProps) => {
   } = props;
 
   return (
-    <Card style={{width, height, ...(disableBorderRadius && {borderRadius: 0})}}>
+    <Card style={{width, height, zIndex: 0, ...(disableBorderRadius && {borderRadius: 0})}}>
       {/* <LinkWrapper link={`./`}> */}
         {/* <CardActionArea className={classes.actionArea}> */}
           <LeafletMapContainer 
