@@ -33,11 +33,11 @@ const StakePage = () => {
   };
 
   return (
-    <GenericPageContainer>
-      <NetworkGateContainer
-        requiredNetwork={BASE_L2_NETWORK}
-        requireConnected={true}
-      >
+    <NetworkGateContainer
+      requiredNetwork={BASE_L2_NETWORK}
+      requireConnected={true}
+    >
+      <GenericPageContainer>
         <>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
             <Tabs 
@@ -75,8 +75,8 @@ const StakePage = () => {
             Want to earn rewards for holding your Propy NFTs? Staking is the way to go! Simply deposit your NFTs along with some PRO into the staking contract and receive an ERC-20 token as a representation of your stake. You can withdraw your NFTs & PRO at any time after a minimum staking period, along with any accumulated PRO rewards. More details will be provided once staking goes live.
           </Typography> */}
         </>
-      </NetworkGateContainer>
-    </GenericPageContainer>
+      </GenericPageContainer>
+    </NetworkGateContainer>
   )
 };
 

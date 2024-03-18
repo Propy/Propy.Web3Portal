@@ -89,52 +89,54 @@ const BridgePage = () => {
   }, [bridgeSelection])
 
   return (
-    <GenericPageContainer>
+    <>
       {requiredNetwork &&
         <>
           <NetworkGateContainer
             requiredNetwork={requiredNetwork}
             requireConnected={true}
           >
-            <>
-              {
-                bridgeSelection &&
-                bridgeAddress &&
-                originNetwork &&
-                destinationNetwork &&
-                originAssetAddress &&
-                originAssetDecimals &&
-                destinationAssetAddress &&
-                destinationAssetDecimals &&
-                  <>
-                    <BridgeFormContainer 
-                      bridgeAddress={bridgeAddress}
-                      origin={originNetwork}
-                      originAssetAddress={originAssetAddress}
-                      originAssetDecimals={originAssetDecimals}
-                      destination={destinationNetwork}
-                      destinationAssetAddress={destinationAssetAddress}
-                      destinationAssetDecimals={destinationAssetDecimals}
-                      postBridgeSuccess={() => setTriggerUpdateIndex(triggerUpdateIndex + 1)}
-                    />
-                    {/* Temp only render on withdrawals section until deposits are supported */}
-                    <div className={classes.sectionSpacerTop}>
-                      <BridgeTransactionHistoryContainer
-                        mode={BASE_BRIDGE_L2_NETWORKS.indexOf(originNetwork) > -1 ? 'withdrawals' : 'deposits'}
-                        l1Network={BASE_BRIDGE_L1_NETWORK}
-                        l2Network={BASE_BRIDGE_L2_NETWORK}
-                        l1TokenAddress={PRO_ETHEREUM_L1_ADDRESS}
-                        l2TokenAddress={PRO_BASE_L2_ADDRESS}
-                        triggerUpdateIndex={triggerUpdateIndex}
+            <GenericPageContainer>
+              <>
+                {
+                  bridgeSelection &&
+                  bridgeAddress &&
+                  originNetwork &&
+                  destinationNetwork &&
+                  originAssetAddress &&
+                  originAssetDecimals &&
+                  destinationAssetAddress &&
+                  destinationAssetDecimals &&
+                    <>
+                      <BridgeFormContainer 
+                        bridgeAddress={bridgeAddress}
+                        origin={originNetwork}
+                        originAssetAddress={originAssetAddress}
+                        originAssetDecimals={originAssetDecimals}
+                        destination={destinationNetwork}
+                        destinationAssetAddress={destinationAssetAddress}
+                        destinationAssetDecimals={destinationAssetDecimals}
+                        postBridgeSuccess={() => setTriggerUpdateIndex(triggerUpdateIndex + 1)}
                       />
-                    </div>
-                  </>
-              }
-            </>
+                      {/* Temp only render on withdrawals section until deposits are supported */}
+                      <div className={classes.sectionSpacerTop}>
+                        <BridgeTransactionHistoryContainer
+                          mode={BASE_BRIDGE_L2_NETWORKS.indexOf(originNetwork) > -1 ? 'withdrawals' : 'deposits'}
+                          l1Network={BASE_BRIDGE_L1_NETWORK}
+                          l2Network={BASE_BRIDGE_L2_NETWORK}
+                          l1TokenAddress={PRO_ETHEREUM_L1_ADDRESS}
+                          l2TokenAddress={PRO_BASE_L2_ADDRESS}
+                          triggerUpdateIndex={triggerUpdateIndex}
+                        />
+                      </div>
+                    </>
+                }
+              </>
+            </GenericPageContainer>
           </NetworkGateContainer>
         </>
       }
-    </GenericPageContainer>
+    </>
   )
 };
 
