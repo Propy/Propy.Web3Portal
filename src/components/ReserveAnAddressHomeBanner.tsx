@@ -14,6 +14,7 @@ import { PropsFromRedux } from '../containers/ReserveAnAddressHomeBannerContaine
 
 import LinkWrapper from './LinkWrapper';
 import MapCard from './MapCard';
+import MapOverlay from './MapOverlay';
 
 import RaTier1Icon from '../assets/svg/ra_tier_1.svg';
 import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
@@ -80,6 +81,16 @@ const useStyles = makeStyles((theme: Theme) =>
     tierIcon: {
       maxWidth: '100%',
       maxHeight: '100%',
+    },
+    mapOverlayContainer: {
+      position: 'absolute',
+      zIndex: '100',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      backgroundColor: '#ffffffb0',
     }
   }),
 );
@@ -149,17 +160,24 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
         <Typography variant="body1" className={[classes.titleSpacing, isConsideredMobile ? "full-width" : ""].join(" ")}>
           Inching closer to a future where tokenized real-estate could be used as collateral in onchain protocols
         </Typography>
-        <MapCard 
-          height="550px"
-          zoom={2}
-          zoomControl={true}
-          dragging={true}
-          doubleClickZoom={true}
-          scrollWheelZoom={true}
-          // center={[38.171368, -95.430112]} // US center
-          center={[24.424473, isConsideredMobile ? -80 : 10]}
-          markers={nftCoordinates}
-      />
+        <div
+          style={{position: 'relative'}}
+        >
+          <LinkWrapper link="map/propykeys">
+            <MapOverlay />
+            <MapCard 
+              height="550px"
+              zoom={2}
+              zoomControl={true}
+              dragging={true}
+              doubleClickZoom={true}
+              scrollWheelZoom={true}
+              // center={[38.171368, -95.430112]} // US center
+              center={[24.424473, isConsideredMobile ? -80 : 10]}
+              markers={nftCoordinates}
+            />
+          </LinkWrapper>
+        </div>
       </div>
       <div>
         <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>

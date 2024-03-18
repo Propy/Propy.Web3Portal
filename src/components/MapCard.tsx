@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import Card from '@mui/material/Card';
 
@@ -18,6 +18,7 @@ interface IMapCardProps {
   scrollWheelZoom?: boolean
   markers?: ILeafletMapMarker[]
   center?: [number, number]
+  disableBorderRadius?: boolean
 }
 
 const MapCard = (props: IMapCardProps) => {
@@ -32,10 +33,11 @@ const MapCard = (props: IMapCardProps) => {
     scrollWheelZoom = true,
     markers = [],
     center,
+    disableBorderRadius = false,
   } = props;
 
   return (
-    <Card style={{width, height}}>
+    <Card style={{width, height, ...(disableBorderRadius && {borderRadius: 0})}}>
       {/* <LinkWrapper link={`./`}> */}
         {/* <CardActionArea className={classes.actionArea}> */}
           <LeafletMapContainer 
@@ -53,4 +55,4 @@ const MapCard = (props: IMapCardProps) => {
   )
 }
 
-export default MapCard;
+export default memo(MapCard);

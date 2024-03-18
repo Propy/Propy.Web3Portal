@@ -19,6 +19,7 @@ import StakePage from '../pages/StakePage';
 import BridgeOptionsPage from '../pages/BridgeOptionsPage';
 import BridgePage from '../pages/BridgePage';
 import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
+import PropyKeysMapPage from '../pages/PropyKeysMapPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -92,6 +93,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
+                      <Route path="/map/propykeys" element={<PropyKeysMapPage />} />
                   </Routes>
                 }
             </div>
