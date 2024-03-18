@@ -118,7 +118,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
   return (
     <>
       {(requireConnected && !onlyGateConnected && !address) &&
-        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT}}>
+        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT, width: '100%'}}>
           <animated.div className={classes.sectionSpacer} style={connectSpring}>
             <WalletIcon className={classes.mainGraphic} />
           </animated.div>
@@ -131,8 +131,8 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <Button variant={'outlined'} color={"primary"} onClick={() => open()}>{"Connect Wallet"}</Button>
         </div>
       }
-      {(requiredNetwork !== activeNetwork) && ((onlyGateConnected && address) || !onlyGateConnected) &&
-        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT}}>
+      {(requiredNetwork !== activeNetwork) && ((onlyGateConnected && address) || (!onlyGateConnected && address)) &&
+        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT, width: '100%'}}>
           <animated.div className={classes.sectionSpacer} style={chainSpring}>
             <img className={classes.mainGraphic} src={NetworkGraphic} alt="Network Graphic"/>
           </animated.div>

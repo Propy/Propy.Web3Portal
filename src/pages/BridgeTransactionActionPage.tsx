@@ -83,47 +83,49 @@ const BridgeTransactionActionPage = () => {
   }, [bridgeSelection, bridgeAction])
 
   return (
-    <GenericPageContainer>
+    <>
       {requiredNetwork &&
         <>
           <NetworkGateContainer
             requiredNetwork={requiredNetwork}
             requireConnected={true}
           >
-            <>
-              {
-                bridgeAddress &&
-                originNetwork &&
-                destinationNetwork &&
-                originAssetAddress &&
-                originAssetDecimals &&
-                destinationAssetAddress &&
-                destinationAssetDecimals &&
-                bridgeSelection &&
-                bridgeAction &&
-                transactionHash &&
-                <>
-                  {bridgeAction === 'prove-withdrawal' &&
-                    <BridgeProveWithdrawalFormContainer 
-                      origin={originNetwork}
-                      destination={destinationNetwork}
-                      transactionHash={transactionHash as `0x${string}`}
-                    />
-                  }
-                  {bridgeAction === 'finalize-withdrawal' &&
-                    <BridgeFinalizeWithdrawalFormContainer 
-                      origin={originNetwork}
-                      destination={destinationNetwork}
-                      transactionHash={transactionHash as `0x${string}`}
-                    />
-                  }
-                </>
-              }
-            </>
+            <GenericPageContainer>
+              <>
+                {
+                  bridgeAddress &&
+                  originNetwork &&
+                  destinationNetwork &&
+                  originAssetAddress &&
+                  originAssetDecimals &&
+                  destinationAssetAddress &&
+                  destinationAssetDecimals &&
+                  bridgeSelection &&
+                  bridgeAction &&
+                  transactionHash &&
+                  <>
+                    {bridgeAction === 'prove-withdrawal' &&
+                      <BridgeProveWithdrawalFormContainer 
+                        origin={originNetwork}
+                        destination={destinationNetwork}
+                        transactionHash={transactionHash as `0x${string}`}
+                      />
+                    }
+                    {bridgeAction === 'finalize-withdrawal' &&
+                      <BridgeFinalizeWithdrawalFormContainer 
+                        origin={originNetwork}
+                        destination={destinationNetwork}
+                        transactionHash={transactionHash as `0x${string}`}
+                      />
+                    }
+                  </>
+                }
+              </>
+            </GenericPageContainer>
           </NetworkGateContainer>
         </>
       }
-    </GenericPageContainer>
+    </>
   )
 };
 
