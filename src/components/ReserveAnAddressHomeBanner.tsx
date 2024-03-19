@@ -111,16 +111,14 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
     let isMounted = true;
     const fetchCollection = async () => {
       if(collectionConfigEntry) {
-        let collectionResponse = await NFTService.getCoordinatesPaginated(
+        let collectionResponse = await NFTService.getCoordinates(
           collectionConfigEntry.network,
           collectionConfigEntry.address,
-          8640,
-          1,
         )
         // setIsLoading(false);
         if(collectionResponse?.status && collectionResponse?.data && isMounted) {
           let renderResults : ICoordinate[] = [];
-          let apiResponseData : INFTCoordinateResponse = collectionResponse.data;
+          let apiResponseData : INFTCoordinateResponse = collectionResponse?.data?.data ? collectionResponse?.data : collectionResponse;
           if(collectionResponse?.status && apiResponseData?.data) {
             for(let nftRecord of apiResponseData?.data) {
               if(nftRecord.longitude && nftRecord.latitude && (renderResults.length < maxEntries)) {
@@ -198,7 +196,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Create an onchain token which symbolically represents the chosen address
                   </Typography>
                   <Button variant="outlined" color="secondary">
-                    5 PRO
+                    10 PRO
                   </Button>
                 </CardActionArea>
               </LinkWrapper>
