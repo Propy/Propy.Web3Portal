@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { PropsFromRedux } from '../containers/ReserveAnAddressHomeBannerContainer';
 
-import MapCard from './MapCard';
+import PropyKeysMapCard from './PropyKeysMapCard';
 
 import {
   NFTService,
@@ -72,7 +72,7 @@ const PropyKeysMap = (props: PropsFromRedux) => {
 
   return (
     <>
-      <MapCard 
+      <PropyKeysMapCard 
         height={GLOBAL_PAGE_HEIGHT}
         zoom={2}
         zoomControl={true}
