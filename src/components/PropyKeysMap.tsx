@@ -44,7 +44,7 @@ const PropyKeysMap = (props: PropsFromRedux) => {
         // setIsLoading(false);
         if(collectionResponse?.status && collectionResponse?.data && isMounted) {
           let renderResults : ICoordinate[] = [];
-          let apiResponseData : INFTCoordinateResponse = collectionResponse;
+          let apiResponseData : INFTCoordinateResponse = collectionResponse?.data?.data ? collectionResponse?.data : collectionResponse;
           if(collectionResponse?.status && apiResponseData?.data) {
             for(let nftRecord of apiResponseData?.data) {
               if(nftRecord.longitude && nftRecord.latitude && (renderResults.length < maxEntries)) {
