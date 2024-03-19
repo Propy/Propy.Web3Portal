@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import { PropsFromRedux } from '../containers/ReserveAnAddressHomeBannerContainer';
 
 import LinkWrapper from './LinkWrapper';
-import MapCard from './MapCard';
+import PropyKeysMapCard from './PropyKeysMapCard';
 import MapOverlay from './MapOverlay';
 
 import RaTier1Icon from '../assets/svg/ra_tier_1.svg';
@@ -21,18 +21,8 @@ import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
 import RaTier3Icon from '../assets/svg/ra_tier_3.svg';
 
 import {
-  NFTService,
-} from '../services/api';
-
-import {
-  COLLECTIONS_PAGE_ENTRIES,
   MINT_AN_ADDRESS_LINK,
 } from '../utils/constants';
-
-import {
-  ICoordinate,
-  INFTCoordinateResponse,
-} from '../interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -95,54 +85,11 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const maxEntries = 10000;
-
 const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
 
   let {
     isConsideredMobile,
   } = props;
-
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-base-testnet'));
-
-  const [nftCoordinates, setNftCoordinates] = useState<ICoordinate[]>([]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCollection = async () => {
-      if(collectionConfigEntry) {
-        let collectionResponse = await NFTService.getCoordinates(
-          collectionConfigEntry.network,
-          collectionConfigEntry.address,
-        )
-        // setIsLoading(false);
-        if(collectionResponse?.status && collectionResponse?.data && isMounted) {
-          let renderResults : ICoordinate[] = [];
-          let apiResponseData : INFTCoordinateResponse = collectionResponse?.data?.data ? collectionResponse?.data : collectionResponse;
-          if(collectionResponse?.status && apiResponseData?.data) {
-            for(let nftRecord of apiResponseData?.data) {
-              if(nftRecord.longitude && nftRecord.latitude && (renderResults.length < maxEntries)) {
-                renderResults.push({
-                  latitude: Number(nftRecord.latitude),
-                  longitude: Number(nftRecord.longitude),
-                  link: `token/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
-                });
-              }
-            }
-          }
-          setNftCoordinates(renderResults);
-        } else {
-          setNftCoordinates([]);
-        }
-      }else {
-        setNftCoordinates([]);
-      }
-    }
-    fetchCollection();
-    return () => {
-      isMounted = false;
-    }
-  }, [collectionConfigEntry])
 
   const classes = useStyles();
 
@@ -163,7 +110,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
         >
           <LinkWrapper link="map/propykeys">
             <MapOverlay />
-            <MapCard 
+            <PropyKeysMapCard 
               height="550px"
               zoom={2}
               zoomControl={true}
@@ -172,7 +119,6 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
               scrollWheelZoom={true}
               // center={[38.171368, -95.430112]} // US center
               center={[24.424473, isConsideredMobile ? -80 : 10]}
-              markers={nftCoordinates}
             />
           </LinkWrapper>
         </div>
