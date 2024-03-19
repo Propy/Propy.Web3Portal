@@ -138,6 +138,12 @@ export const NFTService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}`)
   },
+  async getCoordinates(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}`)
+  },
   async getLikedByStatus(
     network: string,
     assetAddress: string,

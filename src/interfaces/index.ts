@@ -153,11 +153,15 @@ export interface IRecentlyMintedResult {
     }
 }
 
-export interface INFTCoordinateResponse {
+export interface INFTCoordinatePaginatedResponse {
     data: INFTCoordinateEntry[],
     metadata: {
         pagination: IPagination,
     }
+}
+
+export interface INFTCoordinateResponse {
+    data: INFTCoordinateEntry[],
 }
 
 export interface INFTCoordinateEntry {
