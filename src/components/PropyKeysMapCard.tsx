@@ -7,7 +7,6 @@ import Card from '@mui/material/Card';
 import LeafletMapContainer from '../containers/LeafletMapContainer';
 
 import {
-  ILeafletMapMarker,
   ICoordinate,
   INFTCoordinateResponse,
 } from '../interfaces';
@@ -28,7 +27,6 @@ interface IPropyKeysMapCardProps {
   dragging?: boolean
   doubleClickZoom?: boolean
   scrollWheelZoom?: boolean
-  markers?: ILeafletMapMarker[]
   center?: [number, number]
   disableBorderRadius?: boolean
 }
