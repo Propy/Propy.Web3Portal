@@ -101,6 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 'calc(100% - 16px)',
       transform: 'translateY(0%)',
       textAlign: 'center',
+      zIndex: 1200,
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
