@@ -47,7 +47,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
     },
-
+    paginationTotalContainer: {
+      marginTop: theme.spacing(1),
+      display: 'flex',
+      justifyContent: 'center',
+    },
   }),
 );
 
@@ -72,6 +76,7 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
+  // const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const classes = useStyles();
@@ -105,17 +110,31 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
           }
           if(apiResponseData?.metadata?.pagination?.totalPages) {
             setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
+          } else {
+            setPaginationTotalPages(0);
           }
+          // if(apiResponseData?.metadata?.pagination?.total) {
+          //   setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
+          // } else {
+          //   setPaginationTotalRecords(0);
+          // }
         }
         setNftRecords(renderResults);
         setNftAssets(assetResults);
       } else {
         setNftRecords([]);
         setNftAssets({});
+        setPaginationTotalPages(0);
+        // setPaginationTotalRecords(0);
       }
       if(page > 1) {
         setSearchParams((params => {
           params.set("page", page.toString());
+          return params;
+        }));
+      } else if(searchParams.get("page")) {
+        setSearchParams((params => {
+          params.delete("page");
           return params;
         }));
       }
@@ -124,7 +143,7 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
     return () => {
       isMounted = false;
     }
-  }, [perPage, page, setSearchParams])
+  }, [perPage, page, setSearchParams, searchParams])
 
   return (
     <>

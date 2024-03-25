@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     marqueeContainer: {
       // max-width: 100%;
       // overflow: hidden;
-      zIndex: 2000,
+      zIndex: 1100,
       position: 'fixed',
       backgroundColor: 'black',
       color: 'white',
