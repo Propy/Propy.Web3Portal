@@ -178,6 +178,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
             setPaginationTotalRecords(0);
           }
         }
+        if(renderResults.length === 0) {
+          setTitle("No records found");
+        }
         setNftRecords(renderResults);
         setNftAssets(assetResults);
       } else {
