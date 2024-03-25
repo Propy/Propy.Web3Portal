@@ -53,6 +53,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
     },
+    paginationTotalContainer: {
+      marginTop: theme.spacing(1),
+      display: 'flex',
+      justifyContent: 'center',
+    },
     loadingZone: {
       opacity: 0.5,
     }
@@ -86,6 +91,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
+  const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
   const [title, setTitle] = useState("Loading...");
   const [isInitialLoad, setIsInitialLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,6 +172,14 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           } else {
             setPaginationTotalPages(0);
           }
+          if(apiResponseData?.metadata?.pagination?.total) {
+            setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
+          } else {
+            setPaginationTotalRecords(0);
+          }
+        }
+        if(renderResults.length === 0) {
+          setTitle("No records found");
         }
         setNftRecords(renderResults);
         setNftAssets(assetResults);
@@ -176,6 +190,11 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(page > 1) {
         setSearchParams((params => {
           params.set("page", page.toString());
+          return params;
+        }));
+      } else if(searchParams.get("page")) {
+        setSearchParams((params => {
+          params.delete("page");
           return params;
         }));
       }
@@ -237,9 +256,17 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         }
       </Grid>
       {paginationTotalPages > 1 && showPagination &&
-        <div className={classes.paginationContainer}>
-          <Pagination disabled={isLoading} page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
-        </div>
+        <>
+          <div className={classes.paginationContainer}>
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+          </div>
+          {
+            paginationTotalRecords &&
+            <Typography variant="subtitle1" className={classes.paginationTotalContainer}>
+              {paginationTotalRecords} total records
+            </Typography>
+          }
+        </>
       }
     </>
   )

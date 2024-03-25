@@ -44,6 +44,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
     },
+    paginationTotalContainer: {
+      marginTop: theme.spacing(1),
+      display: 'flex',
+      justifyContent: 'center',
+    },
     sectionSpacer: {
       marginBottom: theme.spacing(4),
     },
@@ -71,6 +76,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(20);
   const [paginationTotalPages, setPaginationTotalPages] = useState(0);
+  // const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const classes = useStyles();
@@ -119,16 +125,30 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         }
         if(apiResponseData?.metadata?.pagination?.totalPages) {
           setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
+        } else {
+          setPaginationTotalPages(0);
         }
+        // if(apiResponseData?.metadata?.pagination?.total) {
+        //   setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
+        // } else {
+        //   setPaginationTotalRecords(0);
+        // }
         setOwnedTokenBalances(renderResults);
         setOwnedTokenAssets(assetResults);
       } else {
         setOwnedTokenBalances([]);
         setOwnedTokenAssets({});
+        setPaginationTotalPages(0);
+        // setPaginationTotalRecords(0);
       }
       if(page > 1) {
         setSearchParams((params => {
           params.set("page", page.toString());
+          return params;
+        }));
+      } else if(searchParams.get("page")) {
+        setSearchParams((params => {
+          params.delete("page");
           return params;
         }));
       }
@@ -137,7 +157,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
     return () => {
       isMounted = false;
     }
-  }, [account, perPage, page, setSearchParams])
+  }, [account, perPage, page, setSearchParams, searchParams])
 
   return (
     <>
@@ -173,9 +193,17 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         }
       </Grid>
       {paginationTotalPages > 1 && showPagination &&
-        <div className={classes.paginationContainer}>
-          <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
-        </div>
+        <>
+          <div className={classes.paginationContainer}>
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+          </div>
+          {/* {
+            paginationTotalRecords &&
+            <Typography variant="subtitle1" className={classes.paginationTotalContainer}>
+              {paginationTotalRecords} total records
+            </Typography>
+          } */}
+        </>
       }
     </>
   )
