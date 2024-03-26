@@ -49,8 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     loadingIcon: {
       width: 'auto',
-      height: 100,
-      opacity: 0.6,
+      height: 75,
     }
   }),
 );
@@ -106,10 +105,12 @@ const BasicAreaChart = (props: IBasicAreaChartProps) => {
 
     const loadingSpring = useSpring({
       from: {
-        rotate: '0deg',
+        scale: '1',
+        opacity: '0.1'
       },
       to: {
-        rotate: "180deg",
+        scale: '1.1',
+        opacity: '0.6'
       },
       loop: true,
       delay: 150,
