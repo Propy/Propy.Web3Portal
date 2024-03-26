@@ -312,3 +312,15 @@ export interface IBaseWithdrawalInitiatedEvent {
     withdrawal_proven_event?: IBaseWithdrawalProvenEvent;
     withdrawal_finalized_event?: IBaseWithdrawalFinalizedEvent;
 }
+
+export interface ITimeseries {
+    date: string;
+    value: number;
+}
+
+export interface ITimeseriesUTCDayAPIResponse {
+    data: {
+        utc_day: string,
+        record_count: string,
+    }[]
+}

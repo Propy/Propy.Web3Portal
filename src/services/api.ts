@@ -174,6 +174,15 @@ export const NFTService = {
   },
 }
 
+export const TimeseriesService = {
+  async getPropyKeysDailyMintCounts(
+    network: string,
+    assetAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/timeseries/mints/${network}`, `${assetAddress}`)
+  },
+}
+
 export const AccountBalanceService = {
   async getAccountBalancesPaginated(
     account: string,
