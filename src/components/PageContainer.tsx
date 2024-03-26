@@ -20,6 +20,7 @@ import BridgeOptionsPage from '../pages/BridgeOptionsPage';
 import BridgePage from '../pages/BridgePage';
 import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
 import PropyKeysMapPage from '../pages/PropyKeysMapPage';
+import AnalyticsPage from '../pages/AnalyticsPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -86,6 +87,8 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/token/:network/:tokenAddress/:tokenId" element={<SingleTokenPage isConsideredMobile={isConsideredMobile}/>} />
                       <Route path="/account/:accountAddress" element={<AccountTokensPage darkMode={darkMode} />} />
+                      <Route path="/analytics" element={<AnalyticsPage darkMode={darkMode} />} />
+                      <Route path="/analytics/:analyticsType" element={<AnalyticsPage darkMode={darkMode} />} />
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
