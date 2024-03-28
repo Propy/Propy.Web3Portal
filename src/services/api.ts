@@ -211,6 +211,16 @@ export const AccountBalanceService = {
   },
 }
 
+export const OnchainProxyService = {
+  async getBalanceERC20(
+    network: string,
+    assetAddress: `0x${string}`,
+    account: `${string}`,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/onchain-proxy/balance-erc20`, `${network}/${assetAddress}/${account}`)
+  },
+}
+
 export const SignerService = {
   async getSignerNonce(signerAddress: string) : Promise<AxiosResponse["data"]> {
     return ApiService.post(`/signature/nonce`, {

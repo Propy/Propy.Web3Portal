@@ -132,7 +132,7 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
       useRecord = balanceRecord;
       if (assetRecord?.standard === "ERC-20") {
         setTokenImage(DefaultTokenImage);
-        let balance = priceFormat(Number(utils.formatUnits(useRecord.balance, assetRecord.decimals)), 2, "PRO", false);
+        let balance = priceFormat(Number(utils.formatUnits(useRecord.balance, assetRecord.decimals)), 2, assetRecord.symbol, false);
         setTokenTitle(balance);
         setTokenLink(`token/${useRecord.network_name}/${useRecord.asset_address}`);
       }

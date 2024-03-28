@@ -161,12 +161,13 @@ export const BRIDGE_SELECTION_TO_TRANSACTION_ACTION_TO_REQUIRED_NETWORK : {
     'finalize-withdrawal': process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia',
   },
 }
+export const ETH_L1_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia';
 export const BASE_BRIDGE_L2_NETWORKS = ['base', 'base-sepolia'];
 export const BASE_BRIDGE_L1_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'sepolia';
 export const BASE_BRIDGE_L2_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia';
 export const ETHEREUM_TO_BASE_BRIDGE = process?.env?.REACT_APP_ENV === 'prod' ? "0x3154Cf16ccdb4C6d922629664174b904d80F2C35" : "0xfd0Bf71F60660E2f608ed56e1659C450eB113120";
 export const BASE_TO_ETHEREUM_BRIDGE = process?.env?.REACT_APP_ENV === 'prod' ? "0x4200000000000000000000000000000000000010" : "0x4200000000000000000000000000000000000010";
-export const PRO_ETHEREUM_L1_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x226bb599a12C826476e3A771454697EA52E9E220" : "0xa7423583D3b0B292E093aAC2f8900396EC110960"; // base sepolia
+export const PRO_ETHEREUM_L1_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x226bb599a12C826476e3A771454697EA52E9E220" : "0xa7423583D3b0B292E093aAC2f8900396EC110960"; // sepolia
 export const PRO_BASE_L2_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x18dD5B087bCA9920562aFf7A0199b96B9230438b" : "0x3660925E58444955c4812e42A572e532e69Dac7B"; // base sepolia
 export const L2_TO_L1_MESSAGE_PASSER_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x4200000000000000000000000000000000000016" : "0x4200000000000000000000000000000000000016";
 export const OPTIMISM_PORTAL_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x49048044D57e1C92A77f79988d21Fa8fAF74E97e" : "0x49f53e41452C74589E85cA1677426Ba426459e85";
