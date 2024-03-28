@@ -57,7 +57,7 @@ const HomePage = () => {
                 </div>
                 {address &&
                     <div className={classes.sectionSpacer}>
-                        <AccountTokensBannerContainer account={address} maxRecords={5} showTitle={true} />
+                        <AccountTokensBannerContainer account={address} maxRecords={3} showTitle={true} />
                     </div>
                 }
                 <div className={classes.sectionSpacer}>

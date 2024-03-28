@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 import { useSearchParams } from "react-router-dom";
 
+import { useQuery } from '@tanstack/react-query';
+
 import { Theme } from '@mui/material/styles';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -26,7 +28,15 @@ import {
 
 import {
   AccountBalanceService,
+  OnchainProxyService,
 } from '../services/api';
+
+import {
+  ETH_L1_NETWORK,
+  BASE_L2_NETWORK,
+  PRO_BASE_L2_ADDRESS,
+  PRO_ETHEREUM_L1_ADDRESS,
+} from '../utils/constants';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -89,6 +99,64 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
     isConsideredMobile,
   } = props;
 
+  const { 
+    data: l2ProBalanceData,
+    isLoading: isLoadingL2ProBalanceData,
+  } = useQuery({
+    queryKey: ['l2PROBalance', account],
+    queryFn: async () => {
+      let l2PROBalanceResponse = await OnchainProxyService.getBalanceERC20(
+        BASE_L2_NETWORK,
+        PRO_BASE_L2_ADDRESS,
+        account,
+      );
+      if (l2PROBalanceResponse?.status && l2PROBalanceResponse?.data) {
+        let {
+          balance,
+          token_info,
+        } = l2PROBalanceResponse?.data;
+        token_info.decimals = token_info.decimal ? token_info.decimal : token_info.decimals;
+        token_info.symbol = `${token_info.symbol} (Base)`
+        return {
+          balance: balance[token_info.address],
+          tokenInfo: token_info,
+        }
+      }
+      return null;
+    },
+    cacheTime: 60, // Cache the data indefinitely
+    staleTime: 60, // Data is always considered fresh
+  });
+
+  const { 
+    data: l1ProBalanceData,
+    isLoading: isLoadingL1ProBalanceData,
+  } = useQuery({
+    queryKey: ['l1PROBalance', account],
+    queryFn: async () => {
+      let l2PROBalanceResponse = await OnchainProxyService.getBalanceERC20(
+        ETH_L1_NETWORK,
+        PRO_ETHEREUM_L1_ADDRESS,
+        account,
+      );
+      if (l2PROBalanceResponse?.status && l2PROBalanceResponse?.data) {
+        let {
+          balance,
+          token_info,
+        } = l2PROBalanceResponse?.data;
+        token_info.decimals = token_info.decimal ? token_info.decimal : token_info.decimals;
+        token_info.symbol = `${token_info.symbol} (Ethereum)`
+        return {
+          balance: balance[token_info.address],
+          tokenInfo: token_info,
+        }
+      }
+      return null;
+    },
+    cacheTime: 60, // Cache the data indefinitely
+    staleTime: 60, // Data is always considered fresh
+  });
+
   useEffect(() => {
     let isMounted = true;
     const fetchMixedTokens = async () => {
@@ -113,16 +181,17 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
             }
           }
         }
-        if(apiResponseData?.data?.['ERC-20']) {
-          for(let [assetAddress, assetRecord] of Object.entries(apiResponseData?.data?.['ERC-20'])) {
-            if(assetRecord?.balances) {
-              renderResults = [...renderResults, ...assetRecord.balances];
-            }
-            if(assetRecord?.asset) {
-              assetResults[assetAddress] = assetRecord?.asset;
-            }
-          }
-        }
+        // commenting this out while we transition to current balances from chain
+        // if(apiResponseData?.data?.['ERC-20']) {
+        //   for(let [assetAddress, assetRecord] of Object.entries(apiResponseData?.data?.['ERC-20'])) {
+        //     if(assetRecord?.balances) {
+        //       renderResults = [...renderResults, ...assetRecord.balances];
+        //     }
+        //     if(assetRecord?.asset) {
+        //       assetResults[assetAddress] = assetRecord?.asset;
+        //     }
+        //   }
+        // }
         if(apiResponseData?.metadata?.pagination?.totalPages) {
           setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
         } else {
@@ -174,6 +243,38 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         </div>
       }
       <Grid className={classes.sectionSpacer} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
+        {!isLoadingL1ProBalanceData && l1ProBalanceData?.balance &&
+          <Grid key={`single-token-card-l1-pro-${l1ProBalanceData.tokenInfo.address}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <SingleTokenCard assetRecord={l1ProBalanceData.tokenInfo} 
+              balanceRecord={{
+                balance: l1ProBalanceData.balance,
+                network_name: ETH_L1_NETWORK,
+                asset_address: l1ProBalanceData.tokenInfo.address,
+                //@ts-ignore
+                asset: {
+                  decimals: l1ProBalanceData.tokenInfo.decimals,
+                  standard: 'ERC-20',
+                }
+              }}
+            />
+          </Grid>
+        }
+        {!isLoadingL2ProBalanceData && l2ProBalanceData?.balance &&
+          <Grid key={`single-token-card-l1-pro-${l2ProBalanceData.tokenInfo.address}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <SingleTokenCard assetRecord={l2ProBalanceData.tokenInfo} 
+              balanceRecord={{
+                balance: l2ProBalanceData.balance,
+                network_name: ETH_L1_NETWORK,
+                asset_address: l2ProBalanceData.tokenInfo.address,
+                //@ts-ignore
+                asset: {
+                  decimals: l2ProBalanceData.tokenInfo.decimals,
+                  standard: 'ERC-20',
+                }
+              }}
+            />
+          </Grid>
+        }
         {!isLoading && ownedTokenBalances && ownedTokenBalances.sort((a, b) => {
           if(a?.asset?.standard && b?.asset?.standard) {
             return (a.asset.standard).localeCompare(b.asset.standard);
