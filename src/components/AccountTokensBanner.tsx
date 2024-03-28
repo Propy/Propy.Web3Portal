@@ -110,7 +110,6 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         PRO_BASE_L2_ADDRESS,
         account,
       );
-      console.log({l2PROBalanceResponse})
       if (l2PROBalanceResponse?.status && l2PROBalanceResponse?.data) {
         let {
           balance,
@@ -140,7 +139,6 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         PRO_ETHEREUM_L1_ADDRESS,
         account,
       );
-      console.log({l2PROBalanceResponse})
       if (l2PROBalanceResponse?.status && l2PROBalanceResponse?.data) {
         let {
           balance,
@@ -158,8 +156,6 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
     cacheTime: 60, // Cache the data indefinitely
     staleTime: 60, // Data is always considered fresh
   });
-
-  console.log({l1ProBalanceData, l2ProBalanceData})
 
   useEffect(() => {
     let isMounted = true;
