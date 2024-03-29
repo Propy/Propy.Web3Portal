@@ -142,7 +142,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Create an onchain token which symbolically represents the chosen address
                   </Typography>
                   <Button variant="outlined" color="secondary">
-                    5 PRO
+                    2.5 PRO
                   </Button>
                 </CardActionArea>
               </LinkWrapper>
@@ -165,7 +165,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Have your deed record uploaded to IPFS and associated with your NFT
                   </Typography>
                   <Button variant="outlined" color="secondary">
-                    100 PRO
+                    50 PRO
                   </Button>
                 </CardActionArea>
               </LinkWrapper>
