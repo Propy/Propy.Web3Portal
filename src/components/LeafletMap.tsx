@@ -9,6 +9,8 @@ import MarkerClusterGroup from 'react-leaflet-cluster'
 import markerIconPropy3D from "../assets/img/map-marker-3d-compressed.png";
 import {Icon} from 'leaflet'
 
+import LeafletMapTrackBounds from './LeafletMapTrackBounds';
+
 import {
   ILeafletMapMarker
 } from '../interfaces';
@@ -23,6 +25,8 @@ interface ILeafletMap {
   scrollWheelZoom?: boolean
   markers?: ILeafletMapMarker[]
   center?: [number, number]
+  disableClustering?: boolean
+  onBoundsUpdate?: (boundsRect: string) => void,
 }
 
 // const createClusterCustomIcon = function (cluster: MarkerCluster) {
@@ -42,7 +46,9 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
     doubleClickZoom = true,
     scrollWheelZoom = true,
     markers = [],
-    center = [0, 0]
+    center = [0, 0],
+    disableClustering = false,
+    onBoundsUpdate = (boundsRect: string) => {},
   } = props;
 
   // zoom = 6 = US zoom on desktop
@@ -67,38 +73,62 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       minZoom={2}
       maxBoundsViscosity={0.7}
     >
+      <LeafletMapTrackBounds onBoundsUpdate={onBoundsUpdate} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
       />
-      <MarkerClusterGroup
-        chunkedLoading
-        // iconCreateFunction={createClusterCustomIcon}
-        maxClusterRadius={(zoom: number) => {
-          if(zoom === 18) {
-            return 10;
-          }
-          return 80;
-        }}
-      >
-        {markers && markers.map((marker) =>
-          <Marker 
-            position={[marker.latitude, marker.longitude]} 
-            icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
-            eventHandlers={{
-              click: (e) => {
-                if(marker?.link) {
-                  window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
-                }
-              },
-            }}
-          >
-            {/* <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup> */}
-          </Marker>
-        )}
-      </MarkerClusterGroup>
+      {!disableClustering &&
+        <MarkerClusterGroup
+          chunkedLoading
+          // iconCreateFunction={createClusterCustomIcon}
+          maxClusterRadius={(zoom: number) => {
+            if(zoom === 18) {
+              return 10;
+            }
+            return 80;
+          }}
+        >
+          {markers && markers.map((marker) =>
+            <Marker 
+              position={[marker.latitude, marker.longitude]} 
+              icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
+              eventHandlers={{
+                click: (e) => {
+                  if(marker?.link) {
+                    window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
+                  }
+                },
+              }}
+            >
+              {/* <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+              </Popup> */}
+            </Marker>
+          )}
+        </MarkerClusterGroup>
+      }
+      {disableClustering &&
+        <>
+          {markers && markers.map((marker) =>
+            <Marker 
+              position={[marker.latitude, marker.longitude]} 
+              icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
+              eventHandlers={{
+                click: (e) => {
+                  if(marker?.link) {
+                    window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
+                  }
+                },
+              }}
+            >
+              {/* <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+              </Popup> */}
+            </Marker>
+          )}
+        </>
+      }
     </MapContainer>
   )
 }
