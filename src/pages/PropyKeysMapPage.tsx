@@ -2,10 +2,17 @@ import React from 'react';
 
 import PropyKeysMapContainer from '../containers/PropyKeysMapContainer';
 
-const PropyKeysMapPage = () => {
+interface IPropyKeysMapPage {
+  mode: "normal" | "gis"
+}
+
+const PropyKeysMapPage = (props: IPropyKeysMapPage) => {
+
+    const { mode } = props;
+
     return (
       <>
-        <PropyKeysMapContainer/>
+        <PropyKeysMapContainer mode={mode} />
       </>
     )
 };

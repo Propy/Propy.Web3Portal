@@ -144,6 +144,19 @@ export const NFTService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/coordinates/${network}`, `${contractNameOrCollectionNameOrAddress}`)
   },
+  async getCoordinatesPostGISPoints(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    boundsRect: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${boundsRect ? `?bounds=${boundsRect}` : ''}`)
+  },
+  async getCoordinatesPostGISClusters(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates-postgis-cluster/${network}`, `${contractNameOrCollectionNameOrAddress}`)
+  },
   async getLikedByStatus(
     network: string,
     assetAddress: string,

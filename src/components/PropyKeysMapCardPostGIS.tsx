@@ -1,6 +1,7 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query';
+import { useDebounce } from 'use-debounce';
 
 import Card from '@mui/material/Card';
 
@@ -31,7 +32,7 @@ interface IPropyKeysMapCardProps {
   disableBorderRadius?: boolean
 }
 
-const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
+const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   const {
     height = "320px",
@@ -45,21 +46,33 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     disableBorderRadius = false,
   } = props;
 
+  const [boundsRect, setBoundsRect] = useState("-180,-90,180,90");
+
   const maxEntries = 10000;
 
   let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
+  const [debouncedBoundsRect] = useDebounce(boundsRect, 1000);
+
+  console.log({boundsRect, debouncedBoundsRect});
+
   const { 
     data: nftCoordinates = [],
     // isLoading
-  } = useQuery({
-    queryKey: ['nftCoordinates', collectionConfigEntry],
+  } = useQuery<ICoordinate[], Error>({
+    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry, boundsRect],
     queryFn: async () => {
       if (collectionConfigEntry) {
-        let collectionResponse = await NFTService.getCoordinates(
+        // let collectionResponseClusters = await NFTService.getCoordinatesPostGISClusters(
+        //   collectionConfigEntry.network,
+        //   collectionConfigEntry.address,
+        // );
+        let collectionResponsePoints = await NFTService.getCoordinatesPostGISPoints(
           collectionConfigEntry.network,
           collectionConfigEntry.address,
+          boundsRect,
         );
+        let collectionResponse = collectionResponsePoints;
         if (collectionResponse?.status && collectionResponse?.data) {
           let renderResults: ICoordinate[] = [];
           let apiResponseData: INFTCoordinateResponse = collectionResponse?.data?.data
@@ -83,6 +96,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     },
     cacheTime: Infinity, // Cache the data indefinitely
     staleTime: Infinity, // Data is always considered fresh
+    keepPreviousData: true,
   });
 
   return (
@@ -95,9 +109,11 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
         scrollWheelZoom={scrollWheelZoom}
         markers={nftCoordinates}
         center={center}
+        disableClustering={false}
+        onBoundsUpdate={(boundsRect: string) => setBoundsRect(boundsRect)}
       />
     </Card>
   )
 }
 
-export default memo(PropyKeysMapCard);
+export default memo(PropyKeysMapCardPostGIS);

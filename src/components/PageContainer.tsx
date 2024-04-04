@@ -96,7 +96,8 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
-                      <Route path="/map/propykeys" element={<PropyKeysMapPage />} />
+                      <Route path="/map/propykeys" element={<PropyKeysMapPage mode="normal" />} />
+                      <Route path="/map-gis/propykeys" element={<PropyKeysMapPage mode="gis" />} />
                   </Routes>
                 }
             </div>
