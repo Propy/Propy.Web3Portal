@@ -31,7 +31,7 @@ function LeafletMapTrackBounds(props: ILeafletMapTrackBounds) {
       }
     },
     // delay in ms
-    1500
+    150
   );
 
   const instantUpdate = useCallback((bounds: string, zoom: number) => {
