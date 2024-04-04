@@ -1,26 +1,55 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useMap } from "react-leaflet";
 import { useDebouncedCallback } from 'use-debounce';
 
 interface ILeafletMapTrackBounds {
   onBoundsUpdate?: (boundsRect: string) => void,
+  onZoomUpdate?: (zoom: number) => void,
 }
 
 function LeafletMapTrackBounds(props: ILeafletMapTrackBounds) {
 
-  const { onBoundsUpdate } = props;
+  const { onBoundsUpdate, onZoomUpdate } = props;
 
   const mMap = useMap();
 
-  const debouncedBoundsUpdate = useDebouncedCallback(
-    (value: string) => {
+  const debouncedUpdate = useDebouncedCallback(
+    (bounds: string, zoom: number) => {
+      let defaultZoom = 2;
+      let defaultBounds = "-180,-90,180,90";
+      let useBounds = defaultBounds;
+      let useZoom = defaultZoom;
+      if(zoom >= 9) {
+        useBounds = bounds;
+        useZoom = zoom;
+      }
       if(onBoundsUpdate) {
-        onBoundsUpdate(value);
+        onBoundsUpdate(useBounds);
+      }
+      if(onZoomUpdate) {
+        onZoomUpdate(useZoom);
       }
     },
     // delay in ms
     1500
   );
+
+  const instantUpdate = useCallback((bounds: string, zoom: number) => {
+    let defaultZoom = 2;
+    let defaultBounds = "-180,-90,180,90";
+    let useBounds = defaultBounds;
+    let useZoom = defaultZoom;
+    if(zoom >= 10) {
+      useBounds = bounds;
+      useZoom = zoom;
+    }
+    if(onBoundsUpdate) {
+      onBoundsUpdate(useBounds);
+    }
+    if(onZoomUpdate) {
+      onZoomUpdate(useZoom);
+    }
+  }, [onBoundsUpdate, onZoomUpdate])
 
   useEffect(() => {
     if (!mMap) return;
@@ -33,20 +62,30 @@ function LeafletMapTrackBounds(props: ILeafletMapTrackBounds) {
 
     mMap.on("zoomend", function () {
       let coordinates = mMap.getBounds();
+      let zoom = mMap.getZoom();
       console.log(mMap.getBounds());
       console.log({coordinates: coordinates.toBBoxString(), zoom: mMap.getZoom()});
       let boundsRect = coordinates.toBBoxString();
-      debouncedBoundsUpdate(boundsRect);
+      if(zoom >= 10) {
+        debouncedUpdate(boundsRect, zoom);
+      } else {
+        instantUpdate(boundsRect, zoom);
+      }
     });
 
     mMap.on("moveend", function () {
       let coordinates = mMap.getBounds();
+      let zoom = mMap.getZoom();
       console.log(mMap.getBounds());
       console.log({coordinates: coordinates.toBBoxString(), zoom: mMap.getZoom()});
       let boundsRect = coordinates.toBBoxString();
-      debouncedBoundsUpdate(boundsRect);
+      if(zoom >= 10) {
+        debouncedUpdate(boundsRect, zoom);
+      } else {
+        instantUpdate(boundsRect, zoom);
+      }
     });
-  }, [mMap, onBoundsUpdate, debouncedBoundsUpdate]);
+  }, [mMap, onBoundsUpdate, debouncedUpdate, instantUpdate, onZoomUpdate]);
 
   return (
     <></>

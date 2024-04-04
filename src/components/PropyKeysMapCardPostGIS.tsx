@@ -1,7 +1,6 @@
 import React, { memo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query';
-import { useDebounce } from 'use-debounce';
 
 import Card from '@mui/material/Card';
 
@@ -52,16 +51,16 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
-  const [debouncedBoundsRect] = useDebounce(boundsRect, 1000);
-
-  console.log({boundsRect, debouncedBoundsRect});
+  console.log({boundsRect});
 
   const { 
-    data: nftCoordinates = [],
-    // isLoading
+    data: nftCoordinatesGIS = [],
+    isLoading,
+    isFetching,
   } = useQuery<ICoordinate[], Error>({
-    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry, boundsRect],
+    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry?.address, collectionConfigEntry?.network, boundsRect],
     queryFn: async () => {
+      console.log('nftCoordinates-PostGIS', collectionConfigEntry, boundsRect)
       if (collectionConfigEntry) {
         // let collectionResponseClusters = await NFTService.getCoordinatesPostGISClusters(
         //   collectionConfigEntry.network,
@@ -107,10 +106,11 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
         dragging={dragging}
         doubleClickZoom={doubleClickZoom}
         scrollWheelZoom={scrollWheelZoom}
-        markers={nftCoordinates}
+        markers={nftCoordinatesGIS}
         center={center}
         disableClustering={false}
         onBoundsUpdate={(boundsRect: string) => setBoundsRect(boundsRect)}
+        isLoading={isLoading || isFetching}
       />
     </Card>
   )

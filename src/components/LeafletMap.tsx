@@ -1,12 +1,18 @@
 import React from 'react';
 
+import { Theme } from '@mui/material/styles';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { latLngBounds, latLng } from 'leaflet';
+import { animated, useSpring, config } from '@react-spring/web'
 
 import MarkerClusterGroup from 'react-leaflet-cluster'
 
 // import markerIconPropyBlue from "../assets/svg/map_marker_propy_blue_stroked.svg";
 import markerIconPropy3D from "../assets/img/map-marker-3d-compressed.png";
+import LogoDarkMode from '../assets/svg/propy-logo-house-only.svg'
 import {Icon} from 'leaflet'
 
 import LeafletMapTrackBounds from './LeafletMapTrackBounds';
@@ -27,7 +33,25 @@ interface ILeafletMap {
   center?: [number, number]
   disableClustering?: boolean
   onBoundsUpdate?: (boundsRect: string) => void,
+  onZoomUpdate?: (zoom: number) => void,
+  isLoading?: boolean,
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    loadingIconContainer: {
+      position: 'absolute',
+      zIndex: 1,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingIcon: {
+      width: 'auto',
+      height: 75,
+    }
+  }),
+);
 
 // const createClusterCustomIcon = function (cluster: MarkerCluster) {
 //   return leaflet.divIcon({
@@ -49,14 +73,32 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
     center = [0, 0],
     disableClustering = false,
     onBoundsUpdate = (boundsRect: string) => {},
+    onZoomUpdate = (zoom: number) => {},
+    isLoading = false,
   } = props;
 
   // zoom = 6 = US zoom on desktop
   // center = [38.171368, -95.430112] = middle area US
 
+  const classes = useStyles();
+
   let corner1 = latLng(85, -180);
   let corner2 = latLng(-85, 180);
   let bounds = latLngBounds(corner1, corner2);
+
+  const loadingSpring = useSpring({
+    from: {
+      scale: '1',
+      opacity: '0.1'
+    },
+    to: {
+      scale: '1.1',
+      opacity: '0.6'
+    },
+    loop: true,
+    delay: 150,
+    config: config.wobbly,
+  })
 
   return (
     <MapContainer
@@ -72,8 +114,17 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       maxBounds={bounds}
       minZoom={2}
       maxBoundsViscosity={0.7}
+      zoomDelta={2}
+      zoomSnap={2}
     >
-      <LeafletMapTrackBounds onBoundsUpdate={onBoundsUpdate} />
+      <div style={{zIndex: 9999}}>
+      </div>
+      {isLoading &&
+        <div style={{height: "inherit", width: '100%', zIndex: 999, backgroundColor: '#ffffff5e'}} className={classes.loadingIconContainer}>
+          <animated.img style={loadingSpring} className={classes.loadingIcon} src={LogoDarkMode} alt="loading icon" />
+        </div>
+      }
+      <LeafletMapTrackBounds onBoundsUpdate={onBoundsUpdate} onZoomUpdate={onZoomUpdate} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
