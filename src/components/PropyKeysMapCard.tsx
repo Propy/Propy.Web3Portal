@@ -47,7 +47,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-base-testnet'));
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
   const { 
     data: nftCoordinates = [],
