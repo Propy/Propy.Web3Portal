@@ -50,7 +50,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === (process?.env?.REACT_APP_ENV === 'prod' ? 'propykeys' : 'propy-home-nft-dev-base-testnet'));
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
   const [debouncedBoundsRect] = useDebounce(boundsRect, 1000);
 
