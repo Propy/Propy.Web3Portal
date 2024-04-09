@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query';
 
@@ -31,7 +31,7 @@ interface IPropyKeysMapCardProps {
   disableBorderRadius?: boolean
 }
 
-const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
+const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   const {
     height = "320px",
@@ -45,21 +45,33 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     disableBorderRadius = false,
   } = props;
 
+  const [boundsRect, setBoundsRect] = useState("-180,-90,180,90");
+
   const maxEntries = 10000;
 
   let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
+  console.log({boundsRect});
+
   const { 
-    data: nftCoordinates = [],
-    // isLoading
-  } = useQuery({
-    queryKey: ['nftCoordinates', collectionConfigEntry],
+    data: nftCoordinatesGIS = [],
+    isLoading,
+    isFetching,
+  } = useQuery<ICoordinate[], Error>({
+    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry?.address, collectionConfigEntry?.network, boundsRect],
     queryFn: async () => {
+      console.log('nftCoordinates-PostGIS', collectionConfigEntry, boundsRect)
       if (collectionConfigEntry) {
-        let collectionResponse = await NFTService.getCoordinates(
+        // let collectionResponseClusters = await NFTService.getCoordinatesPostGISClusters(
+        //   collectionConfigEntry.network,
+        //   collectionConfigEntry.address,
+        // );
+        let collectionResponsePoints = await NFTService.getCoordinatesPostGISPoints(
           collectionConfigEntry.network,
           collectionConfigEntry.address,
+          boundsRect,
         );
+        let collectionResponse = collectionResponsePoints;
         if (collectionResponse?.status && collectionResponse?.data) {
           let renderResults: ICoordinate[] = [];
           let apiResponseData: INFTCoordinateResponse = collectionResponse?.data?.data
@@ -83,6 +95,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     },
     cacheTime: Infinity, // Cache the data indefinitely
     staleTime: Infinity, // Data is always considered fresh
+    keepPreviousData: true,
   });
 
   return (
@@ -93,11 +106,14 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
         dragging={dragging}
         doubleClickZoom={doubleClickZoom}
         scrollWheelZoom={scrollWheelZoom}
-        markers={nftCoordinates}
+        markers={nftCoordinatesGIS}
         center={center}
+        disableClustering={false}
+        onBoundsUpdate={(boundsRect: string) => setBoundsRect(boundsRect)}
+        isLoading={isLoading || isFetching}
       />
     </Card>
   )
 }
 
-export default memo(PropyKeysMapCard);
+export default memo(PropyKeysMapCardPostGIS);
