@@ -309,3 +309,9 @@ export const StakeService = {
     return ApiService.postNoIntercept(`/stake/sync`, {});
   },
 }
+
+export const GeoService = {
+  async geoLocateClient() : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/geo/locate`);
+  }
+}
