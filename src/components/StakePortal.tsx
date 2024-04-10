@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 import { animated, useSpring } from '@react-spring/web';
 
+import { useQuery } from '@tanstack/react-query';
+
 import { utils } from 'ethers';
 
 import BigNumber from 'bignumber.js';
@@ -28,7 +30,6 @@ import Button from '@mui/material/Button';
 
 import { useAccount, useNetwork, useBalance, useContractRead, useContractWrite, useWaitForTransaction } from 'wagmi';
 
-
 import { PropsFromRedux } from '../containers/StakeStatsContainer';
 
 import SingleTokenCard from './SingleTokenCard';
@@ -47,6 +48,7 @@ import {
   BASE_PROPYKEYS_STAKING_NFT,
   BASE_OG_STAKING_NFT,
   PRO_BASE_L2_ADDRESS,
+  STAKING_ORIGIN_COUNTRY_BLACKLIST,
 } from '../utils/constants';
 
 import {
@@ -61,6 +63,7 @@ import PRONFTStakingABI from '../abi/PRONFTStakingABI.json';
 import {
   AccountBalanceService,
   StakeService,
+  GeoService,
 } from '../services/api';
 
 import { useStakerUnlockTime } from '../hooks';
@@ -310,6 +313,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const [showRequireTenModal, setShowRequireTenModal] = useState(false);
   const [isSyncingStaking, setIsSyncingStaking] = useState(false);
   const [lastSelectedPropyKeyTokenId, setLastSelectedPropyKeyTokenId] = useState(0);
+  const [isBlacklistedOrigin, setIsBlacklistedOrigin] = useState(false);
 
   const { 
     address,
@@ -444,8 +448,30 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     setSelectedPropyKeyTokenIds([]);
     setSelectedTokenAddress(false);
   }
+
+  const { 
+    data: clientCountry,
+    isLoading: isLoadingGeoLocation,
+  } = useQuery({
+    queryKey: ['stakeGeoLocation', mode],
+    queryFn: async () => {
+      let geoLocateResponse = await GeoService.geoLocateClient();
+      if (geoLocateResponse?.status && geoLocateResponse?.data) {
+        return geoLocateResponse?.data?.info?.country;
+      }
+      return null;
+    },
+  });
+
+  useEffect(() => {
+    if(STAKING_ORIGIN_COUNTRY_BLACKLIST.indexOf(clientCountry) > -1) {
+      setIsBlacklistedOrigin(true);
+    } else {
+      setIsBlacklistedOrigin(false);
+    }
+  }, [clientCountry])
   
-  console.log({propyKeysNFT, nftAssets, selectedTokenIds})
+  console.log({propyKeysNFT, nftAssets, selectedTokenIds, clientCountry})
 
   const { 
     data: dataPropyKeysIsStakingContractApproved,
@@ -888,260 +914,273 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   return (
     <div className={classes.root}>
-      <Grid className={isLoading ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
-        {!isLoading && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
-          <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
-            <Typography variant="body1" style={{textAlign: 'left'}}>
-              Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
-            </Typography>
-          </Grid>
-        }
-        {!isLoading && propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
-          <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-            <SingleTokenCard disabled={(selectedTokenAddress === BASE_OG_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
-          </Grid>  
-        ))}
-        {!isLoading && ogKeysNFT && ogKeysNFT.map((balanceRecord, index) => (
-          <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-            <SingleTokenCard disabled={(selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_OG_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
-          </Grid>  
-        ))}
-        {isLoading && 
-          <>
-            <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
-              <Typography variant="body1" style={{textAlign: 'left'}}>
-                Loading...
+      {(isBlacklistedOrigin && (mode === "enter")) &&
+        <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
+          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+              <Typography variant="h6" style={{textAlign: 'left'}}>
+                  For regulatory reasons, entering the staking protocol is not allowed from your location.
               </Typography>
             </Grid>
-            {
-              Array.from({length: 15}).map((entry, index) => 
-                <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-                  <SingleTokenCardLoading />
-                </Grid>
-              )
+        </Grid>
+      }
+      {(!isBlacklistedOrigin || (mode === "leave")) &&
+        <>
+          <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
+            {!(isLoading || isLoadingGeoLocation) && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
+              <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+                <Typography variant="body1" style={{textAlign: 'left'}}>
+                  Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
+                </Typography>
+              </Grid>
             }
-          </>
-        }
-        {!isLoading && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
-          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
-            <Typography variant="h6" style={{textAlign: 'left'}}>
-                {mode === "enter" ? "No unstaked tokens found" : "No staked tokens found"}
-            </Typography>
-          </Grid>
-        }
-      </Grid>
-      <animated.div className={classes.floatingActionZone} style={actionZoneSpring}>
-        <Card className={classes.floatingActionZoneCard} elevation={6}>
-            <Typography variant="h6">
-              {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length}{selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
-            </Typography>
-            <Box className={classes.selectionOptionsContainer}>
-              <div className={classes.selectionOptionsSpacer}>
-                <Button
-                  // onClick={}
-                  // variant={'outlined'}
-                  size={'small'}
-                  color={'secondary'}
-                  onClick={() => deselectAllOfCurrentCollection()}
-                  disabled={disableSelectionAdjustments}
-                  // color={color}
-                  // disabled={isLoading}
-                  // style={{width: width}}
-                  // className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
-                >
-                  Clear All
-                </Button>
-                <Button
-                  // onClick={}
-                  // variant={'outlined'}
-                  size={'small'}
-                  color={'secondary'}
-                  onClick={() => selectAllOfCurrentCollection()}
-                  disabled={disableSelectionAdjustments}
-                  // color={color}
-                  // disabled={isLoading}
-                  // style={{width: width}}
-                  // className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
-                >
-                  Select All
-                </Button>
-              </div>
-            </Box>
-            {mode === "enter" &&
+            {!(isLoading || isLoadingGeoLocation) && propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
+              <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+                <SingleTokenCard disabled={(selectedTokenAddress === BASE_OG_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
+              </Grid>  
+            ))}
+            {!(isLoading || isLoadingGeoLocation) && ogKeysNFT && ogKeysNFT.map((balanceRecord, index) => (
+              <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+                <SingleTokenCard disabled={(selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_OG_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
+              </Grid>  
+            ))}
+            {(isLoading || isLoadingGeoLocation) && 
               <>
-                <Box className={classes.stepContainer}>
-                  <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
-                    {/* TODO feed getActiveStep the proper allowance required param */}
-                    <Stepper activeStep={activeStep} alternativeLabel>
-                      <Step key={"Approve NFT"}>
-                        <StepLabel>{"Approve NFT"}</StepLabel>
-                      </Step>
-                      <Step key={"Approve PRO"}>
-                        <StepLabel>{"Approve PRO"}</StepLabel>
-                      </Step>
-                      <Step key={"Enter Staking"}>
-                        <StepLabel>{"Enter Staking"}</StepLabel>
-                      </Step>
-                    </Stepper>
-                  </div>
-                </Box>
-                <div className={classes.submitButtonContainer}>
-                  {
-                    (
-                      selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT
-                      && activeStep === 0
-                    ) &&
-                    <FloatingActionButton
-                      className={classes.submitButton}
-                      buttonColor="secondary"
-                      disabled={isAwaitingPropyKeysApprovalForAllTx || isAwaitingWalletInteraction}
-                      onClick={() => runPropyKeysSetApprovalForAll()}
-                      showLoadingIcon={isAwaitingPropyKeysApprovalForAllTx || isAwaitingWalletInteraction}
-                      text={getApproveNFTButtonText(isAwaitingWalletInteraction, isAwaitingPropyKeysApprovalForAllTx)}
-                    />
-                  }
-                  {
-                    (
-                      (selectedTokenAddress === BASE_OG_STAKING_NFT)
-                      && activeStep === 0
-                    ) &&
-                    <FloatingActionButton
-                      className={classes.submitButton}
-                      buttonColor="secondary"
-                      disabled={isAwaitingOGApprovalForAllTx || isAwaitingWalletInteraction}
-                      onClick={() => runOGSetApprovalForAll()}
-                      showLoadingIcon={isAwaitingOGApprovalForAllTx || isAwaitingWalletInteraction}
-                      text={getApproveNFTButtonText(isAwaitingWalletInteraction, isAwaitingOGApprovalForAllTx)}
-                    />
-                  }
-                  {
-                    (
-                      ((selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT) || (selectedTokenAddress === BASE_OG_STAKING_NFT))
-                      && activeStep === 1
-                    ) &&
-                    <FloatingActionButton
-                      className={classes.submitButton}
-                      buttonColor="secondary"
-                      disabled={isLoadingMinimumRequiredPROAllowance || isAwaitingWalletInteraction || isAwaitingPROAllowanceTx || !minimumRequiredPROAllowance || isNaN(Number(stakingContractPROAllowance))}
-                      onClick={() => runAllowancePRO()}
-                      showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPROAllowanceTx}
-                      text={getApprovePROButtonText(isAwaitingWalletInteraction, isAwaitingPROAllowanceTx)}
-                    />
-                  }
-                  {
-                    (
-                      ((selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT) || (selectedTokenAddress === BASE_OG_STAKING_NFT))
-                      && activeStep === 2
-                    ) &&
-                    <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
-                      <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">PRO Balance: {priceFormat(Number(utils.formatUnits(Number(balanceDataPRO?.value ? balanceDataPRO?.value : 0), 8)), 2, 'PRO', false, true)}</Typography>
-                      <Typography className={classes.buttonTitle} variant="subtitle2">{priceFormat(Number(utils.formatUnits(Number(minimumRequiredPROAllowance ? minimumRequiredPROAllowance : 0), 8)), 2, 'PRO', false, true)} Required</Typography>
-                      <FloatingActionButton
-                        className={classes.submitButton}
-                        buttonColor="secondary"
-                        disabled={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking || new BigNumber(balanceDataPRO?.value ? balanceDataPRO?.value.toString() : 0).isLessThan(minimumRequiredPROAllowance ? minimumRequiredPROAllowance.toString() : 0)}
-                        onClick={() => runStake()}
-                        showLoadingIcon={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking}
-                        text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingStakeTx, isSyncingStaking)}
-                      />
-                      <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked. You cannot unstake any tokens during the lockup period.</Typography>
-                    </div>
-                  }
-                </div>
+                <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+                  <Typography variant="body1" style={{textAlign: 'left'}}>
+                    Loading...
+                  </Typography>
+                </Grid>
+                {
+                  Array.from({length: 15}).map((entry, index) => 
+                    <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+                      <SingleTokenCardLoading />
+                    </Grid>
+                  )
+                }
               </>
             }
-            {mode === "leave" &&
-              <>
-                <Box className={classes.stepContainer}>
-                  <Stepper activeStep={activeStep} alternativeLabel>
-                    <Step key={"Approve pSTAKE"}>
-                      <StepLabel>{"Approve pSTAKE"}</StepLabel>
-                    </Step>
-                    <Step key={"Unstake"}>
-                      <StepLabel>{"Unstake"}</StepLabel>
-                    </Step>
-                  </Stepper>
+            {!(isLoading || isLoadingGeoLocation) && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
+              <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+                <Typography variant="h6" style={{textAlign: 'left'}}>
+                    {mode === "enter" ? "No unstaked tokens found" : "No staked tokens found"}
+                </Typography>
+              </Grid>
+            }
+          </Grid>
+          <animated.div className={classes.floatingActionZone} style={actionZoneSpring}>
+            <Card className={classes.floatingActionZoneCard} elevation={6}>
+                <Typography variant="h6">
+                  {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length}{selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
+                </Typography>
+                <Box className={classes.selectionOptionsContainer}>
+                  <div className={classes.selectionOptionsSpacer}>
+                    <Button
+                      // onClick={}
+                      // variant={'outlined'}
+                      size={'small'}
+                      color={'secondary'}
+                      onClick={() => deselectAllOfCurrentCollection()}
+                      disabled={disableSelectionAdjustments}
+                      // color={color}
+                      // disabled={isLoading}
+                      // style={{width: width}}
+                      // className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
+                    >
+                      Clear All
+                    </Button>
+                    <Button
+                      // onClick={}
+                      // variant={'outlined'}
+                      size={'small'}
+                      color={'secondary'}
+                      onClick={() => selectAllOfCurrentCollection()}
+                      disabled={disableSelectionAdjustments}
+                      // color={color}
+                      // disabled={isLoading}
+                      // style={{width: width}}
+                      // className={[getBorderColorClass(color), switchMode ? '' : "outlined-icon-button"].join(" ")}
+                    >
+                      Select All
+                    </Button>
+                  </div>
                 </Box>
-                <div className={classes.submitButtonContainer}>
-                  {
-                    (
-                      activeStep === 0
-                    ) &&
-                    <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
-                      <FloatingActionButton
-                        className={classes.submitButton}
-                        buttonColor="secondary"
-                        disabled={isAwaitingPStakeAllowanceTx || isAwaitingWalletInteraction}
-                        onClick={() => runAllowancePStake()}
-                        showLoadingIcon={isAwaitingPStakeAllowanceTx || isAwaitingWalletInteraction}
-                        text={getApprovePStakeButtonText(isAwaitingWalletInteraction, isAwaitingPStakeAllowanceTx)}
-                      />
-                    </div>
-                  }
-                  {
-                    (
-                      activeStep === 1
-                    ) &&
-                    <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
-                      <FloatingActionButton
-                        className={classes.submitButton}
-                        buttonColor="secondary"
-                        disabled={isAwaitingUnstakeTx || isAwaitingWalletInteraction || (Number(stakerUnlockTime) * 1000 > new Date().getTime()) || isSyncingStaking}
-                        onClick={() => runUnstake()}
-                        showLoadingIcon={isAwaitingUnstakeTx || isAwaitingWalletInteraction || isSyncingStaking}
-                        text={getUnstakeButtonText(isAwaitingWalletInteraction, isAwaitingUnstakeTx, isSyncingStaking)}
-                      />
-                      {(Number(stakerUnlockTime) * 1000 > new Date().getTime()) &&
-                        <Typography className={classes.buttonSubtitle} variant="subtitle2">Locked for {countdownToTimestamp(Number(stakerUnlockTime), "")}</Typography>
+                {mode === "enter" &&
+                  <>
+                    <Box className={classes.stepContainer}>
+                      <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
+                        {/* TODO feed getActiveStep the proper allowance required param */}
+                        <Stepper activeStep={activeStep} alternativeLabel>
+                          <Step key={"Approve NFT"}>
+                            <StepLabel>{"Approve NFT"}</StepLabel>
+                          </Step>
+                          <Step key={"Approve PRO"}>
+                            <StepLabel>{"Approve PRO"}</StepLabel>
+                          </Step>
+                          <Step key={"Enter Staking"}>
+                            <StepLabel>{"Enter Staking"}</StepLabel>
+                          </Step>
+                        </Stepper>
+                      </div>
+                    </Box>
+                    <div className={classes.submitButtonContainer}>
+                      {
+                        (
+                          selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT
+                          && activeStep === 0
+                        ) &&
+                        <FloatingActionButton
+                          className={classes.submitButton}
+                          buttonColor="secondary"
+                          disabled={isAwaitingPropyKeysApprovalForAllTx || isAwaitingWalletInteraction}
+                          onClick={() => runPropyKeysSetApprovalForAll()}
+                          showLoadingIcon={isAwaitingPropyKeysApprovalForAllTx || isAwaitingWalletInteraction}
+                          text={getApproveNFTButtonText(isAwaitingWalletInteraction, isAwaitingPropyKeysApprovalForAllTx)}
+                        />
+                      }
+                      {
+                        (
+                          (selectedTokenAddress === BASE_OG_STAKING_NFT)
+                          && activeStep === 0
+                        ) &&
+                        <FloatingActionButton
+                          className={classes.submitButton}
+                          buttonColor="secondary"
+                          disabled={isAwaitingOGApprovalForAllTx || isAwaitingWalletInteraction}
+                          onClick={() => runOGSetApprovalForAll()}
+                          showLoadingIcon={isAwaitingOGApprovalForAllTx || isAwaitingWalletInteraction}
+                          text={getApproveNFTButtonText(isAwaitingWalletInteraction, isAwaitingOGApprovalForAllTx)}
+                        />
+                      }
+                      {
+                        (
+                          ((selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT) || (selectedTokenAddress === BASE_OG_STAKING_NFT))
+                          && activeStep === 1
+                        ) &&
+                        <FloatingActionButton
+                          className={classes.submitButton}
+                          buttonColor="secondary"
+                          disabled={isLoadingMinimumRequiredPROAllowance || isAwaitingWalletInteraction || isAwaitingPROAllowanceTx || !minimumRequiredPROAllowance || isNaN(Number(stakingContractPROAllowance))}
+                          onClick={() => runAllowancePRO()}
+                          showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPROAllowanceTx}
+                          text={getApprovePROButtonText(isAwaitingWalletInteraction, isAwaitingPROAllowanceTx)}
+                        />
+                      }
+                      {
+                        (
+                          ((selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT) || (selectedTokenAddress === BASE_OG_STAKING_NFT))
+                          && activeStep === 2
+                        ) &&
+                        <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
+                          <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">PRO Balance: {priceFormat(Number(utils.formatUnits(Number(balanceDataPRO?.value ? balanceDataPRO?.value : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                          <Typography className={classes.buttonTitle} variant="subtitle2">{priceFormat(Number(utils.formatUnits(Number(minimumRequiredPROAllowance ? minimumRequiredPROAllowance : 0), 8)), 2, 'PRO', false, true)} Required</Typography>
+                          <FloatingActionButton
+                            className={classes.submitButton}
+                            buttonColor="secondary"
+                            disabled={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking || new BigNumber(balanceDataPRO?.value ? balanceDataPRO?.value.toString() : 0).isLessThan(minimumRequiredPROAllowance ? minimumRequiredPROAllowance.toString() : 0)}
+                            onClick={() => runStake()}
+                            showLoadingIcon={isAwaitingWalletInteraction || isAwaitingStakeTx || isSyncingStaking}
+                            text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingStakeTx, isSyncingStaking)}
+                          />
+                          <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked. You cannot unstake any tokens during the lockup period.</Typography>
+                        </div>
                       }
                     </div>
-                  }
-                </div>
-              </>
-            }
-        </Card>
-      </animated.div>
-      <animated.div className={classes.floatingActionZone} style={actionZoneSyncingSpring}>
-        <Card className={classes.floatingActionZoneCard} elevation={6}>
-            <Typography variant="h6">
-              Syncing Staking Contract
-            </Typography>
-            <>
-              <div className={classes.submitButtonContainer}>
-                  <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
-                    <FloatingActionButton
-                      className={classes.submitButton}
-                      buttonColor="secondary"
-                      disabled={true}
-                      // onClick={() => runStake()}
-                      showLoadingIcon={true}
-                      text={'Syncing Staking Contract...'}
-                    />
+                  </>
+                }
+                {mode === "leave" &&
+                  <>
+                    <Box className={classes.stepContainer}>
+                      <Stepper activeStep={activeStep} alternativeLabel>
+                        <Step key={"Approve pSTAKE"}>
+                          <StepLabel>{"Approve pSTAKE"}</StepLabel>
+                        </Step>
+                        <Step key={"Unstake"}>
+                          <StepLabel>{"Unstake"}</StepLabel>
+                        </Step>
+                      </Stepper>
+                    </Box>
+                    <div className={classes.submitButtonContainer}>
+                      {
+                        (
+                          activeStep === 0
+                        ) &&
+                        <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
+                          <FloatingActionButton
+                            className={classes.submitButton}
+                            buttonColor="secondary"
+                            disabled={isAwaitingPStakeAllowanceTx || isAwaitingWalletInteraction}
+                            onClick={() => runAllowancePStake()}
+                            showLoadingIcon={isAwaitingPStakeAllowanceTx || isAwaitingWalletInteraction}
+                            text={getApprovePStakeButtonText(isAwaitingWalletInteraction, isAwaitingPStakeAllowanceTx)}
+                          />
+                        </div>
+                      }
+                      {
+                        (
+                          activeStep === 1
+                        ) &&
+                        <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
+                          <FloatingActionButton
+                            className={classes.submitButton}
+                            buttonColor="secondary"
+                            disabled={isAwaitingUnstakeTx || isAwaitingWalletInteraction || (Number(stakerUnlockTime) * 1000 > new Date().getTime()) || isSyncingStaking}
+                            onClick={() => runUnstake()}
+                            showLoadingIcon={isAwaitingUnstakeTx || isAwaitingWalletInteraction || isSyncingStaking}
+                            text={getUnstakeButtonText(isAwaitingWalletInteraction, isAwaitingUnstakeTx, isSyncingStaking)}
+                          />
+                          {(Number(stakerUnlockTime) * 1000 > new Date().getTime()) &&
+                            <Typography className={classes.buttonSubtitle} variant="subtitle2">Locked for {countdownToTimestamp(Number(stakerUnlockTime), "")}</Typography>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </>
+                }
+            </Card>
+          </animated.div>
+          <animated.div className={classes.floatingActionZone} style={actionZoneSyncingSpring}>
+            <Card className={classes.floatingActionZoneCard} elevation={6}>
+                <Typography variant="h6">
+                  Syncing Staking Contract
+                </Typography>
+                <>
+                  <div className={classes.submitButtonContainer}>
+                      <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
+                        <FloatingActionButton
+                          className={classes.submitButton}
+                          buttonColor="secondary"
+                          disabled={true}
+                          // onClick={() => runStake()}
+                          showLoadingIcon={true}
+                          text={'Syncing Staking Contract...'}
+                        />
+                      </div>
                   </div>
-              </div>
-            </>
-        </Card>
-      </animated.div>
-      {showRequireTenModal &&
-        <Dialog
-          open={showRequireTenModal}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            Unmet Staking Requirement
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="subtitle2" style={{fontWeight: 400}}>
-              In order to stake a Tier 1 PropyKey, you must have at least 10 stakeable PropyKey NFTs (this is calculated by combining your PropyKey & PropyOG balances with the quantities of PropyKey & PropyOG tokens that you have already staked). This rule only applies when trying to stake a Tier 1 PropyKey. PropyOG NFTs and PropyKeys with a Tier higher than 1 can be staked without restriction.
-            </Typography>
-          </DialogContent>
-          <DialogActions style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Button onClick={() => setShowRequireTenModal(false)} autoFocus>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+                </>
+            </Card>
+          </animated.div>
+          {showRequireTenModal &&
+            <Dialog
+              open={showRequireTenModal}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                Unmet Staking Requirement
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="subtitle2" style={{fontWeight: 400}}>
+                  In order to stake a Tier 1 PropyKey, you must have at least 10 stakeable PropyKey NFTs (this is calculated by combining your PropyKey & PropyOG balances with the quantities of PropyKey & PropyOG tokens that you have already staked). This rule only applies when trying to stake a Tier 1 PropyKey. PropyOG NFTs and PropyKeys with a Tier higher than 1 can be staked without restriction.
+                </Typography>
+              </DialogContent>
+              <DialogActions style={{display: 'flex', justifyContent: 'space-between'}}>
+                <Button onClick={() => setShowRequireTenModal(false)} autoFocus>
+                  Close
+                </Button>
+              </DialogActions>
+            </Dialog>
+          }
+        </>
       }
     </div>
   );
