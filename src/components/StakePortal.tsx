@@ -481,7 +481,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     functionName: 'isApprovedForAll',
     watch: true,
     args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
-  })
+  });
 
   const { 
     data: lastSelectedTokenTier,
@@ -603,11 +603,13 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     if(Number(balanceDataPropyOG) > 0) {
       currentTotal += Number(balanceDataPropyOG);
     }
-    if(Number(lastSelectedTokenTier) === 1 && lastSelectedPropyKeyTokenId && (currentTotal < 10)) {
+    if((Number(lastSelectedTokenTier) === 1) && lastSelectedPropyKeyTokenId && (currentTotal < 10) && (mode === "enter")) {
       setShowRequireTenModal(true);
       setLastSelectedPropyKeyTokenId(0);
+    } else if(mode === "leave") {
+      setShowRequireTenModal(false);
     }
-  }, [lastSelectedTokenTier, lastSelectedPropyKeyTokenId, stakerToStakedCount, balanceDataPropyKeys, balanceDataPropyOG])
+  }, [lastSelectedTokenTier, lastSelectedPropyKeyTokenId, stakerToStakedCount, balanceDataPropyKeys, balanceDataPropyOG, mode])
 
   // APPROVE PRO ON CHAIN CALLS BELOW
 
