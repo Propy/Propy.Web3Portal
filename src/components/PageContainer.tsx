@@ -21,6 +21,7 @@ import BridgePage from '../pages/BridgePage';
 import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
 import PropyKeysMapPage from '../pages/PropyKeysMapPage';
 import AnalyticsPage from '../pages/AnalyticsPage';
+import PropyKeyRepossessionPage from '../pages/PropyKeyRepossessionPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -98,6 +99,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
                       {/* <Route path="/map/propykeys" element={<PropyKeysMapPage mode="normal" />} /> */}
                       <Route path="/map/propykeys" element={<PropyKeysMapPage mode="gis" />} />
+                      <Route path="/propykey-og-claim/:propyKeyTokenId" element={<PropyKeyRepossessionPage />} />
                   </Routes>
                 }
             </div>
