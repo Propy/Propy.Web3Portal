@@ -63,8 +63,8 @@ const HomePage = () => {
                 <div className={classes.sectionSpacer}>
                     <RecentlyMintedTokensBannerContainer showRecentlyMintedLink={true} maxRecords={5} showTitle={true} />
                 </div>
-                {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry) => 
-                    <div className={classes.sectionSpacer}>
+                {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry, index) => 
+                    <div key={`home-page-collection-entry-${entry.address}-${index}`} className={classes.sectionSpacer}>
                         <CollectionBannerContainer
                             showCollectionLink={true}
                             maxRecords={5}

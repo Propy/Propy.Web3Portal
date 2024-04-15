@@ -140,8 +140,9 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
             return 80;
           }}
         >
-          {markers && markers.map((marker) =>
+          {markers && markers.map((marker, index) =>
             <Marker 
+              key={`${marker.latitude}-${marker.longitude}-${index}`}
               position={[marker.latitude, marker.longitude]} 
               icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
               eventHandlers={{
