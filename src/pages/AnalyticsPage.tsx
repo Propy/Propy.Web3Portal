@@ -68,7 +68,7 @@ const AnalyticsPage = (
     // } = props;
 
     const { 
-      data: propyKeysMintsTimeseries = [],
+      data: propyKeysMintsTimeseries = {perDay: [], cumulative: []},
       isLoading
     } = useQuery({
       queryKey: ['propyKeysMintsTimeseries'],
@@ -79,20 +79,33 @@ const AnalyticsPage = (
         );
         if (timeseriesResponse?.status && timeseriesResponse?.data) {
           let renderResults: ITimeseries[] = [];
+          let cumulativeResults: ITimeseries[] = [];
           let apiResponseData: ITimeseriesUTCDayAPIResponse = timeseriesResponse?.data?.data
             ? timeseriesResponse?.data
             : timeseriesResponse;
           if (timeseriesResponse?.status && apiResponseData?.data) {
+            let cumulative = 0;
             for (let timeseriesRecord of apiResponseData?.data) {
+              cumulative += Number(timeseriesRecord.record_count);
               renderResults.push({
                 date: timeseriesRecord.utc_day,
                 value: Number(timeseriesRecord.record_count),
               });
+              cumulativeResults.push({
+                date: timeseriesRecord.utc_day,
+                value: cumulative,
+              })
             }
           }
-          return renderResults;
+          return {
+            perDay: renderResults,
+            cumulative: cumulativeResults,
+          }
         }
-        return [];
+        return {
+          perDay: [],
+          cumulative: [],
+        }
       },
       cacheTime: Infinity, // Cache the data indefinitely
       staleTime: Infinity, // Data is always considered fresh
@@ -106,10 +119,25 @@ const AnalyticsPage = (
                 <div className={classes.sectionSpacer}>
                   <div style={{width: '100%'}}>
                     <BasicAreaChartContainer
-                      chartData={propyKeysMintsTimeseries}
+                      chartData={propyKeysMintsTimeseries.perDay}
                       loading={isLoading}
                       leftTextTitle={`PropyKeys`}
                       leftTextSubtitle={`Daily Mints`}
+                      rightTextFormatValueFn={(value: any) => priceFormat(value, 0, 'Mints', false)}
+                      showChange={true}
+                      changeType={"up-good"}
+                      height={500}
+                      formatValueFn={(value: any) => priceFormat(value, 0, "Mints", false)}
+                    />
+                  </div>
+                </div>
+                <div className={classes.sectionSpacer}>
+                  <div style={{width: '100%'}}>
+                    <BasicAreaChartContainer
+                      chartData={propyKeysMintsTimeseries.cumulative}
+                      loading={isLoading}
+                      leftTextTitle={`PropyKeys`}
+                      leftTextSubtitle={`Cumulative Mints`}
                       rightTextFormatValueFn={(value: any) => priceFormat(value, 0, 'Mints', false)}
                       showChange={true}
                       changeType={"up-good"}
