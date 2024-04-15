@@ -137,7 +137,7 @@ const AnalyticsPage = (
                       chartData={propyKeysMintsTimeseries.cumulative}
                       loading={isLoading}
                       leftTextTitle={`PropyKeys`}
-                      leftTextSubtitle={`Daily Mints`}
+                      leftTextSubtitle={`Cumulative Mints`}
                       rightTextFormatValueFn={(value: any) => priceFormat(value, 0, 'Mints', false)}
                       showChange={true}
                       changeType={"up-good"}
