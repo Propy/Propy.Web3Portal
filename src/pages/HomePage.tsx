@@ -72,6 +72,8 @@ const HomePage = () => {
                             network={entry.network}
                             contractNameOrCollectionNameOrAddress={entry.address}
                             collectionSlug={entry.slug}
+                            overrideTitle={entry.overrideTitle}
+                            filterShims={entry.filterShims}
                         />
                     </div>
                 )}

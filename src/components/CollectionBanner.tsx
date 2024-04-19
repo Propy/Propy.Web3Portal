@@ -75,6 +75,8 @@ interface ICollectionBanner {
   showPagination?: boolean
   firstElementShim?: React.ReactNode,
   showFilters?: boolean,
+  overrideTitle?: string,
+  filterShims?: string[]
 }
 
 interface INftAssets {
@@ -109,6 +111,8 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     isConsideredMobile,
     firstElementShim,
     showFilters = false,
+    overrideTitle,
+    filterShims,
   } = props;
 
   if(firstElementShim && maxRecords) {
@@ -132,7 +136,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("status")) {
         additionalFilters.push({filter_type: "status", value: `${searchParams.get("status")}`});
       }
-      if(searchParams.get("landmark")) {
+      if(searchParams.get("landmark") || (filterShims && filterShims.indexOf("landmark") > -1)) {
         additionalFilters.push({filter_type: "landmark", value: true});
       }
       if(searchParams.get("attached_deed")) {
@@ -162,6 +166,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
                 useTitle = nftRecord.asset.name;
               } else if (nftRecord.asset.address) {
                 useTitle = nftRecord.asset.address;
+              }
+              if(overrideTitle) {
+                useTitle = overrideTitle;
               }
               setTitle(useTitle);
             }
@@ -203,7 +210,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     return () => {
       isMounted = false;
     }
-  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParams])
+  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParams, filterShims, overrideTitle])
 
   return (
     <>
