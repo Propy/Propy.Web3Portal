@@ -71,6 +71,13 @@ const COLLECTIONS_ENTRIES_PROD = [
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+    slug: "propykeys?landmark=true",
+    overrideTitle: "PropyKeys Landmarks",
+    filterShims: ["landmark"],
+  },
+  {
+    network: "base",
+    address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
     slug: "propykeys",
   },
   {
@@ -216,6 +223,14 @@ export const IS_GLOBAL_TOP_BANNER_ENABLED = true;
 export const GLOBAL_TOP_BANNER_HEIGHT = 28;
 export const GLOBAL_PAGE_HEIGHT = IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${64 + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 64px)';
 
-export const COLLECTIONS_PAGE_ENTRIES = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
+interface ICollectionEntry {
+  network: string;
+  address: string;
+  slug: string;
+  overrideTitle?: string;
+  filterShims?: string[];
+}
+
+export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
 
 export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA"];
