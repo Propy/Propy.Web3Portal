@@ -54,11 +54,11 @@ const navigationMenu : IMenuEntry[] = [
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
   },
-  {
-    text: 'Analytics',
-    path: '/analytics',
-    icon: <AccountBalanceWalletIcon />,
-  },
+  // {
+  //   text: 'Analytics',
+  //   path: '/analytics',
+  //   icon: <AccountBalanceWalletIcon />,
+  // },
   {
     text: 'Stake',
     path: '/stake',
