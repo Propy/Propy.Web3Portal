@@ -24,6 +24,7 @@ interface ICollectionFilterZone {
   contractNameOrCollectionNameOrAddress: string
   network: string
   isLoading: boolean
+  setPage: (arg0: number) => void
 }
 
 const PropyKeysCollectionFilterZone = (props: ICollectionFilterZone & PropsFromRedux) => {
@@ -36,6 +37,7 @@ const PropyKeysCollectionFilterZone = (props: ICollectionFilterZone & PropsFromR
     contractNameOrCollectionNameOrAddress,
     isLoading,
     isConsideredMobile,
+    setPage,
   } = props;
 
   const [open, setOpen] = React.useState(false);
@@ -47,9 +49,7 @@ const PropyKeysCollectionFilterZone = (props: ICollectionFilterZone & PropsFromR
   return (
     <>
       <Button className={isConsideredMobile ? classes.filterButtonSpacerMobile : ''} disabled={isLoading} variant={'outlined'} color={"primary"} onClick={() => handleClickOpen()} startIcon={<FilterListIcon />}>{"Filters"}</Button>
-      {open &&
-        <PropyKeysCollectionFilterZoneInner isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} open={open} setOpen={setOpen} />
-      }
+      <PropyKeysCollectionFilterZoneInner open={open} setPage={setPage} isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} setOpen={setOpen} />
     </>
   )
 }

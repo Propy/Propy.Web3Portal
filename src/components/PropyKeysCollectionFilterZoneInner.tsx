@@ -18,7 +18,6 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import {
-  centerShortenLongString,
   toChecksumAddress,
 } from '../utils'
 
@@ -49,6 +48,7 @@ interface ICollectionFilterZone {
   setOpen: (open: boolean) => void
   isLoading: boolean
   isConsideredMobile: boolean
+  setPage: (page: number) => void
 }
 
 const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
@@ -56,13 +56,14 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   let {
     open,
     setOpen,
-    isConsideredMobile,
+    // isConsideredMobile,
+    // setPage,
   } = props;
 
   let [searchParams, setSearchParams] = useSearchParams();
   let [uniqueCities, setUniqueCities] = useState<string[]>([]);
   let [uniqueCountries, setUniqueCountries] = useState<string[]>([]);
-  let [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
+  // let [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
   let [uniqueStatuses, setUniqueStatuses] = useState<string[]>([]);
 
   let [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
@@ -77,10 +78,12 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   const classes = useStyles();
 
   const handleClose = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
-    if(isSomeFilterSet) {
-      if (reason && (reason === "backdropClick" || reason === "escapeKeyDown"))
-          return;
-    }
+    // TODO: instead of isSomeFilterSet, check for if the filter has changed since the modal was opened, if it's changed, require an "apply" 
+    // if(isSomeFilterSet) {
+      if (reason && (reason === "backdropClick" || reason === "escapeKeyDown")) {
+        return;
+      }
+    // }
 
     setOpen(false);
   };
@@ -136,6 +139,10 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       } else {
         params.delete("status");
       }
+      // params.delete("page");
+      // if(setPage) {
+      //   setPage(1);
+      // }
       return params;
     }));
     setOpen(false);
@@ -151,12 +158,12 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       let [
         uniqueCityRequest,
         uniqueCountryRequest,
-        uniqueOwnerRequest,
+        // uniqueOwnerRequest,
         uniqueStatusRequest,
       ] = await Promise.all([
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "City"),
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Country"),
-        NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner"),
+        // NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner"),
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Status")
       ]);
       if(uniqueCityRequest?.data?.length > 0) {
@@ -165,15 +172,30 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
       if(uniqueCountryRequest?.data?.length > 0) {
         setUniqueCountries(uniqueCountryRequest?.data);
       }
-      if(uniqueOwnerRequest?.data?.length > 0) {
-        setUniqueOwners(uniqueOwnerRequest?.data);
-      }
+      // if(uniqueOwnerRequest?.data?.length > 0) {
+      //   setUniqueOwners(uniqueOwnerRequest?.data);
+      // }
       if(uniqueStatusRequest?.data?.length > 0) {
         setUniqueStatuses(uniqueStatusRequest?.data);
       }
     }
     fetchUniqueFieldValues();
   }, [network, contractNameOrCollectionNameOrAddress]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if(isMounted) {
+      setSelectedCity(searchParams.get("city") || "");
+      setSelectedCountry(searchParams.get("country") || "");
+      setSelectedOwner(searchParams.get("owner") || "");
+      setSelectedStatus(searchParams.get("status") || "");
+      setSelectedLandmarksOnly(Boolean(searchParams.get("landmark")));
+      setSelectedDeedsAttachedOnly(Boolean(searchParams.get("attached_deed")));
+    }
+    return () => {
+      isMounted = false;
+    }
+  }, [searchParams])
 
   return (
     <>
@@ -237,7 +259,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
                 renderInput={(params) => <TextField {...params} label="Status" />}
                 value={selectedStatus}
               />
-              <Autocomplete
+              {/* <Autocomplete
                 id="owner-filter"
                 options={uniqueOwners}
                 disabled={uniqueOwners.length === 0}
@@ -258,6 +280,22 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
                     <span>{isConsideredMobile ? centerShortenLongString(toChecksumAddress(option), 20) : toChecksumAddress(option)}</span>
                   </li>
                 )}
+              /> */}
+              <TextField
+                id="owner-filter"
+                label="Owner"
+                sx={{ width: 420, maxWidth: '100%' }}
+                className={classes.inputSpacer}
+                value={selectedOwner}
+                onChange={(event) => setSelectedOwner(event.target.value)}
+                InputProps={{
+                  inputComponent: (props) => (
+                    <input
+                      {...props}
+                      value={toChecksumAddress(props.value)}
+                    />
+                  ),
+                }}
               />
               <FormControlLabel 
                 className={classes.inputSpacerSmall}
@@ -290,7 +328,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
             (!isSomeFilterSet) &&
             <Button onClick={() => setOpen(false)}>Close</Button>
           }
-          <Button onClick={handleApplyFilters} autoFocus>
+          <Button onClick={() => handleApplyFilters()} autoFocus>
             Apply Filters
           </Button>
         </DialogActions>

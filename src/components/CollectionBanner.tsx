@@ -16,6 +16,7 @@ import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 import LinkWrapper from './LinkWrapper';
 import PropyKeysCollectionFilterZoneContainer from '../containers/PropyKeysCollectionFilterZoneContainer';
+import PropyKeysActiveFiltersZoneContainer from '../containers/PropyKeysActiveFiltersZoneContainer';
 
 import { PropsFromRedux } from '../containers/CollectionBannerContainer';
 
@@ -42,6 +43,12 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
     },
+    titleContainerWithFilters: {
+      marginBottom: theme.spacing(2),
+      marginTop: theme.spacing(2),
+      display: 'flex',
+      justifyContent: 'flex-start',
+    },
     title: {
       fontWeight: '500',
       // color: 'white',
@@ -60,6 +67,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     loadingZone: {
       opacity: 0.5,
+    },
+    filterButton: {
+      display: 'flex',
+    },
+    filterButtonSpacing: {
+      marginLeft: theme.spacing(2),
+    },
+    activeFilterZone: {
+      marginBottom: theme.spacing(1),
     }
   }),
 );
@@ -97,6 +113,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   const [title, setTitle] = useState("Loading...");
   const [isInitialLoad, setIsInitialLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilters, setActiveFilters] = useState<ICollectionQueryFilter[]>([]);
 
   const classes = useStyles();
 
@@ -142,6 +159,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("attached_deed")) {
         additionalFilters.push({filter_type: "attached_deed", value: true});
       }
+      setActiveFilters(additionalFilters);
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
         contractNameOrCollectionNameOrAddress,
@@ -215,28 +233,41 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
   return (
     <>
       {showTitle &&
-        <div className={[classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
-          <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
-            {title ? title : "Loading..."}
-          </Typography>
-          {showCollectionLink && 
-            <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`collection/${network}/${collectionSlug}`}>
-              <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
-                View {title}
-              </Button>
-            </LinkWrapper>
-          }
+        <>
+          <div className={[showFilters ? classes.titleContainerWithFilters : classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
+            <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
+              {title ? title : "Loading..."}
+            </Typography>
+            {showCollectionLink && 
+              <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`collection/${network}/${collectionSlug}`}>
+                <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
+                  View {title}
+                </Button>
+              </LinkWrapper>
+            }
+            {
+              showFilters &&
+              (VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
+                <div className={[isConsideredMobile ? "" : classes.filterButtonSpacing, classes.filterButton].join(" ")}>
+                  <PropyKeysCollectionFilterZoneContainer
+                    collectionSlug={collectionSlug}
+                    contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}
+                    network={network}
+                    isLoading={isLoading}
+                    setPage={setPage}
+                  />
+                </div>
+            }
+          </div>
           {
             showFilters &&
             (VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
-              <PropyKeysCollectionFilterZoneContainer
-                collectionSlug={collectionSlug}
-                contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}
-                network={network}
-                isLoading={isLoading}
-              />
+            (activeFilters.length > 0) &&
+              <div className={classes.activeFilterZone}>
+                <PropyKeysActiveFiltersZoneContainer activeFilters={activeFilters} />
+              </div>
           }
-        </div>
+        </>
       }
       <Grid className={[classes.sectionSpacer, isLoading ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
         {!isInitialLoad && nftRecords && firstElementShim && 
