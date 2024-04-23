@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { useNavigate } from "react-router-dom";
-
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -18,6 +16,8 @@ import LogoLightMode from '../assets/svg/propy-light-mode.svg'
 
 import { Web3ModalButtonWagmi } from './Web3ModalButtonWagmi';
 import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
+
+import LinkWrapper from './LinkWrapper';
 
 import {
   PROPY_LIGHT_BLUE,
@@ -69,16 +69,19 @@ const NavigationTopBar = (props: PropsFromRedux) => {
     isConsideredMobile,
   } = props;
 
-  let navigate = useNavigate();
-
   return (
     <div className={classes.root}>
       <AppBar style={{backgroundColor: darkMode ? "#141618" : "#FFFFFF", color: darkMode ? "white" : "#414141"}} className={classes.appBar} position="fixed">
         <Toolbar>
-          <img onClick={() => navigate('/')} height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
-          <Typography onClick={() => navigate('/')} variant="body1" className={classes.title}>
-            dApp
-          </Typography>
+          <LinkWrapper link="/">
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              <img height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
+              <Typography variant="body1" className={classes.title}>
+                dApp
+              </Typography>
+            </div>
+          </LinkWrapper>
+          <div style={{width: '100%'}}/>
           {!isConsideredMobile && <Web3ModalButtonWagmi darkMode={darkMode}/>}
           {process.env.REACT_ENV === 'local' && 
             <IconButton

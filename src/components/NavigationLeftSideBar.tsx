@@ -1,5 +1,4 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import { useNavigate } from "react-router-dom";
 
 import { useAccount } from 'wagmi';
 
@@ -55,6 +54,11 @@ const navigationMenu : IMenuEntry[] = [
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
   },
+  // {
+  //   text: 'Analytics',
+  //   path: '/analytics',
+  //   icon: <AccountBalanceWalletIcon />,
+  // },
   {
     text: 'Stake',
     path: '/stake',
@@ -144,8 +148,6 @@ const useStyles = makeStyles({
 function NavigationLeftSideBar(props: PropsFromRedux) {
   const classes = useStyles();
 
-  let navigate = useNavigate();
-
   const pathMatch = useCurrentPath();
 
   const { address } = useAccount();
@@ -222,15 +224,12 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                 className={classes.entryContainerMargin}
                               >
                                 <LinkWrapper 
-                                  link={item.externalLink ? item.externalLink : undefined}
-                                  external={item.externalLink ? true : undefined}
+                                  link={item.externalLink ? item.externalLink : item.path}
+                                  external={item.externalLink ? true : false}
                                 >
                                   <ListItemButton
                                     onClick={() => {
                                       if(item.path) {
-                                        if(!item.externalLink) {
-                                          navigate(item.path)
-                                        }
                                         props.setShowLeftMenu(false)
                                       } else if (item.children) {
                                         toggleOpenCollapseState(index)
@@ -255,12 +254,13 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                 <Collapse in={openCollapseSections.indexOf(index) > -1} timeout="auto" unmountOnExit>
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
+                                      <LinkWrapper 
+                                        link={child.externalLink ? child.externalLink : child.path}
+                                        external={child.externalLink ? true : false}
+                                      >
                                         <ListItemButton
                                           onClick={() => {
                                             if(child.path && child.path.length > 0) {
-                                              if(!item.externalLink) {
-                                                navigate(child.path)
-                                              }
                                               props.setShowLeftMenu(false)
                                             }
                                           }}
@@ -270,6 +270,7 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                           <ListItemIcon>{child.icon}</ListItemIcon>
                                           <ListItemText primary={child.text} />
                                         </ListItemButton>
+                                      </LinkWrapper>
                                     )}
                                   </List>
                                 </Collapse>
