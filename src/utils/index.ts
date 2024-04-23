@@ -257,6 +257,16 @@ export const capitalizeFirstLetter = (str: string): string => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export const capitalizeEachFirstLetterWithDelimiter = (str: string, delimeter: string): string => {
+	if (!str) return str;
+	let result : string[] = [];
+	let parts = str.split(delimeter);
+	for(let part of parts) {
+		result.push(capitalizeFirstLetter(part));
+	}
+	return result.join(" ");
+}
+
 export const getCookieValue = (name: string) => (
   document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 )
