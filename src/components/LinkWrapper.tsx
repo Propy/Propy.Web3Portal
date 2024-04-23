@@ -39,8 +39,9 @@ const LinkWrapper = (props: ILinkWrapper) => {
     )
   }
   if(!external && link) {
+    let useLink = `/${link}`.replace('//', '/');
     return (
-      <Link onClick={() => onClick && onClick()} style={style} className={[className, 'no-decorate', 'inherit-color'].join(" ")} to={`/${link}`}>
+      <Link onClick={() => onClick && onClick()} style={style} className={[className, 'no-decorate', 'inherit-color'].join(" ")} to={useLink}>
         {children}
       </Link>
     )

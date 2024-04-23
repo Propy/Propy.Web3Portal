@@ -1,5 +1,4 @@
 import React, {useState, Fragment} from 'react';
-import { useNavigate } from "react-router-dom";
 
 import { useAccount } from 'wagmi';
 
@@ -55,6 +54,11 @@ const navigationMenu : IMenuEntry[] = [
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
   },
+  // {
+  //   text: 'Analytics',
+  //   path: '/analytics',
+  //   icon: <AccountBalanceWalletIcon />,
+  // },
   {
     text: 'Stake',
     path: '/stake',
@@ -166,8 +170,6 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
     darkMode,
   } = props;
 
-  let navigate = useNavigate();
-
   const pathMatch = useCurrentPath();
 
   const [openCollapseSections, setOpenCollapseSections] = useState<Number[]>([]);
@@ -232,15 +234,12 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                 className={classes.entryContainerMargin}
                               >
                                 <LinkWrapper 
-                                  link={item.externalLink ? item.externalLink : undefined}
-                                  external={item.externalLink ? true : undefined}
+                                  link={item.externalLink ? item.externalLink : item.path}
+                                  external={item.externalLink ? true : false}
                                 >
                                   <ListItemButton
                                     onClick={() => {
                                       if(item.path) {
-                                        if(!item.externalLink) {
-                                          navigate(item.path)
-                                        }
                                         props.setShowLeftMenu(false)
                                       } else if (item.children) {
                                         toggleOpenCollapseState(index)
@@ -279,25 +278,27 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                         <div
                                           className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
                                         >
-                                          <ListItemButton
-                                            onClick={() => {
-                                              if(child.path && child.path.length > 0) {
-                                                if(!item.externalLink) {
-                                                  navigate(child.path)
-                                                }
-                                                props.setShowLeftMenu(false)
-                                              }
-                                            }}
-                                            key={`child-${index}-${childIndex}`}
-                                            sx={{ pl: 4, color: 'inherit' }}
-                                            disableRipple
+                                          <LinkWrapper 
+                                            link={child.externalLink ? child.externalLink : child.path}
+                                            external={child.externalLink ? true : false}
                                           >
-                                            <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
-                                            <ListItemText primary={child.text} />
-                                            {item.externalLink &&
-                                              <ExternalLinkIcon />
-                                            }
-                                          </ListItemButton>
+                                            <ListItemButton
+                                              onClick={() => {
+                                                if(child.path && child.path.length > 0) {
+                                                  props.setShowLeftMenu(false)
+                                                }
+                                              }}
+                                              key={`child-${index}-${childIndex}`}
+                                              sx={{ pl: 4, color: 'inherit' }}
+                                              disableRipple
+                                            >
+                                              <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
+                                              <ListItemText primary={child.text} />
+                                              {item.externalLink &&
+                                                <ExternalLinkIcon />
+                                              }
+                                            </ListItemButton>
+                                          </LinkWrapper>
                                         </div>
                                     )}
                                   </List>
