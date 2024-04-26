@@ -24,7 +24,15 @@ function a11yProps(index: number) {
   };
 }
 
-const StakePage = () => {
+interface IStakePage {
+  version: number
+}
+
+const StakePage = (props: IStakePage) => {
+
+  let {
+    version,
+  } = props;
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
 
@@ -53,27 +61,14 @@ const StakePage = () => {
             </Tabs>
           </Box>
           {(selectedTabIndex === 0) &&
-            <StakeStatsContainer />
+            <StakeStatsContainer version={version} />
           }
           {(selectedTabIndex === 1) &&
-            <StakePortalContainer mode="enter" />
+            <StakePortalContainer mode="enter" version={version} />
           }
           {(selectedTabIndex === 2) &&
-            <StakePortalContainer mode="leave" />
+            <StakePortalContainer mode="leave" version={version} />
           }
-          {/* <Typography variant="h6" style={{fontWeight: 400}}>
-            We are working hard to make staking live in March, please check back regularly or join our waitlist to be notified once staking goes live.
-          </Typography>
-          <br/>
-          <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
-            <LinkWrapper link="https://forms.gle/xELf5i6xdMZ8Qq8h7" external={true} showExternalLinkIcon={true}>
-              Join the waitlist
-            </LinkWrapper>
-          </Typography>
-          <br/>
-          <Typography variant="body1" style={{fontWeight: 400}}>
-            Want to earn rewards for holding your Propy NFTs? Staking is the way to go! Simply deposit your NFTs along with some PRO into the staking contract and receive an ERC-20 token as a representation of your stake. You can withdraw your NFTs & PRO at any time after a minimum staking period, along with any accumulated PRO rewards. More details will be provided once staking goes live.
-          </Typography> */}
         </>
       </GenericPageContainer>
     </NetworkGateContainer>

@@ -26,7 +26,8 @@ import {
 } from '../utils';
 
 import {
-  BASE_PROPYKEYS_STAKING_CONTRACT,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V1,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V2,
   PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
@@ -41,6 +42,7 @@ BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
 interface IStakeStatsConnectedWallet {
   totalShares: BigInt
+  version: number
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -77,6 +79,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
   let {
     totalShares,
     isConsideredMobile,
+    version,
   } = props;
 
   const classes = useStyles();
@@ -93,7 +96,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     data: stakerShares,
     isLoading: isLoadingStakerShares,
   } = useStakerShares(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     address,
     chain ? chain.id : undefined
   );
@@ -102,7 +105,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     data: stakerUnlockTime,
     isLoading: isLoadingStakerUnlockTime,
   } = useStakerUnlockTime(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     address,
     chain ? chain.id : undefined
   );
@@ -111,7 +114,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     data: leaveAmountFromShares,
     isLoading: isLoadingLeaveAmountFromShares,
   } = useApproxLeaveAmountFromShareAmount(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     stakerShares,
     chain ? chain.id : undefined
   )
@@ -120,7 +123,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     data: stakedPROByStaker,
     isLoading: isLoadingStakedPROByStaker,
   } = useStakedPROByStaker(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     address,
     chain ? chain.id : undefined
   )
@@ -159,13 +162,15 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             {leaveAmountFromShares && stakedPROByStaker && `Available Reward: ${priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares.toString()).minus(stakedPROByStaker.toString()).toString(), 8)), 2, 'PRO')}`}
           </pre>
         </Grid> */}
-        <Grid item xs={12} md={12} lg={12}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              <Typography style={{marginBottom: '4px'}} variant="subtitle1"><span style={{fontWeight: 'bold'}}>Please Note:</span> This staking contract will not be used for futher distributions (the last distribution received by this contract was on the 13th of April 2024). The PropyKeys team is working on <span style={{fontWeight: 'bold'}}>V2</span> of the staking protocol (undergoing audit) which will be more suitable for continuous and long-term use in comparison to V1. Any stakers who are currently staked in the V1 contract who wish to move over to the V2 contract will need to unstake from the V1 contract in order to move over to the V2 contract. Tokens staked in the V1 protocol are not at risk but there won't be any more PRO distributed to V1, therefore it is advised to unstake and await V2.</Typography>
-            </div>
-          </Card>
-        </Grid>
+        {version === 1 &&
+          <Grid item xs={12} md={12} lg={12}>
+            <Card className={classes.card}>
+              <div className={classes.cardInner}>
+                <Typography style={{marginBottom: '4px'}} variant="subtitle1"><span style={{fontWeight: 'bold'}}>Please Note:</span> This staking contract will not be used for futher distributions (the last distribution received by this contract was on the 13th of April 2024). The PropyKeys team is working on <span style={{fontWeight: 'bold'}}>V2</span> of the staking protocol (undergoing audit) which will be more suitable for continuous and long-term use in comparison to V1. Any stakers who are currently staked in the V1 contract who wish to move over to the V2 contract will need to unstake from the V1 contract in order to move over to the V2 contract. Tokens staked in the V1 protocol are not at risk but there won't be any more PRO distributed to V1, therefore it is advised to unstake and await V2.</Typography>
+              </div>
+            </Card>
+          </Grid>
+        }
         <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
