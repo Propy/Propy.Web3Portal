@@ -19,6 +19,8 @@ import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import V1Icon from '@mui/icons-material/LooksOne';
+import V2Icon from '@mui/icons-material/LooksTwo';
 
 import LinkWrapper from './LinkWrapper';
 
@@ -59,10 +61,26 @@ const navigationMenu : IMenuEntry[] = [
   //   path: '/analytics',
   //   icon: <AccountBalanceWalletIcon />,
   // },
+  // {
+  //   text: 'Stake',
+  //   path: '/stake',
+  //   icon: <StakingIcon />,
+  // },
   {
     text: 'Stake',
-    path: '/stake',
     icon: <StakingIcon />,
+    children: [
+      {
+        text: 'V1',
+        path: '/stake/v1',
+        icon: <V1Icon />,
+      },
+      {
+        text: 'V2',
+        path: '/stake/v2',
+        icon: <V2Icon />,
+      },
+    ]
   },
   {
     text: 'Bridge',

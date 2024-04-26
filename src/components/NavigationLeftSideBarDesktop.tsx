@@ -61,11 +61,11 @@ const navigationMenu : IMenuEntry[] = [
   //   path: '/analytics',
   //   icon: <AccountBalanceWalletIcon />,
   // },
-  {
-    text: 'Stake',
-    path: '/stake',
-    icon: <StakingIcon />,
-  },
+  // {
+  //   text: 'Stake',
+  //   path: '/stake',
+  //   icon: <StakingIcon />,
+  // },
   {
     text: 'Stake',
     icon: <StakingIcon />,
