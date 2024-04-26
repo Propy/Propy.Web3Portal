@@ -23,7 +23,8 @@ import {
 } from '../utils';
 
 import {
-  BASE_PROPYKEYS_STAKING_CONTRACT,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V1,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V2,
   PRO_BASE_L2_ADDRESS,
   BASE_PROPYKEYS_STAKING_NFT,
   BASE_OG_STAKING_NFT,
@@ -36,7 +37,7 @@ import { useTotalStakingShareSupply, useTotalStakedPRO, useStakedTokenCount, use
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
 interface IStakeStats {
-
+  version: number;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -67,9 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const StakeStats = (props: PropsFromRedux & IStakeStats) => {
 
-  // let {
-
-  // } = props;
+  let {
+    version,
+  } = props;
 
   const classes = useStyles();
 
@@ -83,7 +84,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: stakerShares,
     isLoading: isLoadingStakerShares,
   } = useTotalStakingShareSupply(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     chain ? chain.id : undefined
   );
 
@@ -91,7 +92,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: totalStakedPRO,
     isLoading: isLoadingTotalStakedPRO,
   } = useTotalStakedPRO(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     chain ? chain.id : undefined
   )
 
@@ -99,7 +100,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: totalStakingBalancePRO,
     isLoading: isLoadingTotalStakingBalancePRO,
   } = useTotalStakingBalancePRO(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     PRO_BASE_L2_ADDRESS,
     chain ? chain.id : undefined
   )
@@ -108,7 +109,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: stakedPropyKeysCount,
     isLoading: isLoadingStakedPropyKeysCount,
   } = useStakedTokenCount(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     BASE_PROPYKEYS_STAKING_NFT,
     chain ? chain.id : undefined
   )
@@ -117,7 +118,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: stakedOGCount,
     isLoading: isLoadingStakedOGCount,
   } = useStakedTokenCount(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     BASE_OG_STAKING_NFT,
     chain ? chain.id : undefined
   )
@@ -134,7 +135,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
       } */}
       {address &&
         <div className={classes.personalStatsSpacer}>
-          <StakeStatsConnectedWalletContainer totalShares={stakerShares} />
+          <StakeStatsConnectedWalletContainer version={version} totalShares={stakerShares} />
         </div>
       }
       <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>

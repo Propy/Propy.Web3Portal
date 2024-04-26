@@ -44,7 +44,8 @@ import {
 } from '../utils';
 
 import {
-  BASE_PROPYKEYS_STAKING_CONTRACT,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V1,
+  BASE_PROPYKEYS_STAKING_CONTRACT_V2,
   BASE_PROPYKEYS_STAKING_NFT,
   BASE_OG_STAKING_NFT,
   PRO_BASE_L2_ADDRESS,
@@ -73,6 +74,7 @@ BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 interface IStakeEnter {
   mode: "enter" | "leave"
   postStakeSuccess?: () => void
+  version: number
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -289,6 +291,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const {
     mode,
     postStakeSuccess,
+    version,
   } = props;
 
   const classes = useStyles();
@@ -480,7 +483,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     abi: PropyNFTABI,
     functionName: 'isApprovedForAll',
     watch: true,
-    args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
+    args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
@@ -496,7 +499,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const { 
     data: stakerToStakedCount,
   } = useContractRead({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'stakerToStakedTokenCount',
     watch: true,
@@ -510,7 +513,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     abi: PropyNFTABI,
     functionName: 'isApprovedForAll',
     watch: true,
-    args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
+    args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
@@ -520,14 +523,14 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     abi: ERC20ABI,
     functionName: 'allowance',
     watch: true,
-    args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
+    args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: minimumRequiredPROAllowance,
     isLoading: isLoadingMinimumRequiredPROAllowance,
   } = useContractRead({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'getPROAmountToStake',
     watch: true,
@@ -537,18 +540,18 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   const { 
     data: stakingContractStakingPowerAllowance,
   } = useContractRead({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: ERC20ABI,
     functionName: 'allowance',
     watch: true,
-    args: [address, BASE_PROPYKEYS_STAKING_CONTRACT],
+    args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: sharesIssuedAgainstSelection,
     // isLoading: isLoadingSharesIssuedAgainstSelection,
   } = useContractRead({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'getSharesIssued',
     watch: true,
@@ -559,7 +562,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     data: stakerUnlockTime,
     // isLoading: isLoadingStakerUnlockTime,
   } = useStakerUnlockTime(
-    BASE_PROPYKEYS_STAKING_CONTRACT,
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     address,
     chain ? chain.id : undefined
   );
@@ -620,7 +623,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     address: PRO_BASE_L2_ADDRESS,
     abi: ERC20ABI,
     functionName: 'approve',
-    args: [BASE_PROPYKEYS_STAKING_CONTRACT, minimumRequiredPROAllowance],
+    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, minimumRequiredPROAllowance],
     onError(error: any) {
       setIsAwaitingPROAllowanceTx(false);
       toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
@@ -660,10 +663,10 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     data: dataPerformPStakeAllowance,
     writeAsync: writePerformPStakeAllowance
   } = useContractWrite({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: ERC20ABI,
     functionName: 'approve',
-    args: [BASE_PROPYKEYS_STAKING_CONTRACT, sharesIssuedAgainstSelection],
+    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, sharesIssuedAgainstSelection],
     onError(error: any) {
       setIsAwaitingPStakeAllowanceTx(false);
       toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
@@ -706,7 +709,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     address: BASE_PROPYKEYS_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'setApprovalForAll',
-    args: [BASE_PROPYKEYS_STAKING_CONTRACT, true],
+    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
     onError(error: any) {
       setIsAwaitingPropyKeysApprovalForAllTx(false);
       toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
@@ -749,7 +752,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     address: BASE_OG_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'setApprovalForAll',
-    args: [BASE_PROPYKEYS_STAKING_CONTRACT, true],
+    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
     onError(error: any) {
       setIsAwaitingOGApprovalForAllTx(false);
       toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
@@ -789,7 +792,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     data: dataPerformStake,
     writeAsync: writePerformStake
   } = useContractWrite({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'enter',
     args: [selectedTokenAddress, selectedTokenIds],
@@ -849,7 +852,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     data: dataPerformUnstake,
     writeAsync: writePerformUnstake
   } = useContractWrite({
-    address: BASE_PROPYKEYS_STAKING_CONTRACT,
+    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'leave',
     args: [selectedTokenAddress, selectedTokenIds],
