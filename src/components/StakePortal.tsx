@@ -366,8 +366,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
           ])
         } else if(mode === "leave") {
           results = await Promise.all([
-            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_PROPYKEYS_STAKING_NFT),
-            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_OG_STAKING_NFT),
+            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_PROPYKEYS_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2),
+            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_OG_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2),
           ])
         }
         if(isMounted) {
@@ -403,7 +403,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     return () => {
       isMounted = false;
     }
-  }, [address, mode, triggerUpdateIndex])
+  }, [address, mode, triggerUpdateIndex, version])
 
   const handleBalanceRecordSelected = (balanceRecord: IBalanceRecord) => {
     let useCurrentSelection = balanceRecord.asset_address === selectedTokenAddress ? [...selectedTokenIds] : [];
