@@ -223,7 +223,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               {!isLoadingStakedOGCount && (
                 <>
                   <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyOG</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakedOGCount ? stakedOGCount : 0), 8)), 0, 'pOGs')}</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
                 </>
               )}
             </div>

@@ -352,6 +352,12 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   useEffect(() => {
     setSelectedPropyKeyTokenIds([]);
     setSelectedTokenAddress(false);
+    setIsLoading(true);
+  }, [version])
+
+  useEffect(() => {
+    setSelectedPropyKeyTokenIds([]);
+    setSelectedTokenAddress(false);
   }, [triggerUpdateIndex])
 
   useEffect(() => {

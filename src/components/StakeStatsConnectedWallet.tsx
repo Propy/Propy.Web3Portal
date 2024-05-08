@@ -36,6 +36,7 @@ import {
   useApproxLeaveAmountFromShareAmount,
   useStakedPROByStaker,
   useStakerUnlockTime,
+  useApproxStakerRewardsPending,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -119,6 +120,17 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     chain ? chain.id : undefined
   )
 
+  const {
+    data: approxStakerRewardsPending,
+    isLoading: isLoadingApproxStakerRewardsPending,
+  } = useApproxStakerRewardsPending(
+    version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
+    address,
+    chain ? chain.id : undefined
+  )
+
+  console.log({approxStakerRewardsPending})
+
   const { 
     data: stakedPROByStaker,
     isLoading: isLoadingStakedPROByStaker,
@@ -174,16 +186,22 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
         <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
-              {(isLoadingLeaveAmountFromShares || isLoadingStakedPROByStaker) && (
+              {((isLoadingLeaveAmountFromShares && (version === 1)) || isLoadingStakedPROByStaker || (isLoadingApproxStakerRewardsPending && version === 2)) && (
                 <>
                   <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
                   <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
                 </>
               )}
-              {!isLoadingLeaveAmountFromShares && !isLoadingStakedPROByStaker && (
+              {version === 1 && !isLoadingLeaveAmountFromShares && !isLoadingStakedPROByStaker && (
                 <>
                   <Typography style={{marginBottom: '4px'}} variant="h6">Available Extra PRO</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares ? leaveAmountFromShares.toString() : 0).minus(stakedPROByStaker ? stakedPROByStaker.toString() : 0).toString(), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
+              {version === 2 && !isLoadingApproxStakerRewardsPending && !isLoadingStakedPROByStaker && (
+                <>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Available Extra PRO</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(new BigNumber(approxStakerRewardsPending ? approxStakerRewardsPending.toString() : 0).toString(), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
             </div>

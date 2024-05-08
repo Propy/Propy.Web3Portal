@@ -5,6 +5,8 @@ const routes = [
   { path: "/my-assets" },
   { path: "/collections" },
   { path: "/stake" },
+  { path: "/stake/v1" },
+  { path: "/stake/v2" },
   { path: "/bridge" },
   { path: "/bridge/:bridgeSelection" },
   { path: "/bridge/:bridgeSelection/:bridgeAction/:transactionHash" },
