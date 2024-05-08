@@ -11,6 +11,7 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 }
 
 // export const API_ENDPOINT = "http://localhost:8420";
+// export const API_ENDPOINT = "https://dev.dappapi.propy.com/";
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
@@ -180,11 +181,13 @@ export const L2_TO_L1_MESSAGE_PASSER_ADDRESS = process?.env?.REACT_APP_ENV === '
 export const OPTIMISM_PORTAL_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x49048044D57e1C92A77f79988d21Fa8fAF74E97e" : "0x49f53e41452C74589E85cA1677426Ba426459e85";
 export const L2_OUTPUT_ORACLE = process?.env?.REACT_APP_ENV === 'prod' ? "0x56315b90c40730925ec5485cf004d835058518A0" : "0x84457ca9D0163FbC4bbfe4Dfbb20ba46e48DF254";
 export const BASE_L2_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'base-sepolia';
-export const BASE_PROPYKEYS_STAKING_CONTRACT = process?.env?.REACT_APP_ENV === 'prod' ? "0xcFEc6c0F4eCd951ecac87e2Ab5BE22449c9faf8B" : "0x89b36952ad798fFDE2CBe825ade5ed94f2d53905";
+export const BASE_PROPYKEYS_STAKING_CONTRACT_V1 = process?.env?.REACT_APP_ENV === 'prod' ? "0xcFEc6c0F4eCd951ecac87e2Ab5BE22449c9faf8B" : "0x89b36952ad798fFDE2CBe825ade5ed94f2d53905";
+export const BASE_PROPYKEYS_STAKING_CONTRACT_V2 = process?.env?.REACT_APP_ENV === 'prod' ? "0x3A8CF059f6e0cbBFD248621cECa69053FA5fB7D4" : "0x74aa08EeE3a819D18B580a57F7B37a9dfb07730D";
 export const BASE_PROPYKEYS_STAKING_NFT = process?.env?.REACT_APP_ENV === 'prod' ? "0xa239b9b3E00637F29f6c7C416ac95127290b950E" : "0x07922CDe9e58fb590ffB59BB8777cF4b737fE2a3";
 export const BASE_PROPYKEYS_NFT = process?.env?.REACT_APP_ENV === 'prod' ? "0xa239b9b3E00637F29f6c7C416ac95127290b950E" : "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c";
 export const BASE_OG_STAKING_NFT = process?.env?.REACT_APP_ENV === 'prod' ? "0xc84F3b80847B224684b11bF956d46c7028bC1906" : "0x4ebCEb82B5940E10c301A33261Af13222A38d974";
 export const PROPY_KEY_REPOSSESSION_CONTRACT = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0x156904cC4E9999cBA3Fb41875056C288fbC53B9F"; // "0x156904cC4E9999cBA3Fb41875056C288fbC53B9F" for using the default testnet propykeys, "0xb7EC51CA03d0774e7B83595CD8653E67fB7778ab" for staking testnet propykeys
+// export const PROPY_KEY_REPOSSESSION_CONTRACT = process?.env?.REACT_APP_ENV === 'prod' ? "0x" : "0xb7EC51CA03d0774e7B83595CD8653E67fB7778ab"
 
 export const BRIDGE_SELECTION_TO_ORIGIN_AND_DESTINATION_NETWORK : {[key: string]: {
   bridgeAddress: `0x${string}`,

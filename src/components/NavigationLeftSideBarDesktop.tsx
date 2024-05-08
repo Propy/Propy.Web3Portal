@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from 'react';
+import React, {useState, Fragment, useEffect} from 'react';
 
 import { useAccount } from 'wagmi';
 
@@ -19,6 +19,8 @@ import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import V1Icon from '@mui/icons-material/LooksOne';
+import V2Icon from '@mui/icons-material/LooksTwo';
 
 import { PropsFromRedux } from '../containers/NavigationLeftSideBarContainer';
 
@@ -59,10 +61,26 @@ const navigationMenu : IMenuEntry[] = [
   //   path: '/analytics',
   //   icon: <AccountBalanceWalletIcon />,
   // },
+  // {
+  //   text: 'Stake',
+  //   path: '/stake',
+  //   icon: <StakingIcon />,
+  // },
   {
     text: 'Stake',
-    path: '/stake',
     icon: <StakingIcon />,
+    children: [
+      {
+        text: 'V1',
+        path: '/stake/v1',
+        icon: <V1Icon />,
+      },
+      {
+        text: 'V2',
+        path: '/stake/v2',
+        icon: <V2Icon />,
+      },
+    ]
   },
   {
     text: 'Bridge',
@@ -120,6 +138,16 @@ const useStyles = makeStyles({
     paddingTop: 8,
     paddingBottom: 8,
     paddingLeft: 11,
+    paddingRight: 11,
+  },
+  menuEntryItemNested: {
+    transition: 'all 0.2s ease-in-out',
+    fontWeight: '500',
+    border: '1px solid transparent',
+    borderRadius: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 23,
     paddingRight: 11,
   },
   menuEntryItemDarkMode: {
@@ -189,6 +217,24 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
       setOpenCollapseSections(newOpenCollapseSections);
     }
   }
+
+  useEffect(() => {
+    let menuIndex = 0;
+    for(let navigationEntry of navigationMenu) {
+      if(navigationEntry.children) {
+        for(let childNavigationEntry of navigationEntry.children) {
+          if(childNavigationEntry.path && (pathMatch === childNavigationEntry.path)) {
+            let indexInCurrentState = openCollapseSections.indexOf(menuIndex);
+            if(indexInCurrentState === -1) {
+              let newOpenCollapseSections = [...openCollapseSections, menuIndex];
+              setOpenCollapseSections(newOpenCollapseSections);
+            }
+          }
+        }
+      }
+      menuIndex++;
+    }
+  }, [openCollapseSections, pathMatch])
 
   const currentSelectionClass = () => {
     if(darkMode) {
@@ -276,7 +322,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                         <div
-                                          className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem].join(" ")}
+                                          className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItemNested].join(" ")}
                                         >
                                           <LinkWrapper 
                                             link={child.externalLink ? child.externalLink : child.path}
@@ -289,13 +335,25 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                                 }
                                               }}
                                               key={`child-${index}-${childIndex}`}
-                                              sx={{ pl: 4, color: 'inherit' }}
+                                              className={[(child.path && ((pathMatch === child.path) || (child?.pathExtended && child?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                              sx={{ 
+                                                pl: 4,
+                                                color: 'inherit',
+                                                "&:hover": {
+                                                  backgroundColor: darkMode ? "transparent" : "#ffffff",
+                                                  border: darkMode ? '1px solid #333436' : '1px solid #ffffff',
+                                                }
+                                              }}
                                               disableRipple
                                             >
                                               <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
-                                              <ListItemText primary={child.text} />
-                                              {item.externalLink &&
-                                                <ExternalLinkIcon />
+                                              <ListItemText sx={{
+                                                "& .MuiTypography-root": {
+                                                  fontWeight: 'inherit'
+                                                }
+                                              }} style={{fontWeight: 'inherit'}} primary={child.text} />
+                                              {child.externalLink &&
+                                                <ExternalLinkIcon style={{opacity: 0.5}} />
                                               }
                                             </ListItemButton>
                                           </LinkWrapper>

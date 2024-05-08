@@ -219,8 +219,9 @@ export const AccountBalanceService = {
   async getAccountBalancesByAssetOnlyStaked(
     account: `0x${string}`,
     assetAddress: `0x${string}`,
+    stakingContractAddress: `0x${string}`,
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true`)
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true&stakingContractAddress=${stakingContractAddress}`)
   },
 }
 

@@ -81,7 +81,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
               </Typography>
             </div>
           </LinkWrapper>
-          <div style={{width: '100%'}}/>
+          <div style={{ flexGrow: 1 }}/>
           {!isConsideredMobile && <Web3ModalButtonWagmi darkMode={darkMode}/>}
           {process.env.REACT_ENV === 'local' && 
             <IconButton
