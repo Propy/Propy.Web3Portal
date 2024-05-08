@@ -8,6 +8,7 @@ import useStakerUnlockTime from './useStakerUnlockTime';
 import useStakedPROByStaker from './useStakedPROByStaker';
 import useTotalStakingBalancePRO from './useTotalStakingBalancePRO';
 import useApproxLeaveAmountFromShareAmount from './useApproxLeaveAmountFromShareAmount';
+import useApproxStakerRewardsPending from './useApproxStakerRewardsPending';
 
 export {
   useWindowSize,
@@ -20,4 +21,5 @@ export {
   useStakedPROByStaker,
   useTotalStakingBalancePRO,
   useApproxLeaveAmountFromShareAmount,
+  useApproxStakerRewardsPending,
 }

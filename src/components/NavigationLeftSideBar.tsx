@@ -155,6 +155,16 @@ const useStyles = makeStyles({
     paddingLeft: 11,
     paddingRight: 11,
   },
+  menuEntryItemNested: {
+    transition: 'all 0.2s ease-in-out',
+    fontWeight: '500',
+    border: '1px solid transparent',
+    borderRadius: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 23,
+    paddingRight: 11,
+  },
   menuEntryItemDarkMode: {
     color: 'white',
   },
@@ -226,6 +236,24 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
     return classes.menuEntryItemLightMode;
   }
 
+  useEffect(() => {
+    let menuIndex = 0;
+    for(let navigationEntry of navigationMenu) {
+      if(navigationEntry.children) {
+        for(let childNavigationEntry of navigationEntry.children) {
+          if(childNavigationEntry.path && (pathMatch === childNavigationEntry.path)) {
+            let indexInCurrentState = openCollapseSections.indexOf(menuIndex);
+            if(indexInCurrentState === -1) {
+              let newOpenCollapseSections = [...openCollapseSections, menuIndex];
+              setOpenCollapseSections(newOpenCollapseSections);
+            }
+          }
+        }
+      }
+      menuIndex++;
+    }
+  }, [openCollapseSections, pathMatch])
+
   return (
     <div>
         <React.Fragment key={'left'}>
@@ -272,23 +300,39 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                 <Collapse in={openCollapseSections.indexOf(index) > -1} timeout="auto" unmountOnExit>
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
-                                      <LinkWrapper 
-                                        link={child.externalLink ? child.externalLink : child.path}
-                                        external={child.externalLink ? true : false}
+                                      <div
+                                        className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItemNested].join(" ")}
                                       >
-                                        <ListItemButton
-                                          onClick={() => {
-                                            if(child.path && child.path.length > 0) {
-                                              props.setShowLeftMenu(false)
-                                            }
-                                          }}
-                                          key={`child-${index}-${childIndex}`}
-                                          sx={{ pl: 4 }}
+                                        <LinkWrapper 
+                                          link={child.externalLink ? child.externalLink : child.path}
+                                          external={child.externalLink ? true : false}
                                         >
-                                          <ListItemIcon>{child.icon}</ListItemIcon>
-                                          <ListItemText primary={child.text} />
-                                        </ListItemButton>
-                                      </LinkWrapper>
+                                          <ListItemButton
+                                            onClick={() => {
+                                              if(child.path && child.path.length > 0) {
+                                                props.setShowLeftMenu(false)
+                                              }
+                                            }}
+                                            key={`child-${index}-${childIndex}`}
+                                            className={[(child.path && ((pathMatch === child.path) || (child?.pathExtended && child?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
+                                            sx={{ 
+                                              pl: 4,
+                                              color: 'inherit',
+                                              "&:hover": {
+                                                backgroundColor: darkMode ? "transparent" : "#ffffff",
+                                                border: darkMode ? '1px solid #333436' : '1px solid #ffffff',
+                                              }
+                                            }}
+                                          >
+                                            <ListItemIcon className={[(child.path && (pathMatch === child.path)) ? classes.selectedIcon : "", classes.menuIcon].join(" ")}>{child.icon}</ListItemIcon>
+                                            <ListItemText sx={{
+                                              "& .MuiTypography-root": {
+                                                fontWeight: 'inherit'
+                                              }
+                                            }} style={{fontWeight: 'inherit'}} primary={child.text} />
+                                          </ListItemButton>
+                                        </LinkWrapper>
+                                      </div>
                                     )}
                                   </List>
                                 </Collapse>
