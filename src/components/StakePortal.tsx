@@ -37,6 +37,8 @@ import SingleTokenCardLoading from './SingleTokenCardLoading';
 
 import FloatingActionButton from './FloatingActionButton';
 
+import LinkWrapper from './LinkWrapper';
+
 import {
   priceFormat,
   countdownToTimestamp,
@@ -50,6 +52,7 @@ import {
   BASE_OG_STAKING_NFT,
   PRO_BASE_L2_ADDRESS,
   STAKING_ORIGIN_COUNTRY_BLACKLIST,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import {
@@ -295,6 +298,10 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   } = props;
 
   const classes = useStyles();
+
+  const latestStakingVersion = 2;
+
+  let isDeprecatedStakingVersion = version < latestStakingVersion;
 
   const { chain } = useNetwork();
 
@@ -925,7 +932,16 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   return (
     <div className={classes.root}>
-      {(isBlacklistedOrigin && (mode === "enter")) &&
+      {(isDeprecatedStakingVersion && (mode === "enter")) &&
+        <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
+          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+              <Typography variant="h6" style={{textAlign: 'left'}}>
+                  This version of the staking contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`stake/v${latestStakingVersion}`}>here</LinkWrapper>.
+              </Typography>
+            </Grid>
+        </Grid>
+      }
+      {(isBlacklistedOrigin && !isDeprecatedStakingVersion && (mode === "enter")) &&
         <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
           <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
               <Typography variant="h6" style={{textAlign: 'left'}}>
@@ -934,7 +950,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             </Grid>
         </Grid>
       }
-      {(!isBlacklistedOrigin || (mode === "leave")) &&
+      {((!isBlacklistedOrigin && !isDeprecatedStakingVersion) || (mode === "leave")) &&
         <>
           <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
             {!(isLoading || isLoadingGeoLocation) && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
