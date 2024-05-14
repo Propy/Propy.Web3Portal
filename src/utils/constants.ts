@@ -236,4 +236,4 @@ interface ICollectionEntry {
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
 
-export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA"];
+export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA", "CA"];
