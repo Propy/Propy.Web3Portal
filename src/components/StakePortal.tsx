@@ -301,6 +301,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const latestStakingVersion = 2;
 
+  const maxSelection = 100;
+
   let isDeprecatedStakingVersion = version < latestStakingVersion;
 
   const { chain } = useNetwork();
@@ -446,7 +448,6 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
   };
 
   const selectAllOfCurrentCollection = () => {
-    let maxSelection = 100;
     console.log({selectedTokenAddress, BASE_PROPYKEYS_STAKING_NFT, BASE_OG_STAKING_NFT})
     if(selectedTokenAddress) {
       if(selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT) {
@@ -956,6 +957,16 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             {!(isLoading || isLoadingGeoLocation) && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
               <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="body1" style={{textAlign: 'left'}}>
+                  {(propyKeysNFT && propyKeysNFT.length > 0) &&
+                    <>
+                      {`Found ${propyKeysNFT && propyKeysNFT.length > 0 ? propyKeysNFT.length : 0} PropyKeys`}<br/>
+                    </>
+                  }
+                  {(ogKeysNFT && ogKeysNFT.length > 0) &&
+                    <>
+                      {`Found ${ogKeysNFT && ogKeysNFT.length > 0 ? ogKeysNFT.length : 0} PropyOG tokens`}<br/>
+                    </>
+                  }
                   Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
                 </Typography>
               </Grid>
@@ -998,6 +1009,9 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             <Card className={classes.floatingActionZoneCard} elevation={6}>
                 <Typography variant="h6">
                   {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length}{selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
+                </Typography>
+                <Typography variant="caption">
+                  Supports a maximum of {maxSelection} tokens per {mode === "enter" ? "stake " : "unstake "} transaction
                 </Typography>
                 <Box className={classes.selectionOptionsContainer}>
                   <div className={classes.selectionOptionsSpacer}>
