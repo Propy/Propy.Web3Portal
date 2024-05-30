@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: 'flex',
       justifyContent: 'center',
+      lineHeight: 0,
     },
     card: {
       display: 'flex',
@@ -931,6 +932,19 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   let disableSelectionAdjustments = isAwaitingPropyKeysApprovalForAllTx || isAwaitingWalletInteraction || isAwaitingOGApprovalForAllTx || isAwaitingPROAllowanceTx || isAwaitingStakeTx || isAwaitingPStakeAllowanceTx || isAwaitingUnstakeTx || isSyncingStaking;
 
+  const getMaxHelperText = () => {
+    let balance = selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? Number(propyKeysNFT ? propyKeysNFT.length : 0) : Number(ogKeysNFT ? ogKeysNFT?.length : 0);
+    let isBalanceMoreThanMaxSelection = balance > maxSelection;
+    let relevantTokenName = selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? "PropyKey" : "PropyOG";
+    let actionName = mode === "enter" ? "stake" : "unstake";
+    let currentTokenState = mode === "enter" ? "unstaked" : "staked";
+    return (
+      <>
+        Maximum {maxSelection} tokens per transaction, you have <strong>{balance} {currentTokenState} {relevantTokenName}{balance === 1 ? "" : "s"}</strong>, therefore you {isBalanceMoreThanMaxSelection ? <>would need to perform <strong>{Math.ceil(balance / maxSelection)} separate {actionName} transactions</strong> to {actionName} all of your {currentTokenState} tokens</> : <>can {actionName} all of your {currentTokenState} tokens in a single transaction</>}
+      </>
+    )
+  }
+
   return (
     <div className={classes.root}>
       {(isDeprecatedStakingVersion && (mode === "enter")) &&
@@ -1010,8 +1024,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                 <Typography variant="h6">
                   {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length}{selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
                 </Typography>
-                <Typography variant="caption">
-                  Supports a maximum of {maxSelection} tokens per {mode === "enter" ? "stake " : "unstake "} transaction
+                <Typography variant="caption" style={{lineHeight: 1.6}}>
+                  {getMaxHelperText()}
                 </Typography>
                 <Box className={classes.selectionOptionsContainer}>
                   <div className={classes.selectionOptionsSpacer}>
