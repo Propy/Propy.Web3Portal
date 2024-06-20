@@ -10,6 +10,7 @@ import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ProfileIcon from '@mui/icons-material/AccountCircle';
 import TokenIcon from '@mui/icons-material/LocalActivity';
 import GovernanceIcon from '@mui/icons-material/Gavel';
 import StakingIcon from '@mui/icons-material/Diversity2';
@@ -49,6 +50,12 @@ const navigationMenu : IMenuEntry[] = [
     text: 'Dashboard',
     path: '/',
     icon: <DashboardIcon />
+  },
+  {
+    text: 'Profile',
+    path: '/profile',
+    icon: <ProfileIcon />,
+    onlyConnected: true,
   },
   {
     text: 'My Assets',
@@ -102,7 +109,7 @@ const navigationMenu : IMenuEntry[] = [
   {
     text: 'Liquidity',
     path: '/liquidity',
-    externalLink: 'https://app.unipilot.io/add?vault=0x15a4a47e85aa36fe4ee68e35eedb6bc10489f4af&chainId=1',
+    externalLink: 'https://info.uniswap.org/#/tokens/0x226bb599a12c826476e3a771454697ea52e9e220',
     icon: <LiquidityIcon />
   },
   // {

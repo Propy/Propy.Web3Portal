@@ -243,7 +243,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
         </div>
       }
       <Grid className={classes.sectionSpacer} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
-        {!isLoadingL1ProBalanceData && l1ProBalanceData?.balance &&
+        {!isLoadingL1ProBalanceData && l1ProBalanceData?.balance && (page === 1) &&
           <Grid key={`single-token-card-l1-pro-${l1ProBalanceData.tokenInfo.address}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard assetRecord={l1ProBalanceData.tokenInfo} 
               balanceRecord={{
@@ -259,7 +259,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
             />
           </Grid>
         }
-        {!isLoadingL2ProBalanceData && l2ProBalanceData?.balance &&
+        {!isLoadingL2ProBalanceData && l2ProBalanceData?.balance && (page === 1) &&
           <Grid key={`single-token-card-l1-pro-${l2ProBalanceData.tokenInfo.address}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard assetRecord={l2ProBalanceData.tokenInfo} 
               balanceRecord={{

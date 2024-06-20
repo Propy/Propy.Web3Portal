@@ -10,6 +10,8 @@ const routes = [
   { path: "/bridge" },
   { path: "/bridge/:bridgeSelection" },
   { path: "/bridge/:bridgeSelection/:bridgeAction/:transactionHash" },
+  { path: "/profile" },
+  { path: "/profile/:profileAddressOrUsername" },
   // { path: "/example/:exampleParam" },
 ]
 
