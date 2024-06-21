@@ -14,6 +14,8 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 // export const API_ENDPOINT = "https://dev.dappapi.propy.com/";
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
+export const DESKTOP_MENU_WIDTH = 250;
+
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
 export const PRO_TOKEN_DECIMALS = 8;
 
@@ -39,6 +41,8 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
 export const VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "propy-home-nft-dev-base-testnet", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
+
+export const VALID_HOME_LISTING_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys-base-sepolia", "propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
 
 const COLLECTIONS_ENTRIES_DEV = [
   {
@@ -95,6 +99,24 @@ const COLLECTIONS_ENTRIES_PROD = [
     network: "ethereum",
     address: "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC",
     slug: "meta-agents",
+  },
+]
+
+const LISTING_COLLECTIONS_ENTRIES_PROD = [
+  {
+    network: "base",
+    slug: "propykeys",
+    overrideTitle: "PropyKeys Home Listings",
+    address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+  },
+]
+
+const LISTING_COLLECTIONS_ENTRIES_DEV = [
+  {
+    network: "base-sepolia",
+    slug: "propykeys-base-sepolia",
+    overrideTitle: "PropyKeys Home Listings (Base Sepolia)",
+    address: "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c",
   },
 ]
 
@@ -236,4 +258,12 @@ interface ICollectionEntry {
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
 
+export const LISTING_COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? LISTING_COLLECTIONS_ENTRIES_PROD : [
+  ...LISTING_COLLECTIONS_ENTRIES_DEV,
+  // ...LISTING_COLLECTIONS_ENTRIES_PROD
+];
+
 export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA", "CA"];
+
+export const HOME_LISTING_CARD_HEIGHT = 309;
+export const HOME_LISTING_CARD_MEDIA_HEIGHT = 220;

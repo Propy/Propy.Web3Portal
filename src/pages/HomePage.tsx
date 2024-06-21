@@ -8,12 +8,14 @@ import { useAccount } from 'wagmi';
 
 import {
     COLLECTIONS_PAGE_ENTRIES,
+    LISTING_COLLECTIONS_PAGE_ENTRIES,
 } from '../utils/constants';
 
 import GenericPageContainer from '../containers/GenericPageContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 import RecentlyMintedTokensBannerContainer from '../containers/RecentlyMintedTokensBannerContainer';
 import CollectionBannerContainer from '../containers/CollectionBannerContainer';
+import ListingCollectionBannerContainer from '../containers/ListingCollectionBannerContainer';
 import ReserveAnAddressHomeBannerContainer from '../containers/ReserveAnAddressHomeBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -63,6 +65,20 @@ const HomePage = () => {
                 <div className={classes.sectionSpacer}>
                     <RecentlyMintedTokensBannerContainer showRecentlyMintedLink={true} maxRecords={5} showTitle={true} />
                 </div>
+                {LISTING_COLLECTIONS_PAGE_ENTRIES && LISTING_COLLECTIONS_PAGE_ENTRIES.map((entry, index) => 
+                    <div key={`home-page-listing-collection-entry-${entry.slug}-${index}`} className={classes.sectionSpacer}>
+                        <ListingCollectionBannerContainer
+                            showCollectionLink={true}
+                            maxRecords={5}
+                            showTitle={true}
+                            network={entry.network}
+                            contractNameOrCollectionNameOrAddress={entry.slug}
+                            collectionSlug={entry.slug}
+                            overrideTitle={entry.overrideTitle}
+                            filterShims={entry.filterShims}
+                        />
+                    </div>
+                )}
                 {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry, index) => 
                     <div key={`home-page-collection-entry-${entry.address}-${index}`} className={classes.sectionSpacer}>
                         <CollectionBannerContainer

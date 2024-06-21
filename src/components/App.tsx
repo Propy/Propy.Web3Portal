@@ -78,6 +78,9 @@ const App = (props: PropsFromRedux) => {
           secondary: {
             main: "#434343",
           },
+          action: {
+            disabledBackground: '#e0e0e08c',
+          }
         },
         components: {
           MuiCardContent :{
