@@ -100,6 +100,27 @@ export interface IAssetRecord {
     transfer_event_erc20_count?: number;
 }
 
+export interface IPropyKeysHomeListingRecord {
+    id: number;
+    network_name: string;
+    asset_address: string;
+    token_id: number;
+    full_address: string;
+    price: number;
+    description: string;
+    bedrooms: number;
+    bathrooms: number;
+    size: number;
+    floor: number;
+    floors: number;
+    type: string;
+    year_built: number;
+    lot_size: number;
+    images: string[];
+    propykeys_internal_listing_id: string;
+    collection_name: string;
+}
+
 export interface IBalanceRecord {
     network_name: string,
     asset_address: string,
@@ -148,6 +169,13 @@ export interface IMixedBalancesResult {
 
 export interface IRecentlyMintedResult {
     data: INFTRecord[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
+export interface IListingCollectionResult {
+    data: IPropyKeysHomeListingRecord[],
     metadata: {
         pagination: IPagination,
     }

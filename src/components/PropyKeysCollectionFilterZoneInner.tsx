@@ -73,7 +73,7 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   let [selectedLandmarksOnly, setSelectedLandmarksOnly] = useState<boolean>(Boolean(searchParams.get("landmark")));
   let [selectedDeedsAttachedOnly, setSelectedDeedsAttachedOnly] = useState<boolean>(Boolean(searchParams.get("attached_deed")));
 
-  let isSomeFilterSet = Boolean(selectedCity || selectedCountry || selectedLandmarksOnly || selectedDeedsAttachedOnly || selectedOwner);
+  let isSomeFilterSet = Boolean(selectedCity || selectedCountry || selectedLandmarksOnly || selectedDeedsAttachedOnly || selectedOwner || selectedStatus);
 
   const classes = useStyles();
 
@@ -288,14 +288,6 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
                 className={classes.inputSpacer}
                 value={selectedOwner}
                 onChange={(event) => setSelectedOwner(event.target.value)}
-                InputProps={{
-                  inputComponent: (props) => (
-                    <input
-                      {...props}
-                      value={toChecksumAddress(props.value)}
-                    />
-                  ),
-                }}
               />
               <FormControlLabel 
                 className={classes.inputSpacerSmall}

@@ -12,9 +12,11 @@ import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftS
 import HomePage from '../pages/HomePage';
 import AccountTokensPage from '../pages/AccountTokensPage';
 import SingleTokenPage from '../pages/SingleTokenPage';
+import SingleListingPage from '../pages/SingleListingPage';
 import RecentlyMintedPage from '../pages/RecentlyMintedPage';
 import CollectionPage from '../pages/CollectionPage';
 import CollectionsPage from '../pages/CollectionsPage';
+import ListingCollectionPage from '../pages/ListingCollectionPage';
 import StakePage from '../pages/StakePage';
 import BridgeOptionsPage from '../pages/BridgeOptionsPage';
 import BridgePage from '../pages/BridgePage';
@@ -104,6 +106,8 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/propykey-og-claim/:propyKeyTokenId" element={<PropyKeyRepossessionPage />} />
                       <Route path="/profile" element={<PropyProfilePage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/profile/:profileAddressOrUsername" element={<PropyProfilePage isConsideredMobile={isConsideredMobile} />} />
+                      <Route path="/listings/:network/:contractNameOrCollectionNameOrAddress" element={<ListingCollectionPage/>} />
+                      <Route path="/listing/:network/:tokenAddress/:tokenId" element={<SingleListingPage isConsideredMobile={isConsideredMobile}/>} />
                   </Routes>
                 }
             </div>

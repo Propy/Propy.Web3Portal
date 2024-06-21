@@ -25,15 +25,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(8),
     },
     childContainerLarge: {
-      margin: theme.spacing(8),
+      padding: theme.spacing(8),
       marginTop: 0,
     },
     childContainerMedium: {
-      margin: theme.spacing(4),
+      padding: theme.spacing(4),
       marginTop: 0,
     },
     childContainerMobile: {
-      margin: theme.spacing(2),
+      padding: theme.spacing(2),
       marginTop: 0,
     },
     titleContainer: {

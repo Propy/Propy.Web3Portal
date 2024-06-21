@@ -7,47 +7,54 @@ import createStyles from '@mui/styles/createStyles';
 
 import Typography from '@mui/material/Typography';
 
+import {
+  DESKTOP_MENU_WIDTH,
+} from '../utils/constants';
+
 import { PropsFromRedux } from '../containers/GenericPageContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    rootMobile: {
       width: '100%',
+    },
+    rootDesktop: {
+      width: `calc(100% - ${DESKTOP_MENU_WIDTH}px)`,
     },
     childrenContainer: {
       position: 'relative',
-      margin: theme.spacing(8),
+      padding: theme.spacing(8),
     },
     childContainerLarge: {
-      margin: theme.spacing(8),
+      padding: theme.spacing(8),
       marginTop: 0,
     },
     childContainerMedium: {
-      margin: theme.spacing(4),
+      padding: theme.spacing(4),
       marginTop: 0,
     },
     childContainerMobile: {
-      margin: theme.spacing(2),
+      padding: theme.spacing(2),
       marginTop: 0,
       marginBottom: theme.spacing(10),
     },
     titleContainer: {
       marginBottom: theme.spacing(4),
-      marginTop: theme.spacing(6),
+      padding: theme.spacing(6),
       paddingBottom: theme.spacing(2),
       borderBottom: '2px solid #DBDBDB',
     },
     titleContainerMobile: {
       marginBottom: theme.spacing(4),
-      marginTop: theme.spacing(4),
+      paddingTop: theme.spacing(4),
       paddingBottom: theme.spacing(2),
       borderBottom: '2px solid #DBDBDB',
     },
     noTitleContainer: {
-      marginTop: theme.spacing(7),
+      paddingTop: theme.spacing(7),
     },
     noTitleContainerMobile: {
-      marginTop: theme.spacing(4),
+      paddingTop: theme.spacing(4),
     },
     title: {
       fontWeight: 500,
@@ -92,7 +99,7 @@ const GenericBannerPage = (props: PropsFromRedux & IGenericBannerPage) => {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={(!isConsideredMobile) ? classes.rootDesktop : classes.rootMobile}>
       <div className={getChildContainerClass(isConsideredMobile, isConsideredMedium, title)}>
         {title &&
           <div className={isConsideredMobile ? classes.titleContainerMobile : classes.titleContainer}>
