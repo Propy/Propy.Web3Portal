@@ -30,7 +30,8 @@ interface IPropyKeysMapCardProps {
   scrollWheelZoom?: boolean
   center?: [number, number]
   disableBorderRadius?: boolean
-  propyKeysMapFilterOptions?: IPropyKeysMapFilterOptions,
+  propyKeysMapFilterOptions?: IPropyKeysMapFilterOptions
+  collectionName?: string
 }
 
 const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
@@ -45,11 +46,12 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     scrollWheelZoom = true,
     center,
     disableBorderRadius = false,
+    collectionName,
   } = props;
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
+  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === collectionName ? collectionName : 'propykeys');
 
   const { 
     data: nftCoordinates = [],

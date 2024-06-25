@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useParams } from 'react-router-dom';
+
 import PropyKeysMapContainer from '../containers/PropyKeysMapContainer';
 
 interface IPropyKeysMapPage {
@@ -10,9 +12,13 @@ const PropyKeysMapPage = (props: IPropyKeysMapPage) => {
 
     const { mode } = props;
 
+    let { 
+      collectionName = "propykeys",
+    } = useParams();
+
     return (
       <>
-        <PropyKeysMapContainer mode={mode} />
+        <PropyKeysMapContainer mode={mode} collectionName={collectionName} />
       </>
     )
 };

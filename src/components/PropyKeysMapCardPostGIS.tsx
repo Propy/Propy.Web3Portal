@@ -32,6 +32,7 @@ interface IPropyKeysMapCardProps {
   center?: [number, number]
   disableBorderRadius?: boolean
   propyKeysMapFilterOptions: IPropyKeysMapFilterOptions
+  collectionName?: string
 }
 
 const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
