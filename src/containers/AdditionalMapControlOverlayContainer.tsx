@@ -1,15 +1,19 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import PropyKeysMap from '../components/PropyKeysMap';
+import {
+  setPropyKeysMapFilterOptions,
+} from '../state/actions';
 
 import {
   IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
+import AdditionalMapControlOverlay from '../components/AdditionalMapControlOverlay';
+
 interface RootState {
   isConsideredMobile: boolean
   isConsideredMedium: boolean
-  propyKeysMapFilterOptions: IPropyKeysMapFilterOptions
+  propyKeysMapFilterOptions: IPropyKeysMapFilterOptions,
 }
   
 const mapStateToProps = (state: RootState) => ({
@@ -17,9 +21,13 @@ const mapStateToProps = (state: RootState) => ({
   isConsideredMedium: state.isConsideredMedium,
   propyKeysMapFilterOptions: state.propyKeysMapFilterOptions,
 })
+
+const mapDispatchToProps = {
+  setPropyKeysMapFilterOptions,
+}
   
-const connector = connect(mapStateToProps, {})
+const connector = connect(mapStateToProps, mapDispatchToProps)
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(PropyKeysMap)
+export default connector(AdditionalMapControlOverlay)

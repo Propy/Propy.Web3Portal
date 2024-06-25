@@ -9,6 +9,7 @@ import LeafletMapContainer from '../containers/LeafletMapContainer';
 import {
   ICoordinate,
   INFTCoordinateResponse,
+  IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
 import {
@@ -29,6 +30,7 @@ interface IPropyKeysMapCardProps {
   scrollWheelZoom?: boolean
   center?: [number, number]
   disableBorderRadius?: boolean
+  propyKeysMapFilterOptions?: IPropyKeysMapFilterOptions,
 }
 
 const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {

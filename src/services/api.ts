@@ -11,6 +11,7 @@ import {
   L1Networks,
   L2Networks,
   ICollectionQueryFilter,
+  IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
@@ -148,8 +149,24 @@ export const NFTService = {
     network: string,
     contractNameOrCollectionNameOrAddress: string,
     boundsRect: string,
+    propyKeysMapFilterOptions: IPropyKeysMapFilterOptions,
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${boundsRect ? `?bounds=${boundsRect}` : ''}`)
+    let queryString : boolean | string = false;
+    if(boundsRect) {
+      queryString = `?bounds=${boundsRect}`
+    }
+    if(propyKeysMapFilterOptions) {
+      let filterParams = new URLSearchParams(Object.entries(propyKeysMapFilterOptions).map(([key, value]) => [key, String(value)])).toString();
+      if(!queryString) {
+        queryString = `?${filterParams}`;
+      } else {
+        queryString += `&${filterParams}`;
+      }
+    }
+    if(!queryString) {
+      queryString = "";
+    }
+    return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${queryString}`)
   },
   async getCoordinatesPostGISClusters(
     network: string,
