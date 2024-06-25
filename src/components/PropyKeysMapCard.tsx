@@ -34,6 +34,11 @@ interface IPropyKeysMapCardProps {
   collectionName?: string
 }
 
+const findCollectionConfig = (slug: string | undefined, entries: typeof COLLECTIONS_PAGE_ENTRIES) => {
+  const requiredSlug = slug || 'propykeys';
+  return entries.find(entry => entry.slug === requiredSlug);
+};
+
 const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
 
   const {
@@ -51,7 +56,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === collectionName ? collectionName : 'propykeys');
+  let collectionConfigEntry = findCollectionConfig(collectionName, COLLECTIONS_PAGE_ENTRIES);
 
   const { 
     data: nftCoordinates = [],

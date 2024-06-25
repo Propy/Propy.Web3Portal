@@ -35,6 +35,11 @@ interface IPropyKeysMapCardProps {
   collectionName?: string
 }
 
+const findCollectionConfig = (slug: string | undefined, entries: typeof COLLECTIONS_PAGE_ENTRIES) => {
+  const requiredSlug = slug || 'propykeys';
+  return entries.find(entry => entry.slug === requiredSlug);
+};
+
 const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   const {
@@ -48,13 +53,14 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
     center,
     disableBorderRadius = false,
     propyKeysMapFilterOptions,
+    collectionName,
   } = props;
 
   const [boundsRect, setBoundsRect] = useState("-180,-90,180,90");
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
+  let collectionConfigEntry = findCollectionConfig(collectionName, COLLECTIONS_PAGE_ENTRIES);
 
   const { 
     data: nftCoordinatesGIS = [],
