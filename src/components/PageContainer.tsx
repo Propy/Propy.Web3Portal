@@ -102,7 +102,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
                       {/* <Route path="/map/propykeys" element={<PropyKeysMapPage mode="normal" />} /> */}
-                      <Route path="/map/propykeys" element={<PropyKeysMapPage mode="gis" />} />
+                      <Route path="/map/:collectionName" element={<PropyKeysMapPage mode="gis" />} />
                       <Route path="/propykey-og-claim/:propyKeyTokenId" element={<PropyKeyRepossessionPage />} />
                       <Route path="/profile" element={<PropyProfilePage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/profile/:profileAddressOrUsername" element={<PropyProfilePage isConsideredMobile={isConsideredMobile} />} />
