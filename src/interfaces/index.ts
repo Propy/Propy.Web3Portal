@@ -352,3 +352,8 @@ export interface ITimeseriesUTCDayAPIResponse {
         record_count: string,
     }[]
 }
+
+export interface IPropyKeysMapFilterOptions {
+    onlyListedHomes: boolean;
+    onlyLandmarks: boolean;
+}

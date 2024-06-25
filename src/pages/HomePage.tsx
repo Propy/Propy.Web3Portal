@@ -69,7 +69,7 @@ const HomePage = () => {
                     <div key={`home-page-listing-collection-entry-${entry.slug}-${index}`} className={classes.sectionSpacer}>
                         <ListingCollectionBannerContainer
                             showCollectionLink={true}
-                            maxRecords={5}
+                            maxRecords={4}
                             showTitle={true}
                             network={entry.network}
                             contractNameOrCollectionNameOrAddress={entry.slug}

@@ -5,10 +5,12 @@ import { useQuery } from '@tanstack/react-query';
 import Card from '@mui/material/Card';
 
 import LeafletMapContainer from '../containers/LeafletMapContainer';
+import AdditionalMapControlOverlayContainer from '../containers/AdditionalMapControlOverlayContainer';
 
 import {
   ICoordinate,
   INFTCoordinateResponse,
+  IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
 import {
@@ -29,6 +31,7 @@ interface IPropyKeysMapCardProps {
   scrollWheelZoom?: boolean
   center?: [number, number]
   disableBorderRadius?: boolean
+  propyKeysMapFilterOptions: IPropyKeysMapFilterOptions
 }
 
 const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
@@ -43,6 +46,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
     scrollWheelZoom = true,
     center,
     disableBorderRadius = false,
+    propyKeysMapFilterOptions,
   } = props;
 
   const [boundsRect, setBoundsRect] = useState("-180,-90,180,90");
@@ -51,16 +55,13 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
 
-  console.log({boundsRect});
-
   const { 
     data: nftCoordinatesGIS = [],
     isLoading,
-    isFetching,
+    isFetching
   } = useQuery<ICoordinate[], Error>({
-    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry?.address, collectionConfigEntry?.network, boundsRect],
+    queryKey: ['nftCoordinates-PostGIS', collectionConfigEntry?.address, collectionConfigEntry?.network, boundsRect, propyKeysMapFilterOptions],
     queryFn: async () => {
-      console.log('nftCoordinates-PostGIS', collectionConfigEntry, boundsRect)
       if (collectionConfigEntry) {
         // let collectionResponseClusters = await NFTService.getCoordinatesPostGISClusters(
         //   collectionConfigEntry.network,
@@ -70,6 +71,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
           collectionConfigEntry.network,
           collectionConfigEntry.address,
           boundsRect,
+          propyKeysMapFilterOptions,
         );
         let collectionResponse = collectionResponsePoints;
         if (collectionResponse?.status && collectionResponse?.data) {
@@ -112,6 +114,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
         onBoundsUpdate={(boundsRect: string) => setBoundsRect(boundsRect)}
         isLoading={isLoading || isFetching}
       />
+      <AdditionalMapControlOverlayContainer />
     </Card>
   )
 }

@@ -1,5 +1,6 @@
 import {
-    SupportedNetworks,   
+    SupportedNetworks,
+    IPropyKeysMapFilterOptions,
 } from '../../interfaces';
 
 export const setShowLeftMenu = (visible: boolean) => ({
@@ -30,4 +31,9 @@ export const setConsideredMedium = (medium: boolean) => ({
 export const setActiveNetwork = (network: SupportedNetworks) => ({
     type: "SET_ACTIVE_NETWORK",
     network: network,
+})
+
+export const setPropyKeysMapFilterOptions = (filterOptions: IPropyKeysMapFilterOptions) => ({
+    type: "SET_PROPYKEYS_MAP_FILTER_OPTIONS",
+    filterOptions: filterOptions,
 })
