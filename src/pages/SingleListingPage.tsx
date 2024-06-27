@@ -256,7 +256,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
           <Grid container spacing={6} columns={12}>
             <Grid item xs={12} sm={12} md={12} lg={7}>
               {isConsideredMobile && renderPrimaryContent()}
-              <ListingGalleryContainer images={listingRecord?.images ? [...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images, ...listingRecord?.images] : []} />
+              <ListingGalleryContainer images={listingRecord?.images ? listingRecord?.images : []} />
               {isConsideredMobile && renderSecondaryContent()}
               {/* {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
                 <div className={classes.sectionSpacer}>
