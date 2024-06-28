@@ -1,5 +1,5 @@
 import ERC20ABI from '../abi/ERC20ABI.json';
-import { useContractRead } from 'wagmi';
+import { useReadContract } from 'wagmi';
 
 function useTotalStakingBalancePRO(
   stakingContractAddress?: `0x${string}`,
@@ -10,13 +10,13 @@ function useTotalStakingBalancePRO(
   const { 
     data: totalStakingBalancePRO,
     isLoading,
-  } = useContractRead({
+  } = useReadContract({
     address: proContractAddress ? proContractAddress : undefined,
     abi: ERC20ABI,
     functionName: 'balanceOf',
     args: [stakingContractAddress],
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
 
   return {data: totalStakingBalancePRO as BigInt, isLoading};

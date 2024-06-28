@@ -1,12 +1,12 @@
 import L2OutputOracle from '../contract-abis/L2OutputOracle';
-import { useContractRead } from 'wagmi';
+import { useReadContract } from 'wagmi';
 
 export function useWithdrawalL2OutputIndex(
   blockNumber: bigint,
   l2OutputOracleAddress: `0x${string}`,
   l1ChainId?: string
 ) {
-  const { data: withdrawalL2OutputIndex } = useContractRead({
+  const { data: withdrawalL2OutputIndex } = useReadContract({
     address: blockNumber ? l2OutputOracleAddress : undefined,
     abi: L2OutputOracle,
     functionName: 'getL2OutputIndexAfter',

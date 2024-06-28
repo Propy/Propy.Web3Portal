@@ -1,5 +1,5 @@
 import PRONFTStakingV2ABI from '../abi/PRONFTStakingV2ABI.json';
-import { useContractRead } from 'wagmi';
+import { useReadContract } from 'wagmi';
 
 function useApproxStakerRewardsPending(
   stakingContractAddress?: `0x${string}`,
@@ -10,13 +10,13 @@ function useApproxStakerRewardsPending(
   const { 
     data: leaveAmount,
     isLoading,
-  } = useContractRead({
+  } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingV2ABI,
     functionName: 'getApproxStakerRewardsPending',
     args: [stakerAddress],
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
 
   return {data: leaveAmount as BigInt, isLoading};

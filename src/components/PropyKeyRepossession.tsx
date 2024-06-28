@@ -20,9 +20,9 @@ import PlaceholderImage from '../assets/img/placeholder.webp';
 
 import { 
   useAccount,
-  useContractRead,
-  useContractWrite,
-  useWaitForTransaction
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt
 } from 'wagmi';
 
 import {
@@ -102,11 +102,11 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const {
     data: dataRepossessionConfig,
-  } = useContractRead<any[], any, any>({
+  } = useReadContract<any[], any, any>({
     address: PROPY_KEY_REPOSSESSION_CONTRACT,
     abi: PropyKeyRepossessionABI,
     functionName: 'tokenIdToRepossessionConfiguration',
-    watch: true,
+    //watch: true,
     args: [propyKeyTokenId],
   })
 
@@ -140,7 +140,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
       }
       return null;
     },
-    cacheTime: 60, // Cache the data indefinitely
+    gcTime: 60, // Cache the data indefinitely
     staleTime: 60, // Data is always considered fresh
   });
 
@@ -165,11 +165,11 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const { 
     data: approvedTokenController,
-  } = useContractRead({
+  } = useReadContract({
     address: BASE_PROPYKEYS_NFT,
     abi: PropyNFTABI,
     functionName: 'getApproved',
-    watch: true,
+    //watch: true,
     args: [propyKeyTokenId],
   });
 
@@ -183,11 +183,11 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const { 
     data: tokenOwner,
-  } = useContractRead({
+  } = useReadContract({
     address: BASE_PROPYKEYS_NFT,
     abi: PropyNFTABI,
     functionName: 'ownerOf',
-    watch: true,
+    //watch: true,
     args: [propyKeyTokenId],
   });
 
@@ -229,73 +229,93 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const { 
     data: dataApproveRedemptionContract,
-    isLoading: isLoadingApproveRedemptionContract,
-    writeAsync: writeApproveRedemptionContract
-  } = useContractWrite({
-    address: BASE_PROPYKEYS_NFT,
-    abi: PropyNFTABI,
-    functionName: 'approve',
-    onError(error: any) {
-      setIsAwaitingApproveTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
-  })
+    isPending: isLoadingApproveRedemptionContract,
+    writeContractAsync: writeApproveRedemptionContract
+  } = useWriteContract();
 
-  useWaitForTransaction({
-    hash: dataApproveRedemptionContract?.hash,
-    onSettled(data, error) {
+  let dataApproveRedemptionContractReceipt = useWaitForTransactionReceipt({
+    hash: dataApproveRedemptionContract,
+    confirmations: 2,
+  });
+
+  useEffect(() => {
+    if(dataApproveRedemptionContractReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingApproveTx(false);
-    },
-    onSuccess() {
       toast.success(`Approval success! You may now run the redemption.`);
     }
-  })
+    if(dataApproveRedemptionContractReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingApproveTx(false);
+      toast.error(`${dataApproveRedemptionContractReceipt?.error ? dataApproveRedemptionContractReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataApproveRedemptionContractReceipt?.status, dataApproveRedemptionContractReceipt?.error]);	
 
   const runRepossessionApproval = async () => {
     setIsAwaitingWalletInteraction(true);
     setIsAwaitingApproveTx(true);
-    await writeApproveRedemptionContract({args: [
-      PROPY_KEY_REPOSSESSION_CONTRACT,
-      propyKeyTokenId,
-    ]});
+    await writeApproveRedemptionContract({
+      args: [
+        PROPY_KEY_REPOSSESSION_CONTRACT,
+        propyKeyTokenId,
+      ],
+      address: BASE_PROPYKEYS_NFT,
+      abi: PropyNFTABI,
+      functionName: 'approve',
+    }, {
+      onSettled() {
+        setIsAwaitingWalletInteraction(false);
+      },
+      onError(error: any) {
+        setIsAwaitingApproveTx(false);
+        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+      },
+    });
   }
 
   const { 
     data: dataExecuteRedemption,
-    isLoading: isLoadingExecuteRedemption,
-    writeAsync: writeExecuteRedemption
-  } = useContractWrite({
-    address: PROPY_KEY_REPOSSESSION_CONTRACT,
-    abi: PropyKeyRepossessionABI,
-    functionName: 'depositPropyKey',
-    onError(error: any) {
-      setIsAwaitingRedemptionTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
-  })
+    isPending: isLoadingExecuteRedemption,
+    writeContractAsync: writeExecuteRedemption
+  } = useWriteContract()
 
-  useWaitForTransaction({
-    hash: dataExecuteRedemption?.hash,
-    onSettled(data, error) {
+  let dataExecuteRedemptionReceipt = useWaitForTransactionReceipt({
+    hash: dataExecuteRedemption,
+    confirmations: 2,
+  });
+
+  useEffect(() => {
+    if(dataExecuteRedemptionReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingRedemptionTx(false);
-    },
-    onSuccess() {
       toast.success(`Redemption success!`);
     }
-  })
+    if(dataExecuteRedemptionReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingRedemptionTx(false);
+      toast.error(`${dataExecuteRedemptionReceipt?.error ? dataExecuteRedemptionReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataExecuteRedemptionReceipt?.status, dataExecuteRedemptionReceipt?.error]);	
 
   const runRepossession = async () => {
     setIsAwaitingWalletInteraction(true);
     setIsAwaitingRedemptionTx(true);
-    await writeExecuteRedemption({args: [
-      propyKeyTokenId,
-    ]});
+    await writeExecuteRedemption({
+      args: [
+        propyKeyTokenId,
+      ],
+      address: PROPY_KEY_REPOSSESSION_CONTRACT,
+      abi: PropyKeyRepossessionABI,
+      functionName: 'depositPropyKey',
+    }, {
+      onSettled() {
+        setIsAwaitingWalletInteraction(false);
+      },
+      onError(error: any) {
+        setIsAwaitingRedemptionTx(false);
+        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+      },
+    });
   }
 
   return (

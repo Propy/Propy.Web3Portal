@@ -1,5 +1,5 @@
 import PRONFTStakingABI from '../abi/PRONFTStakingABI.json';
-import { useContractRead } from 'wagmi';
+import { useReadContract } from 'wagmi';
 
 function useTotalStakedPRO(
   stakingContractAddress?: `0x${string}`,
@@ -9,12 +9,12 @@ function useTotalStakedPRO(
   const { 
     data: totalStakingBalancePRO,
     isLoading,
-  } = useContractRead({
+  } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingABI,
     functionName: 'totalStakedPRO',
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
 
   return {data: totalStakingBalancePRO as BigInt, isLoading};

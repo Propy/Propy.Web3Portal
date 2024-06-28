@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import Card from '@mui/material/Card';
 
@@ -102,9 +102,9 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
       }
       return [];
     },
-    cacheTime: Infinity, // Cache the data indefinitely
+    gcTime: Infinity, // Cache the data indefinitely
     staleTime: Infinity, // Data is always considered fresh
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return (

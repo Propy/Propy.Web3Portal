@@ -18,7 +18,10 @@ import createStyles from '@mui/styles/createStyles';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 
-import { useContractWrite, useWaitForTransaction } from 'wagmi';
+import { 
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from 'wagmi';
 
 import { PropsFromRedux } from '../containers/BridgeProveWithdrawalFormContainer';
 
@@ -259,43 +262,19 @@ const BridgeProveWithdrawalForm = (props: PropsFromRedux & IBridgeProveWithdrawa
 
   const { 
     data: dataSubmitProof,
-    writeAsync: submitProof,
-    isLoading: isLoadingProveWithdrawal,
-  } = useContractWrite({
-    ...proveWithdrawalConfig,
-    onError(error: any) {
-      setIsAwaitingProofTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to submit proof, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
-  });
+    writeContractAsync: submitProof,
+    isPending: isLoadingProveWithdrawal,
+  } = useWriteContract();
 
-  const handleProveWithdrawal = useCallback(() => {
-    void (async () => {
-      try {
-        setIsAwaitingWalletInteraction(true);
-        setIsAwaitingProofTx(true);
-        const proveResult = await submitProof?.();
-        if (proveResult?.hash) {
-          // const proveTxHash = proveResult.hash;
-        }
-      } catch(e) {
-        console.error({e});
-        // onCloseProveWithdrawalModal();
-      }
-    })();
-  }, [
-    submitProof,
-  ]);
+  let dataSubmitProofReceipt = useWaitForTransactionReceipt({
+    hash: dataSubmitProof,
+    confirmations: 2,
+  })
 
-  useWaitForTransaction({
-    hash: dataSubmitProof?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataSubmitProofReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingProofTx(false);
-    },
-    onSuccess() {
       toast.success(`Proof submission success! Please note that after ~ 1 week you will need to come back and finalize your withdrawal.`);
       setShowSuccessMessage(true);
       const refreshBridge = async () => {
@@ -306,7 +285,43 @@ const BridgeProveWithdrawalForm = (props: PropsFromRedux & IBridgeProveWithdrawa
       }
       refreshBridge();
     }
-  })
+    if(dataSubmitProofReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingProofTx(false);
+      toast.error(`${dataSubmitProofReceipt?.error ? dataSubmitProofReceipt?.error : "Unable to submit proof, please try again or contact support."}`);
+    }
+  }, [dataSubmitProofReceipt?.status, dataSubmitProofReceipt?.error, postBridgeSuccess]);
+
+  const handleProveWithdrawal = useCallback(() => {
+    void (async () => {
+      try {
+        setIsAwaitingWalletInteraction(true);
+        setIsAwaitingProofTx(true);
+        const proveResult = await submitProof?.(proveWithdrawalConfig, {
+          onSettled() {
+            setIsAwaitingWalletInteraction(false);
+          },
+          onError(error: any) {
+            setIsAwaitingProofTx(false);
+            toast.error(`${error?.details ? error.details : "Unable to submit proof, please try again or contact support."}`);
+          },
+        });
+        if (proveResult) {
+          // const proveTxHash = proveResult.hash;
+        }
+      } catch(e) {
+        console.error({e});
+        // onCloseProveWithdrawalModal();
+      }
+    })();
+  }, [
+    submitProof,
+    proveWithdrawalConfig,
+  ]);
+
+  // useWaitForTransactionReceipt({
+  //   hash: dataSubmitProof,
+  // })
 
   // L2 -> L1 PROVE WITHDRAWAL METHODS ABOVE
 

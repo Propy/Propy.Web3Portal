@@ -1,5 +1,5 @@
 import PRONFTStakingABI from '../abi/PRONFTStakingABI.json';
-import { useContractRead } from 'wagmi';
+import { useReadContract } from 'wagmi';
 
 function useLeaveAmountFromShareAmount(
   stakingContractAddress?: `0x${string}`,
@@ -10,13 +10,13 @@ function useLeaveAmountFromShareAmount(
   const { 
     data: leaveAmount,
     isLoading,
-  } = useContractRead({
+  } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingABI,
     functionName: 'getApproxLeaveAmountFromShareAmount',
     args: [shareAmount ? shareAmount?.toString() : 0],
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
 
   return {data: leaveAmount as BigInt, isLoading};
