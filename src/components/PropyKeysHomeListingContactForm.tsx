@@ -156,9 +156,6 @@ const PropyKeysHomeListingContactForm = (props: IPropyKeysHomeListingContactForm
         onSubmit={async (values, { setSubmitting, resetForm }) => {
           try {
             if(executeRecaptcha) {
-              if(!recaptchaToken) {
-                toast.error("Recaptcha expired, please refresh the page.");
-              }
               setSubmitting(true);
               const token = await executeRecaptcha(recaptchaActionKey);
               const contactData = {
