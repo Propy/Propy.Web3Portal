@@ -9,6 +9,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Grid from '@mui/material/Grid';
 
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+
 import { useParams } from 'react-router-dom';
 
 import { toast } from 'sonner'
@@ -16,6 +18,7 @@ import { toast } from 'sonner'
 import GenericPageContainer from '../containers/GenericPageContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import ListingGalleryContainer from '../containers/ListingGalleryContainer';
+import PropyKeysHomeListingContactFormContainer from '../containers/PropyKeysHomeListingContactFormContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
 
@@ -37,6 +40,7 @@ import {
 import {
   API_ENDPOINT,
   PROPY_LIGHT_BLUE,
+  RECAPTCHA_KEY,
 } from '../utils/constants';
 
 import {
@@ -79,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(3),
     },
     descriptionSpacerMobile: {
+
+    },
+    descriptionSpacerDesktop: {
       marginBottom: theme.spacing(2),
     },
     priceZone: {
@@ -243,7 +250,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
             {listingRecord?.description &&
               <>
                 <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
-                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : ''}>{listingRecord?.description}</Typography>
+                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : classes.descriptionSpacerDesktop}>{listingRecord?.description}</Typography>
               </>
             }
           </>
@@ -285,6 +292,11 @@ const SingleListingPage = (props: ISingleListingPage) => {
                       </div>
                     </>
                   } */}
+                  {RECAPTCHA_KEY && tokenId &&
+                    <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_KEY}>
+                      <PropyKeysHomeListingContactFormContainer tokenId={tokenId} />
+                    </GoogleReCaptchaProvider>
+                  }
                 </>
               }
             </Grid>

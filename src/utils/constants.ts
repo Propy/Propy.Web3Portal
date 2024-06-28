@@ -14,6 +14,8 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 // export const API_ENDPOINT = "https://dev.dappapi.propy.com/";
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 
+export const PROPYKEYS_API_ENDPOINT = process?.env?.REACT_APP_ENV === 'prod' ? "https://propykeys.com/apirp/api" : "https://stage.propykeys.com/apirp/api";
+
 export const DESKTOP_MENU_WIDTH = 250;
 
 export const PRO_TOKEN_ADDRESS = "0x226bb599a12C826476e3A771454697EA52E9E220";
@@ -22,6 +24,8 @@ export const PRO_TOKEN_DECIMALS = 8;
 export const TOKEN_NAME_PREFIX : {[key: string]: string} = {
   "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC": "MetaAgent",
 }
+
+export const RECAPTCHA_KEY = process.env.REACT_APP_RECAPTCHA_KEY;
 
 export const TOKEN_NAME_HIDE_ID : {[key: string]: boolean} = {
   "0x37f6091feF42eFD50d4F07a91c955606e8dE38c2": true,
