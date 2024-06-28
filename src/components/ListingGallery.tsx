@@ -25,19 +25,32 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'hidden',
     },
     primaryImageContainer: {
-      width: '100%',
-      aspectRatio: '16 / 10',
-      backgroundColor: '#f6f6f6',
-      backgroundSize: 'contain',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
       borderRadius: 15,
       overflow: 'hidden',
       border: '1px solid #d5d5d5',
+      position: 'relative',
+      backgroundColor: '#f6f6f6',
+    },
+    primaryImageBackgroundContainer: {
+      backgroundSize: 'cover',
+      width: '110%',
+      height: '110%',
+      position: 'absolute',
+      backgroundPosition: 'center',
+      top: '-5%',
+      left: '-5%',
+    },
+    primaryImageForegroundContainer: {
+      width: '100%',
+      aspectRatio: '16 / 10',
+      backgroundSize: 'contain',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center',
+      position: 'relative',
     },
     primaryImageControlsTopRow: {
 
@@ -162,20 +175,23 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.primaryImageContainer} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}}>
-        <div className={classes.primaryImageControlsTopRow}>
+      <div className={classes.primaryImageContainer}>
+        <div className={[classes.primaryImageBackgroundContainer, 'image-filter-blur-heavy'].join(' ')} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}} />
+        <div className={classes.primaryImageForegroundContainer} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}}>
+          <div className={classes.primaryImageControlsTopRow}>
 
-        </div>
-        <div className={classes.primaryImageControlsMiddleRow}>
-          <Fab onClick={() => handlePrevious()} color="default" aria-label="add" disabled={selectedImageIndex === 0}>
-            <ArrowPrevious />
-          </Fab>
-          <Fab onClick={() => handleNext()} color="default" aria-label="add" disabled={selectedImageIndex >= (images?.length - 1)}>
-            <ArrowNext />
-          </Fab>
-        </div>
-        <div className={classes.primaryImageControlsBottomRow}>
-          
+          </div>
+          <div className={classes.primaryImageControlsMiddleRow}>
+            <Fab onClick={() => handlePrevious()} color="default" aria-label="add" disabled={selectedImageIndex === 0}>
+              <ArrowPrevious />
+            </Fab>
+            <Fab onClick={() => handleNext()} color="default" aria-label="add" disabled={selectedImageIndex >= (images?.length - 1)}>
+              <ArrowNext />
+            </Fab>
+          </div>
+          <div className={classes.primaryImageControlsBottomRow}>
+            
+          </div>
         </div>
       </div>
       <div 
