@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import Button from '@mui/material/Button';
 
-import { useWeb3Modal } from '@web3modal/wagmi1/react';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 
-import { useNetwork } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -42,7 +42,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     showCompactNetworkSwitch = false,
   } = props;
 
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
 
   const { open } = useWeb3Modal();
 

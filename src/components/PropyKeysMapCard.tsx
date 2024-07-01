@@ -90,7 +90,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
       }
       return [];
     },
-    cacheTime: Infinity, // Cache the data indefinitely
+    gcTime: Infinity, // Cache the data indefinitely
     staleTime: Infinity, // Data is always considered fresh
   });
 

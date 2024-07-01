@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 
 import { useAccount } from 'wagmi';
 
+// import { useQuery } from '@tanstack/react-query';
+
 import {
   isAddress,
 } from '../utils';
@@ -110,6 +112,50 @@ const PropyProfilePage = (
     const { 
       address,
     } = useAccount();
+
+    // const { 
+    //   data: propyKeysMintsTimeseries = {perDay: [], cumulative: []},
+    //   isLoading
+    // } = useQuery({
+    //   queryKey: ['propyKeysMintsTimeseries'],
+    //   queryFn: async () => {
+    //     let timeseriesResponse = await TimeseriesService.getPropyKeysDailyMintCounts(
+    //       BASE_L2_NETWORK,
+    //       BASE_PROPYKEYS_STAKING_NFT
+    //     );
+    //     if (timeseriesResponse?.status && timeseriesResponse?.data) {
+    //       let renderResults: ITimeseries[] = [];
+    //       let cumulativeResults: ITimeseries[] = [];
+    //       let apiResponseData: ITimeseriesUTCDayAPIResponse = timeseriesResponse?.data?.data
+    //         ? timeseriesResponse?.data
+    //         : timeseriesResponse;
+    //       if (timeseriesResponse?.status && apiResponseData?.data) {
+    //         let cumulative = 0;
+    //         for (let timeseriesRecord of apiResponseData?.data) {
+    //           cumulative += Number(timeseriesRecord.record_count);
+    //           renderResults.push({
+    //             date: timeseriesRecord.utc_day,
+    //             value: Number(timeseriesRecord.record_count),
+    //           });
+    //           cumulativeResults.push({
+    //             date: timeseriesRecord.utc_day,
+    //             value: cumulative,
+    //           })
+    //         }
+    //       }
+    //       return {
+    //         perDay: renderResults,
+    //         cumulative: cumulativeResults,
+    //       }
+    //     }
+    //     return {
+    //       perDay: [],
+    //       cumulative: [],
+    //     }
+    //   },
+    //   gcTime: Infinity, // Cache the data indefinitely
+    //   staleTime: Infinity, // Data is always considered fresh
+    // });
 
     const [profileAddress, setProfileAddress] = useState<false | `0x${string}`>(false);
 

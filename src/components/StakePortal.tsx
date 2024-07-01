@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { animated, useSpring } from '@react-spring/web';
 
 import { useQuery } from '@tanstack/react-query';
@@ -28,7 +30,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 
-import { useAccount, useNetwork, useBalance, useContractRead, useContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBlockNumber } from 'wagmi';
 
 import { PropsFromRedux } from '../containers/StakeStatsContainer';
 
@@ -306,7 +308,11 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   let isDeprecatedStakingVersion = version < latestStakingVersion;
 
-  const { chain } = useNetwork();
+  const queryClient = useQueryClient();
+
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
+  const { chain } = useAccount();
 
   const [nftAssets, setNftAssets] = useState<INftAssets>({});
   const [propyKeysNFT, setPropyKeysNFT] = useState<false | IBalanceRecord[]>(false);
@@ -493,83 +499,89 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPropyKeysIsStakingContractApproved,
-  } = useContractRead({
+    queryKey: dataPropyKeysIsStakingContractApprovedQueryKey
+  } = useReadContract({
     address: BASE_PROPYKEYS_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'isApprovedForAll',
-    watch: true,
     args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: lastSelectedTokenTier,
-  } = useContractRead({
+    queryKey: lastSelectedTokenTierQueryKey
+  } = useReadContract({
     address: BASE_PROPYKEYS_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'tokenTier',
-    watch: Number(lastSelectedPropyKeyTokenId) > 0 ? true : false,
     args: [lastSelectedPropyKeyTokenId],
   })
 
+  useEffect(() => {
+    if(Number(lastSelectedPropyKeyTokenId) > 0) {
+      queryClient.invalidateQueries({ queryKey: lastSelectedTokenTierQueryKey })
+    }
+  }, [blockNumber, queryClient, lastSelectedPropyKeyTokenId, lastSelectedTokenTierQueryKey]);
+
   const { 
     data: stakerToStakedCount,
-  } = useContractRead({
+    queryKey: stakerToStakedCountQueryKey,
+  } = useReadContract({
     address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'stakerToStakedTokenCount',
-    watch: true,
     args: [address],
   });
 
   const { 
     data: dataPropyOGsIsStakingContractApproved,
-  } = useContractRead({
+    queryKey: dataPropyOGsIsStakingContractApprovedQueryKey,
+  } = useReadContract({
     address: BASE_OG_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'isApprovedForAll',
-    watch: true,
     args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: stakingContractPROAllowance,
-  } = useContractRead({
+    queryKey: stakingContractPROAllowanceQueryKey,
+  } = useReadContract({
     address: PRO_BASE_L2_ADDRESS,
     abi: ERC20ABI,
     functionName: 'allowance',
-    watch: true,
     args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: minimumRequiredPROAllowance,
     isLoading: isLoadingMinimumRequiredPROAllowance,
-  } = useContractRead({
+    queryKey: minimumRequiredPROAllowanceQueryKey,
+  } = useReadContract({
     address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'getPROAmountToStake',
-    watch: true,
     args: [selectedTokenAddress, selectedTokenIds],
   });
 
   const { 
     data: stakingContractStakingPowerAllowance,
-  } = useContractRead({
+    queryKey: stakingContractStakingPowerAllowanceQueryKey
+  } = useReadContract({
     address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: ERC20ABI,
     functionName: 'allowance',
-    watch: true,
     args: [address, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2],
   });
 
   const { 
     data: sharesIssuedAgainstSelection,
+    queryKey: sharesIssuedAgainstSelectionQueryKey,
     // isLoading: isLoadingSharesIssuedAgainstSelection,
-  } = useContractRead({
+  } = useReadContract({
     address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
     abi: PRONFTStakingABI,
     functionName: 'getSharesIssued',
-    watch: true,
     args: [selectedTokenAddress, selectedTokenIds],
   });
 
@@ -584,31 +596,85 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const {
     data: balanceDataPRO,
+    queryKey: balanceDataPROQueryKey
   } = useBalance({
     address: address,
     token: PRO_BASE_L2_ADDRESS,
-    watch: true,
   });
 
   const {
     data: balanceDataPropyKeys,
-  } = useContractRead({
+    queryKey: balanceDataPropyKeysQueryKey,
+  } = useReadContract({
     address: BASE_PROPYKEYS_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'balanceOf',
-    watch: address ? true : false,
     args: [address],
   });
 
   const {
     data: balanceDataPropyOG,
-  } = useContractRead({
+    queryKey: balanceDataPropyOGQueryKey,
+  } = useReadContract({
     address: BASE_OG_STAKING_NFT,
     abi: PropyNFTABI,
     functionName: 'balanceOf',
-    watch: address ? true : false,
     args: [address],
   });
+
+  useEffect(() => {
+
+    const queryKeys = [
+      balanceDataPropyOGQueryKey,
+      balanceDataPropyKeysQueryKey
+    ];
+
+    if(
+      address
+      && queryKeys.every(Boolean)
+    ) {
+      queryKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    }
+  }, [
+    blockNumber,
+    queryClient,
+    address,
+    balanceDataPropyOGQueryKey,
+    balanceDataPropyKeysQueryKey,
+  ]);
+
+  useEffect(() => {
+
+    const queryKeys = [
+      stakerToStakedCountQueryKey,
+      dataPropyKeysIsStakingContractApprovedQueryKey,
+      balanceDataPROQueryKey,
+      sharesIssuedAgainstSelectionQueryKey,
+      stakingContractStakingPowerAllowanceQueryKey,
+      dataPropyOGsIsStakingContractApprovedQueryKey,
+      stakingContractPROAllowanceQueryKey,
+      minimumRequiredPROAllowanceQueryKey,
+    ];
+
+    if (queryKeys.every(Boolean)) {
+      queryKeys.forEach(key => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+    }
+  }, [
+    blockNumber,
+    queryClient,
+    stakerToStakedCountQueryKey,
+    dataPropyKeysIsStakingContractApprovedQueryKey,
+    balanceDataPROQueryKey,
+    sharesIssuedAgainstSelectionQueryKey,
+    stakingContractStakingPowerAllowanceQueryKey,
+    dataPropyOGsIsStakingContractApprovedQueryKey,
+    stakingContractPROAllowanceQueryKey,
+    minimumRequiredPROAllowanceQueryKey,
+  ]);
 
   useEffect(() => {
     let currentTotal = 0;
@@ -633,36 +699,43 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformPROAllowance,
-    writeAsync: writePerformPROAllowance
-  } = useContractWrite({
-    address: PRO_BASE_L2_ADDRESS,
-    abi: ERC20ABI,
-    functionName: 'approve',
-    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, minimumRequiredPROAllowance],
-    onError(error: any) {
-      setIsAwaitingPROAllowanceTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformPROAllowance
+  } = useWriteContract();
+
+  let dataPerformPROAllowanceResult = useWaitForTransactionReceipt({
+    hash: dataPerformPROAllowance,
+    confirmations: 2,
   });
 
-  useWaitForTransaction({
-    hash: dataPerformPROAllowance?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformPROAllowanceResult?.status === "success") {
       setIsAwaitingPROAllowanceTx(false);
-    },
-    onSuccess() {
       toast.success(`Granted PRO Allowance!`);
-    },
-  })
+    }
+    if(dataPerformPROAllowanceResult?.status === "error") {
+      setIsAwaitingPROAllowanceTx(false);
+      toast.error(`${dataPerformPROAllowanceResult.error ? dataPerformPROAllowanceResult.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformPROAllowanceResult?.status, dataPerformPROAllowanceResult.error]);
 
   const runAllowancePRO = async () => {
     try {
       setIsAwaitingPROAllowanceTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformPROAllowance();
+      writePerformPROAllowance({
+        address: PRO_BASE_L2_ADDRESS,
+        abi: ERC20ABI,
+        functionName: 'approve',
+        args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, minimumRequiredPROAllowance],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          setIsAwaitingPROAllowanceTx(false);
+          toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }
@@ -676,36 +749,45 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformPStakeAllowance,
-    writeAsync: writePerformPStakeAllowance
-  } = useContractWrite({
-    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
-    abi: ERC20ABI,
-    functionName: 'approve',
-    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, sharesIssuedAgainstSelection],
-    onError(error: any) {
-      setIsAwaitingPStakeAllowanceTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformPStakeAllowance
+  } = useWriteContract();
+
+  let dataPerformPStakeAllowanceReceipt = useWaitForTransactionReceipt({
+    hash: dataPerformPStakeAllowance,
+    confirmations: 2,
   });
 
-  useWaitForTransaction({
-    hash: dataPerformPStakeAllowance?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformPStakeAllowanceReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingPStakeAllowanceTx(false);
-    },
-    onSuccess() {
       toast.success(`Granted pSTAKE Allowance!`);
-    },
-  })
+    }
+    if(dataPerformPStakeAllowanceReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingPStakeAllowanceTx(false);
+      toast.error(`${dataPerformPStakeAllowanceReceipt?.error ? dataPerformPStakeAllowanceReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformPStakeAllowanceReceipt?.status, dataPerformPStakeAllowanceReceipt?.error]);	
 
   const runAllowancePStake = async () => {
     try {
       setIsAwaitingPStakeAllowanceTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformPStakeAllowance();
+      writePerformPStakeAllowance({
+        address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
+        abi: ERC20ABI,
+        functionName: 'approve',
+        args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, sharesIssuedAgainstSelection],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          setIsAwaitingPStakeAllowanceTx(false);
+          toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }
@@ -719,36 +801,45 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformPropyKeysNFTSetApprovalForAll,
-    writeAsync: writePerformPropyKeysSetApprovalForAll
-  } = useContractWrite({
-    address: BASE_PROPYKEYS_STAKING_NFT,
-    abi: PropyNFTABI,
-    functionName: 'setApprovalForAll',
-    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
-    onError(error: any) {
-      setIsAwaitingPropyKeysApprovalForAllTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformPropyKeysSetApprovalForAll
+  } = useWriteContract();
+
+  let dataPerformPropyKeysNFTSetApprovalForAllReceipt = useWaitForTransactionReceipt({
+    hash: dataPerformPropyKeysNFTSetApprovalForAll,
+    confirmations: 2,
   });
 
-  useWaitForTransaction({
-    hash: dataPerformPropyKeysNFTSetApprovalForAll?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformPropyKeysNFTSetApprovalForAllReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingPropyKeysApprovalForAllTx(false);
-    },
-    onSuccess() {
       toast.success(`PropyKeys NFT Approval granted to staking contract!`);
-    },
-  })
+    }
+    if(dataPerformPropyKeysNFTSetApprovalForAllReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingPropyKeysApprovalForAllTx(false);
+      toast.error(`${dataPerformPropyKeysNFTSetApprovalForAllReceipt?.error ? dataPerformPropyKeysNFTSetApprovalForAllReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformPropyKeysNFTSetApprovalForAllReceipt?.status, dataPerformPropyKeysNFTSetApprovalForAllReceipt?.error]);	
 
   const runPropyKeysSetApprovalForAll = async () => {
     try {
       setIsAwaitingPropyKeysApprovalForAllTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformPropyKeysSetApprovalForAll();
+      writePerformPropyKeysSetApprovalForAll({
+        address: BASE_PROPYKEYS_STAKING_NFT,
+        abi: PropyNFTABI,
+        functionName: 'setApprovalForAll',
+        args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          setIsAwaitingPropyKeysApprovalForAllTx(false);
+          toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }
@@ -762,36 +853,45 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformOGSetApprovalForAll,
-    writeAsync: writePerformOGSetApprovalForAll
-  } = useContractWrite({
-    address: BASE_OG_STAKING_NFT,
-    abi: PropyNFTABI,
-    functionName: 'setApprovalForAll',
-    args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
-    onError(error: any) {
-      setIsAwaitingOGApprovalForAllTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformOGSetApprovalForAll
+  } = useWriteContract();
+
+  let dataPerformOGSetApprovalForAllReceipt = useWaitForTransactionReceipt({
+    hash: dataPerformOGSetApprovalForAll,
+    confirmations: 2,
   });
 
-  useWaitForTransaction({
-    hash: dataPerformOGSetApprovalForAll?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformOGSetApprovalForAllReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingOGApprovalForAllTx(false);
-    },
-    onSuccess() {
       toast.success(`PropyKeys NFT Approval granted to staking contract!`);
-    },
-  })
+    }
+    if(dataPerformOGSetApprovalForAllReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingOGApprovalForAllTx(false);
+      toast.error(`${dataPerformOGSetApprovalForAllReceipt?.error ? dataPerformOGSetApprovalForAllReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformOGSetApprovalForAllReceipt?.status, dataPerformOGSetApprovalForAllReceipt?.error]);
 
   const runOGSetApprovalForAll = async () => {
     try {
       setIsAwaitingOGApprovalForAllTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformOGSetApprovalForAll();
+      writePerformOGSetApprovalForAll({
+        address: BASE_OG_STAKING_NFT,
+        abi: PropyNFTABI,
+        functionName: 'setApprovalForAll',
+        args: [version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, true],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          setIsAwaitingOGApprovalForAllTx(false);
+          toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }
@@ -805,53 +905,65 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformStake,
-    writeAsync: writePerformStake
-  } = useContractWrite({
-    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
-    abi: PRONFTStakingABI,
-    functionName: 'enter',
-    args: [selectedTokenAddress, selectedTokenIds],
-    onError(error: any) {
-      setIsAwaitingStakeTx(false);
-      if(error?.cause?.reason === 'TIER_1_STAKING_REQUIRES_10_PROPYKEYS') {
-        console.log("REQUIRES 10");
-        setShowRequireTenModal(true);
-      } else {
-        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-      }
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
-  });
+    writeContractAsync: writePerformStake
+  } = useWriteContract();
 
-  useWaitForTransaction({
-    hash: dataPerformStake?.hash,
-    onSettled() {
+  let dataPerformStakeReceipt = useWaitForTransactionReceipt({
+    hash: dataPerformStake,
+    confirmations: 2,
+  })
+
+  useEffect(() => {
+    if(dataPerformStakeReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingStakeTx(false);
-    },
-    onSuccess() {
       toast.success(`Stake success!`);
       const syncStaking = async () => {
         setIsSyncingStaking(true);
         StakeService.triggerStakeOptimisticSync();
         await sleep(10000);
         await StakeService.triggerStakeOptimisticSync();
-        setTriggerUpdateIndex(triggerUpdateIndex + 1);
+        setTriggerUpdateIndex(t => t + 1);
         if(postStakeSuccess) {
           postStakeSuccess();
         }
         setIsSyncingStaking(false);
       }
       syncStaking();
-    },
-  })
+    }
+    if(dataPerformStakeReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingStakeTx(false);
+      toast.error(`${dataPerformStakeReceipt?.error ? dataPerformStakeReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformStakeReceipt?.status, dataPerformStakeReceipt?.error, postStakeSuccess]);	
 
   const runStake = async () => {
     try {
       setIsAwaitingStakeTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformStake();
+      writePerformStake({
+        address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
+        abi: PRONFTStakingABI,
+        functionName: 'enter',
+        args: [selectedTokenAddress, selectedTokenIds],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          console.log({error})
+          setIsAwaitingStakeTx(false);
+          if(error?.cause?.reason === 'TIER_1_STAKING_REQUIRES_10_PROPYKEYS') {
+            console.log("REQUIRES 10");
+            setShowRequireTenModal(true);
+          } else if(error?.cause?.reason === 'UNSTAKE_ALL_BEFORE_ADDING_MORE') {
+            toast.error(`You have pending rewards, please unstake all staked tokens to claim all pending rewards before staking more tokens`);
+          } else {
+            toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+          }
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }
@@ -865,48 +977,57 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const { 
     data: dataPerformUnstake,
-    writeAsync: writePerformUnstake
-  } = useContractWrite({
-    address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
-    abi: PRONFTStakingABI,
-    functionName: 'leave',
-    args: [selectedTokenAddress, selectedTokenIds],
-    onError(error: any) {
-      setIsAwaitingUnstakeTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformUnstake
+  } = useWriteContract();
+
+  let dataPerformUnstakeReceipt = useWaitForTransactionReceipt({
+    hash: dataPerformUnstake,
+    confirmations: 2,
   });
 
-  useWaitForTransaction({
-    hash: dataPerformUnstake?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformUnstakeReceipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingUnstakeTx(false);
-    },
-    onSuccess() {
       toast.success(`Unstake success!`);
       const syncStaking = async () => {
         setIsSyncingStaking(true);
         StakeService.triggerStakeOptimisticSync();
         await sleep(10000);
         await StakeService.triggerStakeOptimisticSync();
-        setTriggerUpdateIndex(triggerUpdateIndex + 1);
+        setTriggerUpdateIndex(t => t + 1);
         if(postStakeSuccess) {
           postStakeSuccess();
         }
         setIsSyncingStaking(false)
       }
       syncStaking();
-    },
-  })
+    }
+    if(dataPerformUnstakeReceipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingUnstakeTx(false);
+      toast.error(`${dataPerformUnstakeReceipt?.error ? dataPerformUnstakeReceipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformUnstakeReceipt?.status, dataPerformUnstakeReceipt?.error, postStakeSuccess]);	
 
   const runUnstake = async () => {
     try {
       setIsAwaitingUnstakeTx(true)
       setIsAwaitingWalletInteraction(true);
-      writePerformUnstake();
+      writePerformUnstake({
+        address: version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2,
+        abi: PRONFTStakingABI,
+        functionName: 'leave',
+        args: [selectedTokenAddress, selectedTokenIds],
+      }, {
+        onSettled() {
+          setIsAwaitingWalletInteraction(false);
+        },
+        onError(error: any) {
+          setIsAwaitingUnstakeTx(false);
+          toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+        },
+      });
     } catch(e: any) {
       console.log({e});
     }

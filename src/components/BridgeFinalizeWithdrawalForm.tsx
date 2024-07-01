@@ -18,7 +18,10 @@ import createStyles from '@mui/styles/createStyles';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 
-import { useContractWrite, useWaitForTransaction } from 'wagmi';
+import { 
+  useWriteContract,
+  useWaitForTransactionReceipt
+} from 'wagmi';
 
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -268,43 +271,19 @@ const BridgeFinalizeWithdrawalForm = (props: PropsFromRedux & IBridgeFinalizeWit
 
   const { 
     data: dataSubmitFinalize,
-    writeAsync: submitFinalize,
-    isLoading: isLoadingFinalizeWithdrawal,
-  } = useContractWrite({
-    ...finalizeWithdrawalConfig,
-    onError(error: any) {
-      setIsAwaitingFinalizeTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to submit finalization, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
-  });
+    writeContractAsync: submitFinalize,
+    isPending: isLoadingFinalizeWithdrawal,
+  } = useWriteContract();
 
-  const handleFinalizeWithdrawal = useCallback(() => {
-    void (async () => {
-      try {
-        setIsAwaitingWalletInteraction(true);
-        setIsAwaitingFinalizeTx(true);
-        const finalizeResult = await submitFinalize?.();
-        if (finalizeResult?.hash) {
-          // const finalizeTxHash = finalizeResult.hash;
-        }
-      } catch(e) {
-        console.error({e});
-        // onCloseFinalizeWithdrawalModal();
-      }
-    })();
-  }, [
-    submitFinalize,
-  ]);
+  let dataSubmitFinalizeResult = useWaitForTransactionReceipt({
+    confirmations: 2,
+    hash: dataSubmitFinalize,
+  })
 
-  useWaitForTransaction({
-    hash: dataSubmitFinalize?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataSubmitFinalizeResult?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingFinalizeTx(false);
-    },
-    onSuccess() {
       toast.success(`Withdrawal finalized! Tokens have been withdrawn to L1.`);
       setShowSuccessMessage(true);
       const refreshBridge = async () => {
@@ -315,7 +294,36 @@ const BridgeFinalizeWithdrawalForm = (props: PropsFromRedux & IBridgeFinalizeWit
       }
       refreshBridge();
     }
-  })
+    if(dataSubmitFinalizeResult?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingFinalizeTx(false);
+      toast.error(`${dataSubmitFinalizeResult.error ? dataSubmitFinalizeResult.error : "Unable to submit finalization, please try again or contact support."}`);
+    }
+  }, [dataSubmitFinalizeResult?.status, dataSubmitFinalizeResult?.error, postBridgeSuccess]);
+
+  const handleFinalizeWithdrawal = useCallback(() => {
+    void (async () => {
+      try {
+        setIsAwaitingWalletInteraction(true);
+        setIsAwaitingFinalizeTx(true);
+        await submitFinalize?.(finalizeWithdrawalConfig, {
+          onSettled() {
+            setIsAwaitingWalletInteraction(false);
+          },
+          onError(error: any) {
+            setIsAwaitingFinalizeTx(false);
+            toast.error(`${error?.details ? error.details : "Unable to submit finalization, please try again or contact support."}`);
+          },
+        });
+      } catch(e) {
+        console.error({e});
+        // onCloseFinalizeWithdrawalModal();
+      }
+    })();
+  }, [
+    submitFinalize,
+    finalizeWithdrawalConfig,
+  ]);
 
   // L2 -> L1 FINALIZE WITHDRAWAL METHODS ABOVE
 

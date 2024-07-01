@@ -14,7 +14,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { useAccount, useNetwork } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { PropsFromRedux } from '../containers/StakeStatsContainer';
 
@@ -78,7 +78,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     address,
   } = useAccount();
 
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
 
   const { 
     data: stakerShares,
