@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
+import { useReadContract, useBlockNumber } from 'wagmi';
+
 import PRONFTStakingABI from '../abi/PRONFTStakingABI.json';
-import { useReadContract } from 'wagmi';
 
 function useStakedPROByStaker(
   stakingContractAddress?: `0x${string}`,
@@ -7,9 +9,12 @@ function useStakedPROByStaker(
   chainId?: number
 ) {
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const { 
     data: stakerStakedPRO,
     isLoading,
+    refetch,
   } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingABI,
@@ -18,6 +23,10 @@ function useStakedPROByStaker(
     chainId: chainId ? chainId : undefined,
     //watch: true,
   });
+
+  useEffect(() => {
+    refetch()
+  }, [blockNumber, refetch])
 
   return {data: stakerStakedPRO as BigInt, isLoading};
 }

@@ -21,7 +21,7 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 
-import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBlockNumber } from 'wagmi';
 
 import { Formik, Form, Field, FormikProps } from 'formik';
 import { TextField } from 'formik-mui';
@@ -276,8 +276,11 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const formikRef = useRef<FormikProps<{[field: string]: any}>>();
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const {
     data: balanceData,
+    refetch: refetchBalanceData
   } = useBalance({
     address: address,
     token: originAssetAddress,
@@ -290,6 +293,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     data: dataL1BridgePROAllowance,
     // isError,
     // isLoading
+    refetch: refetchDataL1BridgePROAllowance
   } = useReadContract({
     address: originAssetAddress,
     abi: ERC20ABI,
@@ -363,6 +367,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const { 
     data: dataL2BridgePROAllowance,
+    refetch: refetchDataL2BridgePROAllowance,
   } = useReadContract({
     address: originAssetAddress,
     abi: ERC20ABI,
@@ -370,6 +375,17 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     //watch: true,
     args: [address, bridgeAddress],
   })
+
+  useEffect(() => {
+    refetchDataL2BridgePROAllowance()
+    refetchBalanceData()
+    refetchDataL1BridgePROAllowance()
+  }, [
+    blockNumber,
+    refetchDataL2BridgePROAllowance,
+    refetchBalanceData,
+    refetchDataL1BridgePROAllowance,
+  ])
 
   const { 
     data: dataApproveBridgeL2,

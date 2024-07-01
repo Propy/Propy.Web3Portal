@@ -22,7 +22,8 @@ import {
   useAccount,
   useReadContract,
   useWriteContract,
-  useWaitForTransactionReceipt
+  useWaitForTransactionReceipt,
+  useBlockNumber,
 } from 'wagmi';
 
 import {
@@ -78,6 +79,8 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const classes = useStyles();
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const [metadataIpfsLink, setMetadataIpfsLink] = useState<undefined | string>();
   const [isMarkedForRepossession, setIsMarkedForRepossession] = useState(false);
   const [ogCountForPropyKey, setOgCountForPropyKey] = useState<number | false>(false);
@@ -102,6 +105,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const {
     data: dataRepossessionConfig,
+    refetch: refetchDataRepossessionConfig,
   } = useReadContract<any[], any, any>({
     address: PROPY_KEY_REPOSSESSION_CONTRACT,
     abi: PropyKeyRepossessionABI,
@@ -165,6 +169,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const { 
     data: approvedTokenController,
+    refetch: refetchApprovedTokenController,
   } = useReadContract({
     address: BASE_PROPYKEYS_NFT,
     abi: PropyNFTABI,
@@ -183,6 +188,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
 
   const { 
     data: tokenOwner,
+    refetch: refetchTokenOwner,
   } = useReadContract({
     address: BASE_PROPYKEYS_NFT,
     abi: PropyNFTABI,
@@ -190,6 +196,17 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
     //watch: true,
     args: [propyKeyTokenId],
   });
+
+  useEffect(() => {
+    refetchTokenOwner();
+    refetchDataRepossessionConfig();
+    refetchApprovedTokenController();
+  }, [
+    blockNumber,
+    refetchTokenOwner,
+    refetchDataRepossessionConfig,
+    refetchApprovedTokenController,
+  ])
 
   useEffect(() => {
     console.log({tokenOwner, address});
