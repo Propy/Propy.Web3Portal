@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Theme } from '@mui/material/styles';
@@ -88,6 +88,10 @@ const BridgePage = () => {
     }
   }, [bridgeSelection])
 
+  const postBridgeSuccess = useCallback(() => {
+    setTriggerUpdateIndex(prevIndex => prevIndex + 1);
+  }, []);
+
   return (
     <>
       {requiredNetwork &&
@@ -116,7 +120,7 @@ const BridgePage = () => {
                         destination={destinationNetwork}
                         destinationAssetAddress={destinationAssetAddress}
                         destinationAssetDecimals={destinationAssetDecimals}
-                        postBridgeSuccess={() => setTriggerUpdateIndex(triggerUpdateIndex + 1)}
+                        postBridgeSuccess={postBridgeSuccess}
                       />
                       {/* Temp only render on withdrawals section until deposits are supported */}
                       <div className={classes.sectionSpacerTop}>

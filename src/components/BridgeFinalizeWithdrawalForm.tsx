@@ -304,17 +304,21 @@ const BridgeFinalizeWithdrawalForm = (props: PropsFromRedux & IBridgeFinalizeWit
   const handleFinalizeWithdrawal = useCallback(() => {
     void (async () => {
       try {
-        setIsAwaitingWalletInteraction(true);
-        setIsAwaitingFinalizeTx(true);
-        await submitFinalize?.(finalizeWithdrawalConfig, {
-          onSettled() {
-            setIsAwaitingWalletInteraction(false);
-          },
-          onError(error: any) {
-            setIsAwaitingFinalizeTx(false);
-            toast.error(`${error?.details ? error.details : "Unable to submit finalization, please try again or contact support."}`);
-          },
-        });
+        if(finalizeWithdrawalConfig) {
+          setIsAwaitingWalletInteraction(true);
+          setIsAwaitingFinalizeTx(true);
+          await submitFinalize?.(finalizeWithdrawalConfig, {
+            onSettled() {
+              setIsAwaitingWalletInteraction(false);
+            },
+            onError(error: any) {
+              setIsAwaitingFinalizeTx(false);
+              toast.error(`${error?.details ? error.details : "Unable to submit finalization, please try again or contact support."}`);
+            },
+          });
+        } else {
+          toast.error(`Unable to submit finalization, please refresh the page and try again, or contact support if the problem persists.`);
+        }
       } catch(e) {
         console.error({e});
         // onCloseFinalizeWithdrawalModal();
