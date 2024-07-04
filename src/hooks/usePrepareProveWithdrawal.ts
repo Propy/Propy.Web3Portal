@@ -203,5 +203,5 @@ export function usePrepareProveWithdrawal(
     l2L1MessagePasserAddress,
   ]);
 
-  return data!.request;
+  return data?.request;
 }

@@ -324,7 +324,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
       setIsAwaitingApproveTx(false);
       toast.error(`${dataApproveBridgeL1Receipt?.error ? dataApproveBridgeL1Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
     }
-}, [dataApproveBridgeL1Receipt?.status, dataApproveBridgeL1Receipt?.error, origin, destination]);
+  }, [dataApproveBridgeL1Receipt?.status, dataApproveBridgeL1Receipt?.error, origin, destination]);
 
   const { 
     data: dataPerformBridgeL1,
@@ -356,7 +356,7 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
       setIsAwaitingPerformTx(false);
       toast.error(`${dataPerformBridgeL1Receipt?.error ? dataPerformBridgeL1Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
     }
-  }, [dataPerformBridgeL1Receipt?.status, dataPerformBridgeL1Receipt?.error, postBridgeSuccess, destination]);	
+  }, [dataPerformBridgeL1Receipt?.status, dataPerformBridgeL1Receipt?.error, postBridgeSuccess, destination]);
 
 
   // L1 BRIDGING METHODS ABOVE

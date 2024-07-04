@@ -295,19 +295,23 @@ const BridgeProveWithdrawalForm = (props: PropsFromRedux & IBridgeProveWithdrawa
   const handleProveWithdrawal = useCallback(() => {
     void (async () => {
       try {
-        setIsAwaitingWalletInteraction(true);
-        setIsAwaitingProofTx(true);
-        const proveResult = await submitProof?.(proveWithdrawalConfig, {
-          onSettled() {
-            setIsAwaitingWalletInteraction(false);
-          },
-          onError(error: any) {
-            setIsAwaitingProofTx(false);
-            toast.error(`${error?.details ? error.details : "Unable to submit proof, please try again or contact support."}`);
-          },
-        });
-        if (proveResult) {
-          // const proveTxHash = proveResult.hash;
+        if(proveWithdrawalConfig) {
+          setIsAwaitingWalletInteraction(true);
+          setIsAwaitingProofTx(true);
+          const proveResult = await submitProof?.(proveWithdrawalConfig, {
+            onSettled() {
+              setIsAwaitingWalletInteraction(false);
+            },
+            onError(error: any) {
+              setIsAwaitingProofTx(false);
+              toast.error(`${error?.details ? error.details : "Unable to submit proof, please try again or contact support."}`);
+            },
+          });
+          if (proveResult) {
+            // const proveTxHash = proveResult.hash;
+          }
+        } else {
+          toast.error(`Unable to submit proof, please refresh the page and try again, or contact support if the problem persists.`);
         }
       } catch(e) {
         console.error({e});

@@ -87,5 +87,5 @@ export function usePrepareFinalizeWithdrawal(
     }
   }, [withdrawalReceipt]);
 
-  return data!.request;
+  return data?.request;
 }
