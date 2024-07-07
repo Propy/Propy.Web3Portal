@@ -20,6 +20,8 @@ import GenericTitleContainer from '../containers/GenericTitleContainer';
 import ListingGalleryContainer from '../containers/ListingGalleryContainer';
 import PropyKeysHomeListingContactFormContainer from '../containers/PropyKeysHomeListingContactFormContainer';
 
+import SingleTokenCardBaseline from '../components/SingleTokenCardBaseline';
+
 import LinkWrapper from '../components/LinkWrapper';
 
 import BathroomIcon from '../assets/svg/bathroom-icon.svg';
@@ -35,6 +37,7 @@ import {
 
 import {
   IPropyKeysHomeListingRecord,
+  INFTRecord,
 } from '../interfaces';
 
 import {
@@ -45,6 +48,7 @@ import {
 
 import {
   priceFormat,
+  getResolvableIpfsLink,
 } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -129,6 +133,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
     const [listingRecord, setListingRecord] = useState<IPropyKeysHomeListingRecord | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
+    const [nftRecord, setNftRecord] = useState<false | INFTRecord>(false);
 
     let { 
       network,
@@ -144,6 +149,9 @@ const SingleListingPage = (props: ISingleListingPage) => {
         console.log({listingRecordQueryResponse})
         if(listingRecordQueryResponse?.status && listingRecordQueryResponse?.data && isMounted) {
           setListingRecord(listingRecordQueryResponse?.data);
+          if(listingRecordQueryResponse?.data?.nft) {
+            setNftRecord(listingRecordQueryResponse?.data?.nft);
+          }
         } else if(isMounted) {
           setListingRecord(null);
         }
@@ -270,6 +278,23 @@ const SingleListingPage = (props: ISingleListingPage) => {
                   <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
                 </div>
               } */}
+              {nftRecord &&
+                <>
+                <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated PropyKeys Record"/>
+                  <div style={{maxWidth: 350}}>
+                    <SingleTokenCardBaseline
+                      tokenLink={`token/${nftRecord?.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`}
+                      tokenImage={nftRecord?.metadata?.image ? getResolvableIpfsLink(nftRecord.metadata.image) : undefined}
+                      tokenStandard={nftRecord?.asset?.standard}
+                      tokenId={nftRecord?.token_id}
+                      tokenCollectionName={nftRecord?.asset?.collection_name}
+                      tokenContractAddress={nftRecord?.asset_address}
+                      tokenNetwork={nftRecord?.network_name}
+                      tokenTitle={nftRecord?.metadata?.name ? nftRecord?.metadata?.name : ""}
+                    />
+                  </div>
+                </>
+              }
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={5}>
               {listingRecord &&
