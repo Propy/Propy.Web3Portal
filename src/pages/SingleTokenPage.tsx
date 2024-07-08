@@ -23,6 +23,7 @@ import OfferListContainer from '../containers/OfferListContainer';
 import NFTLikeZoneContainer from '../containers/NFTLikeZoneContainer';
 
 import LinkWrapper from '../components/LinkWrapper';
+import SingleListingCard from '../components/SingleListingCard';
 
 import PlaceholderImage from '../assets/img/placeholder.webp';
 import DefaultTokenImage from '../assets/img/default-token.webp';
@@ -40,6 +41,7 @@ import {
   ITransferEventERC721Record,
   IOfferRecord,
   TokenStandard,
+  IPropyKeysHomeListingRecord,
 } from '../interfaces';
 
 import {
@@ -48,6 +50,7 @@ import {
   TOKEN_NAME_HIDE_ID,
   PROPY_LIGHT_BLUE,
   MINT_AN_ADDRESS_NFT_ADDRESSES,
+  COLLECTIONS_PAGE_ENTRIES,
 } from '../utils/constants';
 
 import {
@@ -143,12 +146,15 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
     const [tokenStandard, setTokenStandard] = useState<TokenStandard | null>(null);
     const [allowSignalInterest] = useState(true);
+    const [listingRecord, setListingRecord] = useState<null | IPropyKeysHomeListingRecord>(null);
 
     let { 
       network,
       tokenAddress,
       tokenId,
     } = useParams();
+
+    const matchedListingRecord = listingRecord ? COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.address === listingRecord.asset_address) : false;
 
     useEffect(() => {
       let isMounted = true;
@@ -169,12 +175,20 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
           }
           if(tokenRecordQueryResponse?.data?.transfer_events_erc721) {
             setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc721);
-          }
-          if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
+          } else if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
             setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc20);
+          } else {
+            setTokenEventRecord(null)
           }
           if(tokenRecordQueryResponse?.data?.offchain_offers) {
             setTokenOfferList(tokenRecordQueryResponse?.data?.offchain_offers);
+          } else {
+            setTokenOfferList(null);
+          }
+          if(tokenRecordQueryResponse?.data?.propykeys_home_listing) {
+            setListingRecord(tokenRecordQueryResponse?.data?.propykeys_home_listing);
+          } else {
+            setListingRecord(null);
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = tokenRecordQueryResponse?.data?.metadata ? tokenRecordQueryResponse?.data?.metadata : {};
@@ -291,6 +305,18 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
                   <div className={classes.sectionSpacer}>
                     <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
                   </div>
+                }
+                {listingRecord && tokenRecord &&
+                  <>
+                    <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated Home Listing"/>
+                    <div style={{maxWidth: 350}}>
+                      <SingleListingCard 
+                        listingCollectionName={matchedListingRecord && matchedListingRecord?.overrideTitle ? matchedListingRecord?.overrideTitle : ""} 
+                        listingRecord={listingRecord}
+                        assetRecord={tokenRecord}
+                      />
+                    </div>
+                  </>
                 }
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={7}>

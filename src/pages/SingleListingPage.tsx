@@ -133,7 +133,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
     const [listingRecord, setListingRecord] = useState<IPropyKeysHomeListingRecord | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
-    const [nftRecord, setNftRecord] = useState<false | INFTRecord>(false);
+    const [nftRecord, setNftRecord] = useState<null | INFTRecord>(null);
 
     let { 
       network,
@@ -146,14 +146,16 @@ const SingleListingPage = (props: ISingleListingPage) => {
       const fetchListing = async () => {
         let queryUrl = `${API_ENDPOINT}/listing/propykeys/${network}/${tokenAddress}/${tokenId}`;
         let listingRecordQueryResponse = await fetch(queryUrl).then(resp => resp.json());
-        console.log({listingRecordQueryResponse})
         if(listingRecordQueryResponse?.status && listingRecordQueryResponse?.data && isMounted) {
           setListingRecord(listingRecordQueryResponse?.data);
           if(listingRecordQueryResponse?.data?.nft) {
             setNftRecord(listingRecordQueryResponse?.data?.nft);
+          } else {
+            setNftRecord(null);
           }
         } else if(isMounted) {
           setListingRecord(null);
+          setNftRecord(null);
         }
       }
       fetchListing();
