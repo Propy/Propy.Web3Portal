@@ -308,7 +308,7 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
                 }
                 {listingRecord && tokenRecord &&
                   <>
-                  <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated Home Listing"/>
+                    <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated Home Listing"/>
                     <div style={{maxWidth: 350}}>
                       <SingleListingCard 
                         listingCollectionName={matchedListingRecord && matchedListingRecord?.overrideTitle ? matchedListingRecord?.overrideTitle : ""} 
