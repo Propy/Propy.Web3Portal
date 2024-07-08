@@ -86,13 +86,17 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
           let apiResponseData: INFTCoordinateResponse = collectionResponse?.data?.data
             ? collectionResponse?.data
             : collectionResponse;
+          let linkPrefix = `token`;
+          if(propyKeysMapFilterOptions.onlyListedHomes) {
+            linkPrefix = `listing`
+          }
           if (collectionResponse?.status && apiResponseData?.data) {
             for (let nftRecord of apiResponseData?.data) {
               if (nftRecord.longitude && nftRecord.latitude && renderResults.length < maxEntries) {
                 renderResults.push({
                   latitude: Number(nftRecord.latitude),
                   longitude: Number(nftRecord.longitude),
-                  link: `token/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
+                  link: `${linkPrefix}/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
                 });
               }
             }
