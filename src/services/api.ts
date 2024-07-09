@@ -115,6 +115,13 @@ export const FlowService = {
 }
 
 export const NFTService = {
+  async getNft(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+  ) {
+    return ApiService.get(`/nft/${network}/${assetAddress}/${tokenId}`);
+  },
   async refreshMetadata(network: string, tokenAddress: string, tokenId: string) : Promise<AxiosResponse["data"]> {
     return ApiService.post(`nft/refresh-metadata`, {
       network: network,
@@ -342,6 +349,13 @@ export const GeoService = {
 }
 
 export const PropyKeysListingService = {
+  async getListing(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+  ) {
+    return ApiService.get(`/listing/propykeys/${network}/${assetAddress}/${tokenId}`);
+  },
   async refreshMetadata(network: string, tokenAddress: string, tokenId: string) : Promise<AxiosResponse["data"]> {
     return ApiService.post(`listing/refresh-metadata`, {
       network: network,
