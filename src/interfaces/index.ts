@@ -147,6 +147,10 @@ export interface ICoordinate {
     longitude: number
     latitude: number
     link: string
+    type?: 'listing' | 'token',
+    asset_address?: string,
+    token_id?: string,
+    network_name?: string,
 }
 
 export interface IPagination {
@@ -267,6 +271,10 @@ export interface ILeafletMapMarker {
     longitude: number;
     latitude: number;
     link?: string;
+    type?: 'listing' | 'token',
+    asset_address?: string,
+    token_id?: string,
+    network_name?: string,
 }
 
 export interface IHorizontalScrollingTextEntry {

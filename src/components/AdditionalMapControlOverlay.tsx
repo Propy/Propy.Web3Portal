@@ -44,11 +44,16 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AdditionalMapControlOverlay = (props: PropsFromRedux) => {
+interface IAdditionalMapControlOverlay {
+  setPopupOpen?: (status: boolean) => void
+}
+
+const AdditionalMapControlOverlay = (props: IAdditionalMapControlOverlay & PropsFromRedux) => {
 
   let {
     setPropyKeysMapFilterOptions,
     propyKeysMapFilterOptions,
+    setPopupOpen,
   } = props;
 
   const classes = useStyles();
@@ -56,6 +61,9 @@ const AdditionalMapControlOverlay = (props: PropsFromRedux) => {
   const setFilter = <K extends keyof IPropyKeysMapFilterOptions>(filterKey: K, value: IPropyKeysMapFilterOptions[K]) => {
     let originalFilters = Object.assign({}, propyKeysMapFilterOptions);
     originalFilters[filterKey] = value;
+    if(setPopupOpen) {
+      setPopupOpen(false);
+    }
     setPropyKeysMapFilterOptions(originalFilters);
   }
 
