@@ -12,7 +12,7 @@ import PropyHouseOnlyLogo from '../assets/img/propy-house-only.png';
 const queryClient = new QueryClient()
 
 // 1. Get projectId from https://cloud.walletconnect.com
-const projectId = '40a62032057258c14ebfdc9c25bfe42e'
+const projectId = '32a05ca21db0679cb1e3e2601081e2f4'
 
 // 2. Create wagmiConfig
 const metadata = {
