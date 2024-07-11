@@ -13,7 +13,11 @@ import {
   PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
-import { PropsFromRedux } from '../containers/GenericBannerPageContainer';
+import { PropsFromRedux } from '../containers/ListingGalleryContainer';
+
+import {
+  IFullScreenGalleryConfig,
+} from '../interfaces';
 
 const previewImageSize = 100;
 
@@ -52,6 +56,12 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       position: 'relative',
     },
+    primaryImageForeground: {
+      height: '100%',
+      objectFit: 'contain',
+      position: 'absolute',
+      cursor: 'pointer',
+    },
     primaryImageControlsTopRow: {
 
     },
@@ -78,6 +88,9 @@ const useStyles = makeStyles((theme: Theme) =>
     previewImageSelected: {
       border: `4px solid ${PROPY_LIGHT_BLUE}`,
     },
+    previewImageUnselected: {
+      border: `4px solid #ededed`,
+    },
     previewImageEntryOuter: {
       position: 'relative',
       width: previewImageSize,
@@ -93,7 +106,7 @@ const useStyles = makeStyles((theme: Theme) =>
     previewImageEntryInner: {
       width: "100%",
       height: "100%",
-      backgroundSize: 'contain',
+      backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
     },
@@ -112,6 +125,8 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
     images,
     // isConsideredMobile,
     // isConsideredMedium,
+    // fullScreenGalleryConfig,
+    setFullScreenGalleryConfig,
   } = props;
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -173,11 +188,24 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
     });
   };
 
+  const handleFullscreenImageSelection = (index: number) => {
+    if(setFullScreenGalleryConfig) {
+      let precomputedConfig : IFullScreenGalleryConfig = {
+        images,
+        visible: true,
+        selectedImageIndex: index,
+        onFullscreenGalleryClose: (lastSelectedIndex: number) => { handleImageSelection(lastSelectedIndex) }
+      }
+      setFullScreenGalleryConfig(precomputedConfig);
+    }
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.primaryImageContainer}>
         <div className={[classes.primaryImageBackgroundContainer, 'image-filter-blur-heavy'].join(' ')} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}} />
-        <div className={classes.primaryImageForegroundContainer} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}}>
+        <div className={classes.primaryImageForegroundContainer}>
+          <img alt={`Home listing preview ${selectedImageIndex + 1} of ${images?.length}`} src={images[selectedImageIndex]} className={classes.primaryImageForeground} onClick={() => handleFullscreenImageSelection(selectedImageIndex)}/>
           <div className={classes.primaryImageControlsTopRow}>
 
           </div>
@@ -210,7 +238,7 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
               ref={(el) => (previewImageRefs.current[index] = el)}
               onClick={() => handleImageSelection(index)}
               key={`${index}-${imageLink}`}
-              className={[classes.previewImageEntryOuter, index === selectedImageIndex ? classes.previewImageSelected : ""].join(" ")}
+              className={[classes.previewImageEntryOuter, index === selectedImageIndex ? classes.previewImageSelected : classes.previewImageUnselected].join(" ")}
             >
               <div className={classes.previewImageEntryInner} style={{backgroundImage: `url(${imageLink})`}}/>
             </div>

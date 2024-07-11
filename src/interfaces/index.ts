@@ -365,3 +365,17 @@ export interface IPropyKeysMapFilterOptions {
     onlyListedHomes: boolean;
     onlyLandmarks: boolean;
 }
+
+export interface IFullScreenGalleryImageEntry {
+    index: number;
+    imgUrl: string;
+    title?: string;
+    description?: string;
+}
+
+export interface IFullScreenGalleryConfig {
+    visible: boolean;
+    images: string[];
+    selectedImageIndex: number;
+    onFullscreenGalleryClose: (arg0?: any) => void;
+}

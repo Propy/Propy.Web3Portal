@@ -1,6 +1,7 @@
 import {
     SupportedNetworks,
     IPropyKeysMapFilterOptions,
+    IFullScreenGalleryConfig,
 } from '../../interfaces';
 
 export const setShowLeftMenu = (visible: boolean) => ({
@@ -36,4 +37,9 @@ export const setActiveNetwork = (network: SupportedNetworks) => ({
 export const setPropyKeysMapFilterOptions = (filterOptions: IPropyKeysMapFilterOptions) => ({
     type: "SET_PROPYKEYS_MAP_FILTER_OPTIONS",
     filterOptions: filterOptions,
+})
+
+export const setFullScreenGalleryConfig = (fullScreenGalleryConfig: IFullScreenGalleryConfig) => ({
+    type: "SET_FULL_SCREEN_GALLERY_CONFIG",
+    fullScreenGalleryConfig: fullScreenGalleryConfig,
 })

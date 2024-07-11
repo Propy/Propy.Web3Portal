@@ -8,6 +8,7 @@ import createStyles from '@mui/styles/createStyles';
 
 import Navigation from './Navigation';
 import NavigationLeftSideBarDesktopContainer from '../containers/NavigationLeftSideBarDesktopContainer';
+import FullScreenGalleryContainer from '../containers/FullScreenGalleryContainer';
 
 import HomePage from '../pages/HomePage';
 import AccountTokensPage from '../pages/AccountTokensPage';
@@ -111,6 +112,7 @@ const PageContainer = (props: PropsFromRedux) => {
                   </Routes>
                 }
             </div>
+            <FullScreenGalleryContainer />
         </Navigation>
     )
 }

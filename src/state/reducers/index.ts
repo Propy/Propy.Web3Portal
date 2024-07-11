@@ -6,6 +6,7 @@ import isConsideredMobile from './isConsideredMobile';
 import isConsideredMedium from './isConsideredMedium';
 import activeNetwork from './activeNetwork';
 import propyKeysMapFilterOptions from './propyKeysMapFilterOptions';
+import fullScreenGalleryConfig from './fullScreenGalleryConfig';
 
 const rootReducer = combineReducers({
     showLeftMenu,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     isConsideredMedium,
     activeNetwork,
     propyKeysMapFilterOptions,
+    fullScreenGalleryConfig,
 });
 
 export default rootReducer;
