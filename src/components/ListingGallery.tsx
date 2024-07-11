@@ -205,7 +205,7 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
       <div className={classes.primaryImageContainer}>
         <div className={[classes.primaryImageBackgroundContainer, 'image-filter-blur-heavy'].join(' ')} style={images?.length > 0 ? { backgroundImage: `url(${images[selectedImageIndex]})` } : {}} />
         <div className={classes.primaryImageForegroundContainer}>
-          <img alt={`Home listing preview ${selectedImageIndex + 1} of ${images?.length}`} src={images[selectedImageIndex]} className={classes.primaryImageForeground} onClick={() => handleFullscreenImageSelection(selectedImageIndex)}/>
+          {images?.[selectedImageIndex] && <img alt={`Home listing preview ${selectedImageIndex + 1} of ${images?.length}`} src={images[selectedImageIndex]} className={classes.primaryImageForeground} onClick={() => handleFullscreenImageSelection(selectedImageIndex)}/>}
           <div className={classes.primaryImageControlsTopRow}>
 
           </div>
