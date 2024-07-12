@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const createListingPopupNode = (listingRecord: IPropyKeysHomeListingRecord) => {
   return (
     <div style={{width: 300, height: 309}}>
-      <LinkWrapper link={`${window.location.origin}/#/token/${listingRecord.network_name}/${listingRecord.asset_address}/${listingRecord.token_id}`} external={true}>
+      <LinkWrapper link={`${window.location.origin}/#/listing/${listingRecord.network_name}/${listingRecord.asset_address}/${listingRecord.token_id}`} external={true}>
         <SingleListingCardBaseline
           tokenImage={listingRecord.images[0]}
           tokenCollectionName={listingRecord.collection_name}
