@@ -4,8 +4,8 @@ import { animated, useSpring } from '@react-spring/web'
 
 import { toast } from 'sonner';
 
-import { useAccount, useSwitchNetwork } from 'wagmi'
-import { useWeb3Modal } from '@web3modal/wagmi1/react'
+import { useAccount, useSwitchChain } from 'wagmi'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -73,7 +73,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
 
   const classes = useStyles();
 
-  const { error, isLoading, switchNetwork } = useSwitchNetwork();
+  const { error, isPending, switchChain } = useSwitchChain();
 
   const { 
     address,
@@ -142,7 +142,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <Typography style={{textAlign: 'center'}} variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
             Please switch to {NETWORK_NAME_TO_DISPLAY_NAME[requiredNetwork]} to continue
           </Typography>
-          <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isLoading} onClickOverride={() => switchNetwork && switchNetwork(NETWORK_NAME_TO_ID[requiredNetwork])} />
+          <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isPending} onClickOverride={() => switchChain && switchChain({chainId: NETWORK_NAME_TO_ID[requiredNetwork]})} />
         </div>
       }
       {((requiredNetwork === activeNetwork) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address) || (onlyGateConnected && address)) &&

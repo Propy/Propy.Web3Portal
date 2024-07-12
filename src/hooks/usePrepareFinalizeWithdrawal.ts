@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import OptimismPortal from '../base-bridge/contract-abis/OptimismPortal';
 import { WithdrawalMessage } from '../base-bridge/types/WithdrawalMessage';
 import { getWithdrawalMessage } from '../base-bridge/transactions/getWithdrawalMessage';
-import { usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { useSimulateContract, useWaitForTransactionReceipt } from 'wagmi';
 
 export function usePrepareFinalizeWithdrawal(
   withdrawalTx: `0x${string}`,
@@ -17,14 +17,14 @@ export function usePrepareFinalizeWithdrawal(
   const [withdrawalForTx, setWithdrawalForTx] = useState<WithdrawalMessage | null>(null);
   const [lastRefetchOnChallengePeriodIndex, setLastRefetchOnChallengePeriodIndex] = useState(refetchOnChallengePeriodIndex);
 
-  const { data: withdrawalReceipt } = useWaitForTransaction({
+  const { data: withdrawalReceipt } = useWaitForTransactionReceipt({
     hash: withdrawalTx,
     chainId: parseInt(l2ChainID),
   });
 
   const shouldPrepare = withdrawalForTx;
 
-  const { config, error: usePrepareContractWriteError, refetch } = usePrepareContractWrite({
+  const { data, error: useSimulateContractError, refetch } = useSimulateContract({
     address: shouldPrepare ? l1OptimismPortalProxyAddress : undefined,
     abi: OptimismPortal,
     functionName: 'finalizeWithdrawalTransaction',
@@ -47,24 +47,24 @@ export function usePrepareFinalizeWithdrawal(
   useEffect(() => {
     if(
       //@ts-ignore
-      usePrepareContractWriteError?.cause?.reason?.indexOf("proven withdrawal finalization period has not elapsed") &&
+      useSimulateContractError?.cause?.reason?.indexOf("proven withdrawal finalization period has not elapsed") &&
       (refetchOnChallengePeriodIndex !== lastRefetchOnChallengePeriodIndex)
     ) {
       refetch();
       setLastRefetchOnChallengePeriodIndex(refetchOnChallengePeriodIndex);
     }
-  }, [refetchOnChallengePeriodIndex, refetch, usePrepareContractWriteError, lastRefetchOnChallengePeriodIndex])
+  }, [refetchOnChallengePeriodIndex, refetch, useSimulateContractError, lastRefetchOnChallengePeriodIndex])
 
   useEffect(() => {
-    console.log({usePrepareContractWriteError})
-    if(usePrepareContractWriteError) {
+    console.log({useSimulateContractError})
+    if(useSimulateContractError) {
       //@ts-ignore
-      if(usePrepareContractWriteError?.cause?.reason?.indexOf("withdrawal has already been finalized") > -1) {
+      if(useSimulateContractError?.cause?.reason?.indexOf("withdrawal has already been finalized") > -1) {
         alreadyFinalizedHandler(true);
         prepErrorHandler(false);
         finalizationPeriodHasNotElapsed(false);
         //@ts-ignore
-      } else if(usePrepareContractWriteError?.cause?.reason?.indexOf("proven withdrawal finalization period has not elapsed")) {
+      } else if(useSimulateContractError?.cause?.reason?.indexOf("proven withdrawal finalization period has not elapsed")) {
         prepErrorHandler(true);
         alreadyFinalizedHandler(false);
         finalizationPeriodHasNotElapsed(true);
@@ -78,7 +78,7 @@ export function usePrepareFinalizeWithdrawal(
       prepErrorHandler(false);
       finalizationPeriodHasNotElapsed(false);
     }
-  }, [usePrepareContractWriteError, prepErrorHandler, alreadyFinalizedHandler, finalizationPeriodHasNotElapsed])
+  }, [useSimulateContractError, prepErrorHandler, alreadyFinalizedHandler, finalizationPeriodHasNotElapsed])
 
   useEffect(() => {
     if (withdrawalReceipt) {
@@ -87,5 +87,5 @@ export function usePrepareFinalizeWithdrawal(
     }
   }, [withdrawalReceipt]);
 
-  return config;
+  return data?.request;
 }

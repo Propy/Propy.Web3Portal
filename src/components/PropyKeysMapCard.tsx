@@ -9,6 +9,7 @@ import LeafletMapContainer from '../containers/LeafletMapContainer';
 import {
   ICoordinate,
   INFTCoordinateResponse,
+  IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
 import {
@@ -29,7 +30,14 @@ interface IPropyKeysMapCardProps {
   scrollWheelZoom?: boolean
   center?: [number, number]
   disableBorderRadius?: boolean
+  propyKeysMapFilterOptions?: IPropyKeysMapFilterOptions
+  collectionName?: string
 }
+
+const findCollectionConfig = (slug: string | undefined, entries: typeof COLLECTIONS_PAGE_ENTRIES) => {
+  const requiredSlug = slug || 'propykeys';
+  return entries.find(entry => entry.slug === requiredSlug);
+};
 
 const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
 
@@ -43,11 +51,13 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
     scrollWheelZoom = true,
     center,
     disableBorderRadius = false,
+    collectionName,
+    propyKeysMapFilterOptions,
   } = props;
 
   const maxEntries = 10000;
 
-  let collectionConfigEntry = COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.slug === 'propykeys');
+  let collectionConfigEntry = findCollectionConfig(collectionName, COLLECTIONS_PAGE_ENTRIES);
 
   const { 
     data: nftCoordinates = [],
@@ -65,13 +75,17 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
           let apiResponseData: INFTCoordinateResponse = collectionResponse?.data?.data
             ? collectionResponse?.data
             : collectionResponse;
+          let linkPrefix = `token`;
+          if(propyKeysMapFilterOptions?.onlyListedHomes) {
+            linkPrefix = `listing`
+          }
           if (collectionResponse?.status && apiResponseData?.data) {
             for (let nftRecord of apiResponseData?.data) {
               if (nftRecord.longitude && nftRecord.latitude && renderResults.length < maxEntries) {
                 renderResults.push({
                   latitude: Number(nftRecord.latitude),
                   longitude: Number(nftRecord.longitude),
-                  link: `token/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
+                  link: `${linkPrefix}/${nftRecord.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`,
                 });
               }
             }
@@ -81,7 +95,7 @@ const PropyKeysMapCard = (props: IPropyKeysMapCardProps) => {
       }
       return [];
     },
-    cacheTime: Infinity, // Cache the data indefinitely
+    gcTime: Infinity, // Cache the data indefinitely
     staleTime: Infinity, // Data is always considered fresh
   });
 

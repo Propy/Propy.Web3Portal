@@ -124,7 +124,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
       }
       return null;
     },
-    cacheTime: 60, // Cache the data indefinitely
+    gcTime: 60, // Cache the data indefinitely
     staleTime: 60, // Data is always considered fresh
   });
 
@@ -153,7 +153,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
       }
       return null;
     },
-    cacheTime: 60, // Cache the data indefinitely
+    gcTime: 60, // Cache the data indefinitely
     staleTime: 60, // Data is always considered fresh
   });
 

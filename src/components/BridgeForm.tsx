@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import { animated, useSpring } from '@react-spring/web';
 
@@ -21,7 +21,7 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 
-import { useAccount, useBalance, useContractRead, useContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBlockNumber } from 'wagmi';
 
 import { Formik, Form, Field, FormikProps } from 'formik';
 import { TextField } from 'formik-mui';
@@ -276,12 +276,15 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const formikRef = useRef<FormikProps<{[field: string]: any}>>();
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const {
     data: balanceData,
+    refetch: refetchBalanceData
   } = useBalance({
     address: address,
     token: originAssetAddress,
-    watch: true,
+    //watch: true,
   });
 
   // L1 BRIDGING METHODS BELOW
@@ -290,64 +293,54 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
     data: dataL1BridgePROAllowance,
     // isError,
     // isLoading
-  } = useContractRead({
+    refetch: refetchDataL1BridgePROAllowance
+  } = useReadContract({
     address: originAssetAddress,
     abi: ERC20ABI,
     functionName: 'allowance',
-    watch: true,
+    //watch: true,
     args: [address, bridgeAddress],
   })
 
   const { 
     data: dataApproveBridgeL1,
-    isLoading: isLoadingApproveBridgeL1,
-    writeAsync: writeApproveBridgeL1
-  } = useContractWrite({
-    address: originAssetAddress,
-    abi: ERC20ABI,
-    functionName: 'approve',
-    onError(error: any) {
-      setIsAwaitingApproveTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
+    isPending: isLoadingApproveBridgeL1,
+    writeContractAsync: writeApproveBridgeL1
+  } = useWriteContract()
+
+  let dataApproveBridgeL1Receipt = useWaitForTransactionReceipt({
+    hash: dataApproveBridgeL1,
+    confirmations: 2,
   })
 
-  useWaitForTransaction({
-    hash: dataApproveBridgeL1?.hash,
-    onSettled(data, error) {
+  useEffect(() => {
+    if(dataApproveBridgeL1Receipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingApproveTx(false);
-    },
-    onSuccess() {
       toast.success(`Approval success! You may now bridge PRO from ${NETWORK_NAME_TO_DISPLAY_NAME[origin]} to ${NETWORK_NAME_TO_DISPLAY_NAME[destination]}`);
     }
-  })
+    if(dataApproveBridgeL1Receipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingApproveTx(false);
+      toast.error(`${dataApproveBridgeL1Receipt?.error ? dataApproveBridgeL1Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataApproveBridgeL1Receipt?.status, dataApproveBridgeL1Receipt?.error, origin, destination]);
 
   const { 
     data: dataPerformBridgeL1,
-    isLoading: isLoadingPerformBridgeL1,
-    writeAsync: writePerformBridgeL1
-  } = useContractWrite({
-    address: bridgeAddress,
-    abi: L1StandardBridgeABI,
-    functionName: 'bridgeERC20',
-    onError(error: any) {
-      setIsAwaitingPerformTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled(data, error) {
-      setIsAwaitingWalletInteraction(false);
-    },
+    isPending: isLoadingPerformBridgeL1,
+    writeContractAsync: writePerformBridgeL1
+  } = useWriteContract()
+
+  let dataPerformBridgeL1Receipt = useWaitForTransactionReceipt({
+    hash: dataPerformBridgeL1,
+    confirmations: 2,
   })
 
-  useWaitForTransaction({
-    hash: dataPerformBridgeL1?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformBridgeL1Receipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingPerformTx(false);
-    },
-    onSuccess() {
       formikRef?.current?.resetForm();
       toast.success(`Bridge success! Please note that it may take 20-60 minutes for your PRO tokens to arrive on ${NETWORK_NAME_TO_DISPLAY_NAME[destination]}`);
       const refreshBridge = async () => {
@@ -358,7 +351,13 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
       }
       refreshBridge();
     }
-  })
+    if(dataPerformBridgeL1Receipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingPerformTx(false);
+      toast.error(`${dataPerformBridgeL1Receipt?.error ? dataPerformBridgeL1Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformBridgeL1Receipt?.status, dataPerformBridgeL1Receipt?.error, postBridgeSuccess, destination]);
+
 
   // L1 BRIDGING METHODS ABOVE
 
@@ -368,64 +367,64 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
 
   const { 
     data: dataL2BridgePROAllowance,
-  } = useContractRead({
+    refetch: refetchDataL2BridgePROAllowance,
+  } = useReadContract({
     address: originAssetAddress,
     abi: ERC20ABI,
     functionName: 'allowance',
-    watch: true,
+    //watch: true,
     args: [address, bridgeAddress],
   })
 
+  useEffect(() => {
+    refetchDataL2BridgePROAllowance()
+    refetchBalanceData()
+    refetchDataL1BridgePROAllowance()
+  }, [
+    blockNumber,
+    refetchDataL2BridgePROAllowance,
+    refetchBalanceData,
+    refetchDataL1BridgePROAllowance,
+  ])
+
   const { 
     data: dataApproveBridgeL2,
-    isLoading: isLoadingApproveBridgeL2,
-    writeAsync: writeApproveBridgeL2
-  } = useContractWrite({
-    address: originAssetAddress,
-    abi: ERC20ABI,
-    functionName: 'approve',
-    onError(error: any) {
-      console.log('Error', error);
-      setIsAwaitingApproveTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    isPending: isLoadingApproveBridgeL2,
+    writeContractAsync: writeApproveBridgeL2
+  } = useWriteContract()
+
+  let dataApproveBridgeL2Receipt = useWaitForTransactionReceipt({
+    hash: dataApproveBridgeL2,
+    confirmations: 2,
   })
 
-  useWaitForTransaction({
-    hash: dataApproveBridgeL2?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataApproveBridgeL2Receipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingApproveTx(false);
-    },
-    onSuccess() {
       toast.success(`Approval success! You may now bridge PRO from ${NETWORK_NAME_TO_DISPLAY_NAME[origin]} to ${NETWORK_NAME_TO_DISPLAY_NAME[destination]}`);
     }
-  })
+    if(dataApproveBridgeL2Receipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingApproveTx(false);
+      toast.error(`${dataApproveBridgeL2Receipt?.error ? dataApproveBridgeL2Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataApproveBridgeL2Receipt?.status, dataApproveBridgeL2Receipt?.error, origin, destination]);	
 
   const { 
     data: dataPerformBridgeL2,
-    writeAsync: writePerformBridgeL2
-  } = useContractWrite({
-    address: bridgeAddress,
-    abi: L2StandardBridgeABI,
-    functionName: 'withdraw',
-    onError(error: any) {
-      setIsAwaitingPerformTx(false);
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
-    },
-    onSettled() {
-      setIsAwaitingWalletInteraction(false);
-    },
+    writeContractAsync: writePerformBridgeL2
+  } = useWriteContract()
+
+  let dataPerformBridgeL2Receipt = useWaitForTransactionReceipt({
+    hash: dataPerformBridgeL2,
+    confirmations: 2,
   })
 
-  useWaitForTransaction({
-    hash: dataPerformBridgeL2?.hash,
-    onSettled() {
+  useEffect(() => {
+    if(dataPerformBridgeL2Receipt?.status === "success") {
+      // handle successful block inclusion + no error
       setIsAwaitingPerformTx(false);
-    },
-    onSuccess() {
       formikRef?.current?.resetForm();
       toast.success(`Withdrawal initiation success! Please note that you will need to submit a withdrawal proof before the ~ 1 week timeline to withdraw to ${NETWORK_NAME_TO_DISPLAY_NAME[destination]} begins`);
       const refreshBridge = async () => {
@@ -435,8 +434,13 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
         }
       }
       refreshBridge();
-    },
-  })
+    }
+    if(dataPerformBridgeL2Receipt?.status === "error") {
+      // handle successful block inclusion + error
+      setIsAwaitingPerformTx(false);
+      toast.error(`${dataPerformBridgeL2Receipt?.error ? dataPerformBridgeL2Receipt?.error : "Unable to complete transaction, please try again or contact support."}`);
+    }
+  }, [dataPerformBridgeL2Receipt?.status, dataPerformBridgeL2Receipt?.error, destination, postBridgeSuccess]);	
 
   // L2 BRIDGING METHODS ABOVE
 
@@ -503,39 +507,93 @@ const BridgeForm = (props: PropsFromRedux & IBridgeForm) => {
                   if(isSufficientAllowance(Number(dataL1BridgePROAllowance ? dataL1BridgePROAllowance : 0), values.proAmount.toString(), originAssetDecimals)) {
                     setIsAwaitingPerformTx(true);
                     setIsAwaitingWalletInteraction(true);
-                    await writePerformBridgeL1({args: [
-                      originAssetAddress,
-                      destinationAssetAddress,
-                      utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
-                      1,
-                      '0x0'
-                    ]});
+                    await writePerformBridgeL1({
+                      address: bridgeAddress,
+                      abi: L1StandardBridgeABI,
+                      functionName: 'bridgeERC20',
+                      args: [
+                        originAssetAddress,
+                        destinationAssetAddress,
+                        utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
+                        1,
+                        '0x0'
+                      ]
+                    },
+                    {
+                      onSettled() {
+                        setIsAwaitingWalletInteraction(false);
+                      },
+                      onError(error: any) {
+                        setIsAwaitingPerformTx(false);
+                        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+                      },
+                    });
                   } else {
                     setIsAwaitingWalletInteraction(true);
                     setIsAwaitingApproveTx(true);
-                    await writeApproveBridgeL1({args: [
-                      bridgeAddress,
-                      utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
-                    ]})
+                    await writeApproveBridgeL1({
+                      address: originAssetAddress,
+                      abi: ERC20ABI,
+                      functionName: 'approve',
+                      args: [
+                        bridgeAddress,
+                        utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
+                      ]
+                    },
+                    {
+                      onSettled() {
+                        setIsAwaitingWalletInteraction(false);
+                      },
+                      onError(error: any) {
+                        setIsAwaitingApproveTx(false);
+                        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+                      },
+                    })
                   }
                 }
                 if(["base", "base-sepolia", 'base-goerli'].indexOf(origin) > -1) {
                   if(isSufficientAllowance(Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0), values.proAmount.toString(), originAssetDecimals)) {
                     setIsAwaitingPerformTx(true);
                     setIsAwaitingWalletInteraction(true);
-                    await writePerformBridgeL2({args: [
-                      originAssetAddress,
-                      utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
-                      150000,
-                      '0x0'
-                    ]});
+                    await writePerformBridgeL2({
+                      address: bridgeAddress,
+                      abi: L2StandardBridgeABI,
+                      functionName: 'withdraw',
+                      args: [
+                        originAssetAddress,
+                        utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
+                        150000,
+                        '0x0'
+                      ]
+                    }, {
+                      onSettled() {
+                        setIsAwaitingWalletInteraction(false);
+                      },
+                      onError(error: any) {
+                        setIsAwaitingPerformTx(false);
+                        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+                      },
+                    });
                   } else {
                     setIsAwaitingWalletInteraction(true);
                     setIsAwaitingApproveTx(true);
-                    await writeApproveBridgeL2({args: [
-                      bridgeAddress,
-                      utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
-                    ]})
+                    await writeApproveBridgeL2({
+                      address: originAssetAddress,
+                      abi: ERC20ABI,
+                      functionName: 'approve',
+                      args: [
+                        bridgeAddress,
+                        utils.parseUnits(values.proAmount.toString(), originAssetDecimals).toString(),
+                      ]
+                    }, {
+                      onSettled() {
+                        setIsAwaitingWalletInteraction(false);
+                      },
+                      onError(error: any) {
+                        setIsAwaitingApproveTx(false);
+                        toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+                      },
+                    })
                   }
                 }
               } catch(e: any) {

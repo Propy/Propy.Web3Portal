@@ -100,6 +100,27 @@ export interface IAssetRecord {
     transfer_event_erc20_count?: number;
 }
 
+export interface IPropyKeysHomeListingRecord {
+    id: number;
+    network_name: string;
+    asset_address: string;
+    token_id: number;
+    full_address: string;
+    price: number;
+    description: string;
+    bedrooms: number;
+    bathrooms: number;
+    size: number;
+    floor: number;
+    floors: number;
+    type: string;
+    year_built: number;
+    lot_size: number;
+    images: string[];
+    propykeys_internal_listing_id: string;
+    collection_name: string;
+}
+
 export interface IBalanceRecord {
     network_name: string,
     asset_address: string,
@@ -126,6 +147,10 @@ export interface ICoordinate {
     longitude: number
     latitude: number
     link: string
+    type?: 'listing' | 'token',
+    asset_address?: string,
+    token_id?: string,
+    network_name?: string,
 }
 
 export interface IPagination {
@@ -148,6 +173,13 @@ export interface IMixedBalancesResult {
 
 export interface IRecentlyMintedResult {
     data: INFTRecord[],
+    metadata: {
+        pagination: IPagination,
+    }
+}
+
+export interface IListingCollectionResult {
+    data: IPropyKeysHomeListingRecord[],
     metadata: {
         pagination: IPagination,
     }
@@ -239,6 +271,10 @@ export interface ILeafletMapMarker {
     longitude: number;
     latitude: number;
     link?: string;
+    type?: 'listing' | 'token',
+    asset_address?: string,
+    token_id?: string,
+    network_name?: string,
 }
 
 export interface IHorizontalScrollingTextEntry {
@@ -323,4 +359,23 @@ export interface ITimeseriesUTCDayAPIResponse {
         utc_day: string,
         record_count: string,
     }[]
+}
+
+export interface IPropyKeysMapFilterOptions {
+    onlyListedHomes: boolean;
+    onlyLandmarks: boolean;
+}
+
+export interface IFullScreenGalleryImageEntry {
+    index: number;
+    imgUrl: string;
+    title?: string;
+    description?: string;
+}
+
+export interface IFullScreenGalleryConfig {
+    visible: boolean;
+    images: string[];
+    selectedImageIndex: number;
+    onFullscreenGalleryClose: (arg0?: any) => void;
 }

@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { type WalletClient, useWalletClient } from 'wagmi'
+import { useWalletClient } from 'wagmi'
 import { providers } from 'ethers'
  
-export function walletClientToSigner(walletClient: WalletClient) {
+//@ts-ignore
+export function walletClientToSigner(walletClient) {
   const { account, chain, transport } = walletClient
   const network = {
     chainId: chain.id,

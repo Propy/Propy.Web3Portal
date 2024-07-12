@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
+import { useReadContract, useBlockNumber } from 'wagmi';
+
 import ERC20ABI from '../abi/ERC20ABI.json';
-import { useContractRead } from 'wagmi';
 
 function useTotalStakingBalancePRO(
   stakingContractAddress?: `0x${string}`,
@@ -7,17 +9,24 @@ function useTotalStakingBalancePRO(
   chainId?: number
 ) {
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const { 
     data: totalStakingBalancePRO,
     isLoading,
-  } = useContractRead({
+    refetch,
+  } = useReadContract({
     address: proContractAddress ? proContractAddress : undefined,
     abi: ERC20ABI,
     functionName: 'balanceOf',
     args: [stakingContractAddress],
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
+
+  useEffect(() => {
+    refetch()
+  }, [blockNumber, refetch])
 
   return {data: totalStakingBalancePRO as BigInt, isLoading};
 }

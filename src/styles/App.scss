@@ -112,3 +112,52 @@ w3m-modal {
 .light-text {
   font-weight: 400;
 }
+
+.image-filter-blur-heavy {
+  -webkit-filter: blur(15px);
+  -moz-filter: blur(15px);
+  -o-filter: blur(15px);
+  -ms-filter: blur(15px);
+  filter: blur(15px);
+}
+
+.leaflet-popup {
+  margin-bottom: 65px!important;
+}
+
+.map-listing-popup-image-container {
+  width: 100%;
+  height: 160px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0px;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0px;
+  width: 300px!important;
+}
+
+.loading-icon-map-popup-container {
+  position: 'relative';
+  z-index: 1;
+  display: 'flex';
+  justify-content: 'center';
+  align-items: 'center';
+  height: '100%';
+}
+
+.loading-icon-map-icon {
+  width: 'auto';
+  height: 75;
+}
+
+.hide-body-overflow {
+  overflow: hidden!important;
+}

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { LeafletMouseEvent } from 'leaflet';
 import { latLngBounds, latLng } from 'leaflet';
 import { animated, useSpring, config } from '@react-spring/web'
 
@@ -35,6 +36,10 @@ interface ILeafletMap {
   onBoundsUpdate?: (boundsRect: string) => void,
   onZoomUpdate?: (zoom: number) => void,
   isLoading?: boolean,
+  popupNode?: React.ReactNode | undefined,
+  onMarkerSelection?: (marker: ILeafletMapMarker) => void
+  setPopupOpen?: (status: boolean) => void
+  onMapMove?: (center: [number, number]) => void
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -61,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
 //   })
 // }
 
-const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
+const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
 
   const {
     zoom = 2,
@@ -75,7 +80,22 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
     onBoundsUpdate = (boundsRect: string) => {},
     onZoomUpdate = (zoom: number) => {},
     isLoading = false,
+    popupNode,
+    onMarkerSelection,
+    setPopupOpen,
+    // onMapMove,
   } = props;
+
+  const MapEvents = ({ onDragStart }: { onDragStart?: (e: any) => void }) => {
+    useMapEvents({
+      dragstart: (e) => {
+        if (onDragStart) {
+          onDragStart(e);
+        }
+      },
+    });
+    return null;
+  };
 
   // zoom = 6 = US zoom on desktop
   // center = [38.171368, -95.430112] = middle area US
@@ -100,6 +120,12 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
     config: config.wobbly,
   })
 
+  const handleMarkerClick = (e: LeafletMouseEvent, marker: ILeafletMapMarker) => {
+    if(marker && onMarkerSelection) {
+      onMarkerSelection(marker);
+    }
+  }
+
   return (
     <MapContainer
       style={{height: "inherit"}}
@@ -117,6 +143,13 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
       zoomDelta={2}
       zoomSnap={2}
     >
+      <MapEvents 
+        onDragStart={(e) => {
+          if(setPopupOpen) { 
+            setPopupOpen(false) 
+          }
+        }}
+      />
       <div style={{zIndex: 9999}}>
       </div>
       {isLoading &&
@@ -147,15 +180,32 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
               icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
               eventHandlers={{
                 click: (e) => {
-                  if(marker?.link) {
+                  if(popupNode) {
+                    handleMarkerClick(e, marker);
+                  } else if(marker?.link) {
                     window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
                   }
                 },
               }}
             >
-              {/* <Popup>
-                A pretty CSS3 popup. <br /> Easily customizable.
-              </Popup> */}
+              {popupNode && 
+                <Popup 
+                  className="map-popup-overlay"
+                  children={popupNode}
+                  eventHandlers={{
+                    remove: () => {
+                      if (setPopupOpen) {
+                        setPopupOpen(false);
+                      }
+                    },
+                    add: () => {
+                      if (setPopupOpen) {
+                        setPopupOpen(true);
+                      }
+                    },
+                  }}
+                />
+              }
             </Marker>
           )}
         </MarkerClusterGroup>
@@ -168,21 +218,38 @@ const LeafletMap = (props: PropsFromRedux & ILeafletMap) => {
               icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
               eventHandlers={{
                 click: (e) => {
-                  if(marker?.link) {
+                  if(popupNode) {
+                    handleMarkerClick(e, marker);
+                  } else if(marker?.link) {
                     window.open(`${window.location.origin}/#/${marker.link}`, '_blank');
                   }
                 },
               }}
             >
-              {/* <Popup>
-                A pretty CSS3 popup. <br /> Easily customizable.
-              </Popup> */}
+              {popupNode && 
+                <Popup 
+                  className="map-popup-overlay"
+                  children={popupNode}
+                  eventHandlers={{
+                    remove: () => {
+                      if (setPopupOpen) {
+                        setPopupOpen(false);
+                      }
+                    },
+                    add: () => {
+                      if (setPopupOpen) {
+                        setPopupOpen(true);
+                      }
+                    },
+                  }}
+                />
+              }
             </Marker>
           )}
         </>
       }
     </MapContainer>
   )
-}
+})
 
 export default LeafletMap;

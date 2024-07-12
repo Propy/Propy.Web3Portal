@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import styled, { keyframes } from 'styled-components'
 import Typography from '@mui/material/Typography';
-import { useBlockNumber, useNetwork } from 'wagmi';
+import { useBlockNumber, useAccount } from 'wagmi';
 
 import { getEtherscanLinkByChainId } from '../utils';
 
@@ -84,7 +84,7 @@ const BlockNumberIndicator = () => {
       watch: true,
       cacheTime: 5_000,
     });
-    const { chain } = useNetwork();
+    const { chain } = useAccount();
 
     const [showSpinner, setShowSpinner] = useState(false)
     const [blockSyncStatus, setBlockSyncStatus] = useState('connecting');

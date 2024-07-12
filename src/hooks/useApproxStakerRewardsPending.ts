@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
+import { useReadContract, useBlockNumber } from 'wagmi';
+
 import PRONFTStakingV2ABI from '../abi/PRONFTStakingV2ABI.json';
-import { useContractRead } from 'wagmi';
 
 function useApproxStakerRewardsPending(
   stakingContractAddress?: `0x${string}`,
@@ -7,17 +9,24 @@ function useApproxStakerRewardsPending(
   chainId?: number
 ) {
 
+  const { data: blockNumber } = useBlockNumber({ watch: true })
+
   const { 
     data: leaveAmount,
     isLoading,
-  } = useContractRead({
+    refetch,
+  } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingV2ABI,
     functionName: 'getApproxStakerRewardsPending',
     args: [stakerAddress],
     chainId: chainId ? chainId : undefined,
-    watch: true,
+    //watch: true,
   });
+
+  useEffect(() => {
+    refetch()
+  }, [blockNumber, refetch])
 
   return {data: leaveAmount as BigInt, isLoading};
 }

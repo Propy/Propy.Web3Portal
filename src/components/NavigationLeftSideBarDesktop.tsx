@@ -33,6 +33,7 @@ import {
   PROPY_LIGHT_BLUE,
   IS_GLOBAL_TOP_BANNER_ENABLED,
   GLOBAL_TOP_BANNER_HEIGHT,
+  DESKTOP_MENU_WIDTH,
 } from '../utils/constants';
 
 interface IMenuEntry {
@@ -132,7 +133,7 @@ const navigationMenu : IMenuEntry[] = [
 
 const useStyles = makeStyles({
   list: {
-    width: 250,
+    width: DESKTOP_MENU_WIDTH,
   },
   fullList: {
     width: 'auto',
@@ -265,7 +266,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
               variant="persistent"
               open={true}
               sx={{
-                width: 250,
+                width: DESKTOP_MENU_WIDTH,
                 position: 'relative',
                 '& .MuiDrawer-paper': {
                   borderRadius: 0,
@@ -329,6 +330,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                         <div
+                                          key={`parent-${index}-child-${childIndex}`}
                                           className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItemNested].join(" ")}
                                         >
                                           <LinkWrapper 

@@ -4,7 +4,7 @@ import { WithdrawalMessage } from '../base-bridge/types/WithdrawalMessage';
 import { useL2OutputProposal } from '../base-bridge/hooks/useL2OutputProposal';
 import { useWithdrawalL2OutputIndex } from '../base-bridge/hooks/useWithdrawalL2OutputIndex';
 import { getWithdrawalMessage } from '../base-bridge/transactions/getWithdrawalMessage';
-import { usePrepareContractWrite, usePublicClient, useWaitForTransaction } from 'wagmi';
+import { useSimulateContract, usePublicClient, useWaitForTransactionReceipt } from 'wagmi';
 import { keccak256, encodeAbiParameters, parseAbiParameters, PublicClient, pad } from 'viem';
 import { hashWithdrawal } from '../base-bridge/hashing/hashWithdrawal';
 // import { useChainEnv } from '../base-bridge/hooks/useChainEnv';
@@ -71,7 +71,7 @@ export function usePrepareProveWithdrawal(
   // const isMainnet = chainEnv === 'mainnet';
   // const includeTosVersionByte = isMainnet;
 
-  const { data: withdrawalReceipt } = useWaitForTransaction({
+  const { data: withdrawalReceipt } = useWaitForTransactionReceipt({
     hash: withdrawalTx,
     chainId: parseInt(l2ChainID),
   });
@@ -87,7 +87,7 @@ export function usePrepareProveWithdrawal(
     }
   }, [shouldPrepare, initCompleteHandler])
 
-  const { config, error: usePrepareContractWriteError } = usePrepareContractWrite({
+  const { data, error: useSimulateContractError } = useSimulateContract({
     address: shouldPrepare ? l1OptimismPortalProxyAddress : undefined,
     abi: OptimismPortal,
     functionName: 'proveWithdrawalTransaction',
@@ -117,9 +117,9 @@ export function usePrepareProveWithdrawal(
   });
 
   useEffect(() => {
-    if(usePrepareContractWriteError) {
+    if(useSimulateContractError) {
       //@ts-ignore
-      if(usePrepareContractWriteError?.cause?.reason?.indexOf("withdrawal hash has already been proven") > -1) {
+      if(useSimulateContractError?.cause?.reason?.indexOf("withdrawal hash has already been proven") > -1) {
         alreadyProvenHandler(true);
         prepErrorHandler(false);
       } else {
@@ -130,7 +130,7 @@ export function usePrepareProveWithdrawal(
       alreadyProvenHandler(false);
       prepErrorHandler(false);
     }
-  }, [usePrepareContractWriteError, prepErrorHandler, alreadyProvenHandler])
+  }, [useSimulateContractError, prepErrorHandler, alreadyProvenHandler])
 
   useEffect(() => {
     void (async () => {
@@ -143,7 +143,8 @@ export function usePrepareProveWithdrawal(
         withdrawalReceipt &&
         withdrawalL2OutputIndex &&
         l2OutputProposal &&
-        blockNumberOfLatestL2OutputProposal
+        blockNumberOfLatestL2OutputProposal &&
+        l2PublicClient
       ) {
         const withdrawalMessage = getWithdrawalMessage(withdrawalReceipt);
 
@@ -202,5 +203,5 @@ export function usePrepareProveWithdrawal(
     l2L1MessagePasserAddress,
   ]);
 
-  return config;
+  return data?.request;
 }

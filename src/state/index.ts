@@ -8,7 +8,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 const persistConfig = {
     key: 'root',
     storage: storage,
-    blacklist: ["showLeftMenu", "darkMode"],
+    blacklist: ["showLeftMenu", "darkMode", "fullScreenGalleryConfig"],
     stateReconciler: autoMergeLevel2
 };
 

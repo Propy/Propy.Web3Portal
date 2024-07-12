@@ -11,6 +11,7 @@ import {
   L1Networks,
   L2Networks,
   ICollectionQueryFilter,
+  IPropyKeysMapFilterOptions,
 } from '../interfaces';
 
 $axios.defaults.baseURL = `${API_ENDPOINT}/`;
@@ -114,6 +115,13 @@ export const FlowService = {
 }
 
 export const NFTService = {
+  async getNft(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+  ) {
+    return ApiService.get(`/nft/${network}/${assetAddress}/${tokenId}`);
+  },
   async refreshMetadata(network: string, tokenAddress: string, tokenId: string) : Promise<AxiosResponse["data"]> {
     return ApiService.post(`nft/refresh-metadata`, {
       network: network,
@@ -148,8 +156,24 @@ export const NFTService = {
     network: string,
     contractNameOrCollectionNameOrAddress: string,
     boundsRect: string,
+    propyKeysMapFilterOptions: IPropyKeysMapFilterOptions,
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${boundsRect ? `?bounds=${boundsRect}` : ''}`)
+    let queryString : boolean | string = false;
+    if(boundsRect) {
+      queryString = `?bounds=${boundsRect}`
+    }
+    if(propyKeysMapFilterOptions) {
+      let filterParams = new URLSearchParams(Object.entries(propyKeysMapFilterOptions).map(([key, value]) => [key, String(value)])).toString();
+      if(!queryString) {
+        queryString = `?${filterParams}`;
+      } else {
+        queryString += `&${filterParams}`;
+      }
+    }
+    if(!queryString) {
+      queryString = "";
+    }
+    return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${queryString}`)
   },
   async getCoordinatesPostGISClusters(
     network: string,
@@ -184,6 +208,13 @@ export const NFTService = {
     metadataField: string,
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/nft/unique-metadata-values/${network}`, `${assetAddress}/${metadataField}`)
+  },
+  async getUniqueMetadataFieldValuesWithListingAttached(
+    network: string,
+    assetAddress: string,
+    metadataField: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/unique-metadata-values-with-listing/${network}`, `${assetAddress}/${metadataField}`)
   },
 }
 
@@ -315,4 +346,30 @@ export const GeoService = {
   async geoLocateClient() : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/geo/locate`);
   }
+}
+
+export const PropyKeysListingService = {
+  async getListing(
+    network: string,
+    assetAddress: string,
+    tokenId: string,
+  ) {
+    return ApiService.get(`/listing/propykeys/${network}/${assetAddress}/${tokenId}`);
+  },
+  async refreshMetadata(network: string, tokenAddress: string, tokenId: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.post(`listing/refresh-metadata`, {
+      network: network,
+      asset_address: tokenAddress,
+      token_id: tokenId
+    })
+  },
+  async getCollectionPaginated(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    perPage: number,
+    page: number,
+    additionalFilters?: ICollectionQueryFilter[],
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/listing/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"]).join("&")}` : ''}`)
+  },
 }
