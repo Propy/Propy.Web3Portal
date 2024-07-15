@@ -19,6 +19,7 @@ import GenericPageContainer from '../containers/GenericPageContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
 import ListingGalleryContainer from '../containers/ListingGalleryContainer';
 import PropyKeysHomeListingContactFormContainer from '../containers/PropyKeysHomeListingContactFormContainer';
+import PropyKeysHomeListingLikeZoneContainer from '../containers/PropyKeysHomeListingLikeZoneContainer';
 
 import SingleTokenCardBaseline from '../components/SingleTokenCardBaseline';
 
@@ -252,11 +253,11 @@ const SingleListingPage = (props: ISingleListingPage) => {
       if(listingRecord) {
         return (
           <>
-            {/* {tokenId && tokenAddress && network && 
+            {listingRecord?.id && 
               <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                <NFTLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
+                <PropyKeysHomeListingLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} propyKeysHomeListingId={listingRecord?.id.toString()} />
               </div>
-            } */}
+            }
             {listingRecord?.description &&
               <>
                 <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
@@ -282,7 +283,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
               } */}
               {nftRecord &&
                 <>
-                <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated PropyKeys Record"/>
+                  <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated PropyKeys Record"/>
                   <div style={{maxWidth: 350}}>
                     <SingleTokenCardBaseline
                       tokenLink={`token/${nftRecord?.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`}
