@@ -31,6 +31,8 @@ import useWindowSize from '../hooks/useWindowSize';
 
 import { PropsFromRedux } from '../containers/PageContainerContainer';
 
+import { defaultFullScreenGalleryConfig } from '../state/reducers/fullScreenGalleryConfig';
+
 import {
   IS_GLOBAL_TOP_BANNER_ENABLED,
   GLOBAL_TOP_BANNER_HEIGHT,
@@ -54,6 +56,7 @@ const PageContainer = (props: PropsFromRedux) => {
     const {
       isConsideredMobile,
       darkMode,
+      setFullScreenGalleryConfig,
     } = props;
 
     const { pathname } = useLocation();
@@ -78,8 +81,9 @@ const PageContainer = (props: PropsFromRedux) => {
     }, [windowSize.width, windowSize.height, setShowDesktopMenu]);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname]);
+      window.scrollTo(0, 0);
+      setFullScreenGalleryConfig(defaultFullScreenGalleryConfig);
+    }, [pathname, setFullScreenGalleryConfig]);
 
     return (
         <Navigation>

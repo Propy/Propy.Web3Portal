@@ -372,4 +372,15 @@ export const PropyKeysListingService = {
   ) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/listing/${network}`, `${contractNameOrCollectionNameOrAddress}?perPage=${perPage}&page=${page}${(additionalFilters && additionalFilters?.length > 0) ? `&${additionalFilters.map((queryEntry) => queryEntry["filter_type"] + "=" + queryEntry["value"]).join("&")}` : ''}`)
   },
+  async getLikedByStatus(
+    propyKeysHomeListingId: string,
+    likerAddress: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/listing/liked-by-status/${propyKeysHomeListingId}`, `${likerAddress}`)
+  },
+  async getLikeCount(
+    propyKeysHomeListingId: string,
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/listing/like-count/${propyKeysHomeListingId}`)
+  },
 }
