@@ -4,6 +4,8 @@ import { animated, useSpring } from '@react-spring/web';
 
 import { utils } from "ethers";
 
+import dayjs from 'dayjs';
+
 import BigNumber from 'bignumber.js';
 
 import { toast } from 'sonner';
@@ -32,10 +34,16 @@ import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 
 import FloatingActionButton from './FloatingActionButton';
 
-import { SupportedNetworks } from '../interfaces';
+import { 
+  SupportedNetworks,
+  NetworkName,
+} from '../interfaces';
+
+import LinkWrapper from './LinkWrapper';
 
 import {
   priceFormat,
+  getEtherscanLinkByNetworkName,
 } from '../utils';
 
 import {
@@ -44,6 +52,7 @@ import {
   OPTIMISM_PORTAL_ADDRESS,
   BASE_BRIDGE_L1_NETWORK,
   BASE_BRIDGE_L2_NETWORK,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import {
@@ -381,7 +390,14 @@ const BridgeFinalizeWithdrawalForm = (props: PropsFromRedux & IBridgeFinalizeWit
               showLoadingIcon={isAwaitingWalletInteraction || isAwaitingFinalizeTx || isAwaitingValidPreparation || isFinalizationPeriodNotElapsed}
               text={getBridgeFinalizedWithdrawalButtonText(isAwaitingWalletInteraction, isAwaitingFinalizeTx, isAwaitingValidPreparation, isWithdrawalAlreadyFinalized, showSuccessMessage, isFinalizationPeriodNotElapsed)}
             />
-            {isAwaitingValidPreparation && <Typography variant="caption" style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem'}} className={classes.innerSpacingTop}>Waiting for your withdrawal proof to make it through the challenge period, this will take around ~ 1 week from the time of submitting your withdrawal proof.</Typography>}
+            {isAwaitingValidPreparation && 
+              <>
+                <Typography variant="caption" style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem'}} className={classes.innerSpacingTop}>Waiting for your <LinkWrapper style={{display: 'inline-block', fontWeight: 'bold', color: PROPY_LIGHT_BLUE}} external={true} link={transactionData?.withdrawal_proven_event?.transaction_hash && getEtherscanLinkByNetworkName(destination as NetworkName, transactionData?.withdrawal_proven_event?.transaction_hash, 'transaction')}>withdrawal proof</LinkWrapper> to make it through the challenge period, this will take around ~ 1 week from the time of submitting your withdrawal proof.</Typography>
+                {transactionData?.withdrawal_proven_event?.evm_transaction?.block_timestamp &&
+                  <Typography variant="caption" style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem'}} className={classes.innerSpacingTop}>Detected <LinkWrapper style={{display: 'inline-block', fontWeight: 'bold', color: PROPY_LIGHT_BLUE}} external={true} link={transactionData?.withdrawal_proven_event?.transaction_hash && getEtherscanLinkByNetworkName(destination as NetworkName, transactionData?.withdrawal_proven_event?.transaction_hash, 'transaction')}>withdrawal proof</LinkWrapper> at {dayjs.unix(Number(transactionData?.withdrawal_proven_event?.evm_transaction?.block_timestamp)).format('hh:mm A MMM-D-YYYY')}, therefore withdrawal finalization should be possible at approximately {dayjs.unix(Number(transactionData?.withdrawal_proven_event?.evm_transaction?.block_timestamp)).add(7, 'day').format('hh:mm A MMM-D-YYYY')}.</Typography>
+                }
+              </>
+            }
             {(isWithdrawalAlreadyFinalized || showSuccessMessage) && <Typography variant="caption" style={{textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem'}} className={classes.innerSpacingTop}>Withdrawal finalized! Tokens have been withdrawn to L1.</Typography>}
           </div>
         }

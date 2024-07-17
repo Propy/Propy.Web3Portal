@@ -300,6 +300,7 @@ export interface IBaseWithdrawalProvenEvent {
     event_fingerprint: string;
     created_at: Date;
     updated_at: Date;
+    evm_transaction?: IEVMTransactionRecord;
 }
   
 export interface IBaseWithdrawalFinalizedEvent {
