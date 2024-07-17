@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
     textFirstLine: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'end',
+      alignItems: 'center',
     },
     disabledActionArea: {
       opacity: 0.5,
