@@ -11,7 +11,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 
-import NFTLikeZoneContainer from '../containers/NFTLikeZoneContainer';
+import PropyKeysHomeListingLikeZoneContainer from '../containers/PropyKeysHomeListingLikeZoneContainer';
 
 import PlaceholderImage from '../assets/img/placeholder.webp';
 
@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme: Theme) =>
     textFirstLine: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'end',
+      alignItems: 'center',
     },
     disabledActionArea: {
       opacity: 0.5,
@@ -151,9 +151,6 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
     subtleDisableInteraction,
     tokenLink,
     tokenImage,
-    tokenId,
-    tokenContractAddress,
-    tokenNetwork,
     tokenTitle,
     listingRecord,
   } = props;
@@ -246,15 +243,16 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
                   {tokenCollectionName}
                 </Typography>
               } */}
-              {tokenId && tokenContractAddress && tokenNetwork && !selectable && 
+              <Typography variant="h6" className={[classes.title].join(" ")}>
+                {tokenTitle}
+              </Typography>
+              {listingRecord?.id && !selectable && 
                 <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                  <NFTLikeZoneContainer compact={true} tokenId={tokenId} tokenAddress={tokenContractAddress} tokenNetwork={tokenNetwork} />
+                  <PropyKeysHomeListingLikeZoneContainer compact={true} propyKeysHomeListingId={listingRecord?.id.toString()} />
                 </div>
               }
             </div>
-            <Typography variant="h6" className={[classes.title].join(" ")}>
-              {tokenTitle}
-            </Typography>
+            
             {/* {listingRecord?.price &&
               <Typography variant="subtitle1" className={[classes.collectionName].join(" ")}>
                 {priceFormat(`${listingRecord?.price}`, 2, "$")}
