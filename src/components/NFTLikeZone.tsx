@@ -69,7 +69,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
 
   const classes = useStyles();
 
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const { 
     // data,
@@ -125,7 +125,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
   }, [tokenNetwork, tokenAddress, tokenId, address, reloadIndex])
 
   const signLike = async (type: 'add_like_nft' | 'remove_like_nft') => {
-    if(signMessageAsync && address) {
+    if(signMessageAsync && address && chainId) {
       let signerAccount = address;
       let nonceResponse : INonceResponse = await SignerService.getSignerNonce(address);
       let {
@@ -140,6 +140,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
           signerAccount,
           nonce,
           salt,
+          chainId,
           type,
           {
             token_address: tokenAddress,
@@ -171,9 +172,15 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                 toast.error(`Unable to ${type === 'add_like_nft' ? "add" : "remove"} like`);
               }
             }
-          } catch (e) {
-            //@ts-ignore
-            toast.error(e?.shortMessage ? e.shortMessage : "Failed to sign message");
+          } catch (e: any) {
+            let errorMessage;
+            if(e?.shortMessage) {
+              errorMessage = e?.shortMessage;
+            }
+            if(e?.data?.message) {
+              errorMessage = e?.data?.message;
+            }
+            toast.error(errorMessage ? errorMessage : "Failed to sign message");
           }
         } else {
           toast.error("Unable to generate message for signing");
