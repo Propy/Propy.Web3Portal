@@ -244,15 +244,17 @@ export const AccountBalanceService = {
   async getAccountBalancesByAssetIncludeStakingStatus(
     account: `0x${string}`,
     assetAddress: `0x${string}`,
+    maxRecords: number,
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true`)
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&perPage=${maxRecords}`)
   },
   async getAccountBalancesByAssetOnlyStaked(
     account: `0x${string}`,
     assetAddress: `0x${string}`,
     stakingContractAddress: `0x${string}`,
+    maxRecords: number,
   ) : Promise<AxiosResponse["data"]> {
-    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true&stakingContractAddress=${stakingContractAddress}`)
+    return ApiService.get(`/balances`, `${account}/${assetAddress}?includeStakingStatus=true&includeLastStakerRecords=true&onlyLastStakerRecords=true&stakingContractAddress=${stakingContractAddress}&perPage=${maxRecords}`)
   },
 }
 

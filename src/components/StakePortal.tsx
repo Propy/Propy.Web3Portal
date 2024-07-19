@@ -60,6 +60,7 @@ import {
 import {
   IAssetRecord,
   IBalanceRecord,
+  IPaginationNoOptional,
 } from '../interfaces';
 
 import ERC20ABI from '../abi/ERC20ABI.json';
@@ -155,7 +156,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     loadingZone: {
       opacity: 0.5,
-    }
+    },
+    loadMoreButtonContainer: {
+      marginTop: theme.spacing(4),
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+    },
   }),
 );
 
@@ -316,7 +323,11 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const [nftAssets, setNftAssets] = useState<INftAssets>({});
   const [propyKeysNFT, setPropyKeysNFT] = useState<false | IBalanceRecord[]>(false);
+  const [propyKeysNFTPaginationData, setPropyKeysNFTPaginationData] = useState<false | IPaginationNoOptional>(false);
+  const [maxStakedLoadCount, setMaxStakedLoadCount] = useState(100);
+  const [maxUnstakedLoadCount, setMaxUnstakedLoadCount] = useState(100);
   const [ogKeysNFT, setOGKeysNFT] = useState<false | IBalanceRecord[]>(false);
+  const [ogKeysNFTPaginationData, setOGKeysNFTPaginationData] = useState<false | IPaginationNoOptional>();
   const [selectedTokenIds, setSelectedPropyKeyTokenIds] = useState<number[]>([]);
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<false | string>(false);
   const [isAwaitingUnstakeTx, setIsAwaitingUnstakeTx] = useState(false);
@@ -383,13 +394,13 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
         let results;
         if (mode === "enter") {
           results = await Promise.all([
-            AccountBalanceService.getAccountBalancesByAssetIncludeStakingStatus(address, BASE_PROPYKEYS_STAKING_NFT),
-            AccountBalanceService.getAccountBalancesByAssetIncludeStakingStatus(address, BASE_OG_STAKING_NFT),
+            AccountBalanceService.getAccountBalancesByAssetIncludeStakingStatus(address, BASE_PROPYKEYS_STAKING_NFT, maxUnstakedLoadCount),
+            AccountBalanceService.getAccountBalancesByAssetIncludeStakingStatus(address, BASE_OG_STAKING_NFT, maxUnstakedLoadCount),
           ])
         } else if(mode === "leave") {
           results = await Promise.all([
-            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_PROPYKEYS_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2),
-            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_OG_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2),
+            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_PROPYKEYS_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, maxStakedLoadCount),
+            AccountBalanceService.getAccountBalancesByAssetOnlyStaked(address, BASE_OG_STAKING_NFT, version === 1 ? BASE_PROPYKEYS_STAKING_CONTRACT_V1 : BASE_PROPYKEYS_STAKING_CONTRACT_V2, maxStakedLoadCount),
           ])
         }
         if(isMounted) {
@@ -415,7 +426,13 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
           if(isMounted) {
             setNftAssets(assetResults);
             setPropyKeysNFT(propykeysRenderResults);
+            if(results?.[0]?.data?.metadata?.pagination) {
+              setPropyKeysNFTPaginationData(results?.[0]?.data?.metadata?.pagination);
+            }
             setOGKeysNFT(ogRenderResults);
+            if(results?.[1]?.data?.metadata?.pagination) {
+              setOGKeysNFTPaginationData(results?.[1]?.data?.metadata?.pagination);
+            }
             setIsLoading(false);
           }
         }
@@ -425,7 +442,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     return () => {
       isMounted = false;
     }
-  }, [address, mode, triggerUpdateIndex, version])
+  }, [address, mode, triggerUpdateIndex, version, maxUnstakedLoadCount, maxStakedLoadCount])
 
   const handleBalanceRecordSelected = (balanceRecord: IBalanceRecord) => {
     let useCurrentSelection = balanceRecord.asset_address === selectedTokenAddress ? [...selectedTokenIds] : [];
@@ -495,7 +512,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     }
   }, [clientCountry])
   
-  console.log({propyKeysNFT, nftAssets, selectedTokenIds, clientCountry})
+  console.log({clientCountry})
 
   const { 
     data: dataPropyKeysIsStakingContractApproved,
@@ -1092,14 +1109,14 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
             {!(isLoading || isLoadingGeoLocation) && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
               <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="body1" style={{textAlign: 'left'}}>
-                  {(propyKeysNFT && propyKeysNFT.length > 0) &&
+                  {(propyKeysNFTPaginationData && propyKeysNFTPaginationData?.total > 0) &&
                     <>
-                      {`Found ${propyKeysNFT && propyKeysNFT.length > 0 ? propyKeysNFT.length : 0} PropyKeys`}<br/>
+                      {`Found ${propyKeysNFTPaginationData && propyKeysNFTPaginationData?.total > 0 ? propyKeysNFTPaginationData.total : 0} PropyKeys`}<br/>
                     </>
                   }
-                  {(ogKeysNFT && ogKeysNFT.length > 0) &&
+                  {(ogKeysNFTPaginationData && ogKeysNFTPaginationData?.total > 0) &&
                     <>
-                      {`Found ${ogKeysNFT && ogKeysNFT.length > 0 ? ogKeysNFT.length : 0} PropyOG tokens`}<br/>
+                      {`Found ${ogKeysNFTPaginationData && ogKeysNFTPaginationData?.total > 0 ? ogKeysNFTPaginationData.total : 0} PropyOG tokens`}<br/>
                     </>
                   }
                   Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
@@ -1131,6 +1148,38 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                   )
                 }
               </>
+            }
+            {
+              (mode === "enter") && ((ogKeysNFT && ogKeysNFT?.length > 0) || (propyKeysNFT && propyKeysNFT?.length > 0)) &&
+                <div className={classes.loadMoreButtonContainer}>
+                  <FloatingActionButton
+                    // className={classes.submitButton}
+                    buttonColor="secondary"
+                    disabled={isLoading || ((propyKeysNFTPaginationData && (propyKeysNFTPaginationData?.total === propyKeysNFTPaginationData?.count)) && (ogKeysNFTPaginationData && (ogKeysNFTPaginationData?.total === ogKeysNFTPaginationData?.count)))}
+                    onClick={() => setMaxUnstakedLoadCount(maxUnstakedLoadCount + 100)}
+                    showLoadingIcon={isLoading || isLoadingGeoLocation}
+                    text={(
+                      (propyKeysNFTPaginationData && (propyKeysNFTPaginationData?.total === propyKeysNFTPaginationData?.count))
+                      && (ogKeysNFTPaginationData && (ogKeysNFTPaginationData?.total === ogKeysNFTPaginationData?.count))
+                    ) ? "All Records Loaded" : "Load More"}
+                  />
+                </div>
+            }
+            {
+              (mode === "leave") && ((ogKeysNFT && ogKeysNFT?.length > 0) || (propyKeysNFT && propyKeysNFT?.length > 0)) &&
+                <div className={classes.loadMoreButtonContainer}>
+                  <FloatingActionButton
+                    // className={classes.submitButton}
+                    buttonColor="secondary"
+                    disabled={isLoading || ((propyKeysNFTPaginationData && (propyKeysNFTPaginationData?.total === propyKeysNFTPaginationData?.count)) && (ogKeysNFTPaginationData && (ogKeysNFTPaginationData?.total === ogKeysNFTPaginationData?.count)))}
+                    onClick={() => setMaxStakedLoadCount(maxStakedLoadCount + 100)}
+                    showLoadingIcon={isLoading || isLoadingGeoLocation}
+                    text={(
+                      (propyKeysNFTPaginationData && (propyKeysNFTPaginationData?.total === propyKeysNFTPaginationData?.count))
+                      && (ogKeysNFTPaginationData && (ogKeysNFTPaginationData?.total === ogKeysNFTPaginationData?.count))
+                    ) ? "All Records Loaded" : "Load More"}
+                  />
+                </div>
             }
             {!(isLoading || isLoadingGeoLocation) && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
               <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
