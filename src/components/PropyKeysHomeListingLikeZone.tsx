@@ -67,7 +67,7 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
 
   const classes = useStyles();
 
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const { 
     // data,
@@ -122,7 +122,7 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
   }, [propyKeysHomeListingId, address, reloadIndex])
 
   const signLike = async (type: 'add_like_propykeys_listing' | 'remove_like_propykeys_listing') => {
-    if(signMessageAsync && address) {
+    if(signMessageAsync && address && chainId) {
       let signerAccount = address;
       let nonceResponse : INonceResponse = await SignerService.getSignerNonce(address);
       let {
@@ -137,6 +137,7 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
           signerAccount,
           nonce,
           salt,
+          chainId,
           type,
           {
             listing_id: propyKeysHomeListingId,
@@ -166,9 +167,15 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
                 toast.error(`Unable to ${type === 'add_like_propykeys_listing' ? "add" : "remove"} like`);
               }
             }
-          } catch (e) {
-            //@ts-ignore
-            toast.error(e?.shortMessage ? e.shortMessage : "Failed to sign message");
+          } catch (e: any) {
+            let errorMessage;
+            if(e?.shortMessage) {
+              errorMessage = e?.shortMessage;
+            }
+            if(e?.data?.message) {
+              errorMessage = e?.data?.message;
+            }
+            toast.error(errorMessage ? errorMessage : "Failed to sign message");
           }
         } else {
           toast.error("Unable to generate message for signing");

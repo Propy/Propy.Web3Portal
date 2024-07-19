@@ -275,6 +275,7 @@ export const constructSignerMessage = (
 	signerAccount: string,
 	nonce: number,
 	salt: string,
+	chainId: number,
 	actionType: string,
 	metadata: any
 ) => {
@@ -284,6 +285,7 @@ export const constructSignerMessage = (
 			action: actionType,
 			metadata,
 			timestamp: Math.floor(new Date().getTime() / 1000),
+			chain_id: chainId,
 			nonce,
 			salt,
 		}, null, 4);

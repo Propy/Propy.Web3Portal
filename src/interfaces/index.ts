@@ -161,6 +161,14 @@ export interface IPagination {
     totalPages?: number
 }
 
+export interface IPaginationNoOptional {
+    total: number
+    count: number
+    perPage: number
+    currentPage: number
+    totalPages: number
+}
+
 export interface IMixedBalancesResult {
     [key: string]: {
         [key: string]: {

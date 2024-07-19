@@ -182,7 +182,7 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                     Tier 3
                   </Typography>
                   <Typography variant="h5" className={classes.cardSubtitle}>
-                    RWA
+                    RWA NFT
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Speed up the buying & selling process, potentially use NFT as onchain collateral
