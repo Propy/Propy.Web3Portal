@@ -24,7 +24,7 @@ export function usePrepareFinalizeWithdrawal(
 
   const shouldPrepare = withdrawalForTx;
 
-  const { data, error: useSimulateContractError, refetch } = useSimulateContract({
+  const { data, error: useSimulateContractError, isFetching, isRefetching, refetch } = useSimulateContract({
     address: shouldPrepare ? l1OptimismPortalProxyAddress : undefined,
     abi: OptimismPortal,
     functionName: 'finalizeWithdrawalTransaction',
@@ -75,10 +75,15 @@ export function usePrepareFinalizeWithdrawal(
       }
     } else {
       alreadyFinalizedHandler(false);
-      prepErrorHandler(false);
-      finalizationPeriodHasNotElapsed(false);
+      if(!isFetching && !isRefetching && shouldPrepare) {
+        finalizationPeriodHasNotElapsed(false);
+        prepErrorHandler(false);
+      } else {
+        finalizationPeriodHasNotElapsed(true);
+        prepErrorHandler(true);
+      }
     }
-  }, [useSimulateContractError, prepErrorHandler, alreadyFinalizedHandler, finalizationPeriodHasNotElapsed])
+  }, [useSimulateContractError, shouldPrepare, l1OptimismPortalProxyAddress, isFetching, isRefetching, prepErrorHandler, alreadyFinalizedHandler, finalizationPeriodHasNotElapsed])
 
   useEffect(() => {
     if (withdrawalReceipt) {

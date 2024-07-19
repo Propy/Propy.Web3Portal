@@ -42,21 +42,22 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     showCompactNetworkSwitch = false,
   } = props;
 
-  const { chain } = useAccount();
+  const { chainId, address } = useAccount();
 
   const { open } = useWeb3Modal();
 
   useEffect(() => {
-    if(chain) {
-      console.log({chain})
-      let networkName = NETWORK_ID_TO_NAME[chain.id];
+    if(chainId) {
+      let networkName = NETWORK_ID_TO_NAME[chainId];
       if(networkName) {
         setActiveNetwork(networkName as SupportedNetworks);
       } else {
         setActiveNetwork('unsupported');
       }
+    } else if (!chainId && address) {
+      setActiveNetwork('unsupported');
     }
-  }, [chain, setActiveNetwork, open]);
+  }, [chainId, address, setActiveNetwork, open]);
 
   const activeNetworkToImage = (network: SupportedNetworks, showCompactNetworkSwitch: boolean) => {
     let networkImage;

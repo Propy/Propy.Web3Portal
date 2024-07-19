@@ -40,6 +40,10 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: 'black',
       height: 'calc(100% - 100px)'
     },
+    primaryImage: {
+      maxHeight: '100%',
+      maxWidth: '100%',
+    },
     primaryImageBackgroundContainer: {
       backgroundSize: 'cover',
       width: '110%',
@@ -56,10 +60,20 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundPosition: 'center',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
       height: '100%',
+    },
+    controlsOverlayContainer: {
+      top: 0,
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     primaryImageControlsTopRow: {
       display: 'flex',
@@ -192,7 +206,10 @@ const FullScreenGallery = (props: PropsFromRedux & IFullScreenGallery) => {
             // onClick={() => handleFullscreenImageSelection(selectedImageIndex)}
           >
             <div className={[classes.primaryImageBackgroundContainer, 'image-filter-blur-heavy'].join(' ')} style={fullScreenGalleryConfig?.images?.length > 0 ? { backgroundImage: `url(${fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex]})` } : {}} />
-            <div className={classes.primaryImageForegroundContainer} style={fullScreenGalleryConfig?.images?.length > 0 ? { backgroundImage: `url(${fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex]})` } : {}}>
+            <div className={classes.primaryImageForegroundContainer}>
+              <img alt={`fullscreen listing ${fullScreenGalleryConfig?.selectedImageIndex}`} key={`listing-image-${fullScreenGalleryConfig?.selectedImageIndex}`} className={classes.primaryImage} src={fullScreenGalleryConfig?.images?.length > 0 ? fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex] : ""}/>
+            </div>
+            <div className={classes.controlsOverlayContainer}>
               <div className={classes.primaryImageControlsTopRow}>
                 <div style={{margin: 8}}>
                   <Typography style={{fontWeight: 'bold'}}>{fullScreenGalleryConfig?.selectedImageIndex + 1} / {fullScreenGalleryConfig?.images?.length}</Typography>

@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme: Theme) =>
       overflowX: 'scroll',
       padding: 4,
       border: '1px solid #d5d5d5',
+      height: 110,
     },
     previewImageRowInner: {
       display: 'flex',

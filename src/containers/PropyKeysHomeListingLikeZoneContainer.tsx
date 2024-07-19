@@ -1,8 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import PageContainer from '../components/PageContainer';
-
-import { setFullScreenGalleryConfig } from '../state/actions';
+import PropyKeysHomeListingLikeZone from '../components/PropyKeysHomeListingLikeZone';
 
 interface RootState {
   isConsideredMobile: boolean
@@ -15,13 +13,9 @@ const mapStateToProps = (state: RootState) => ({
   isConsideredMedium: state.isConsideredMedium,
   darkMode: state.darkMode,
 })
-
-const mapDispatchToProps = {
-  setFullScreenGalleryConfig,
-}
   
-const connector = connect(mapStateToProps, mapDispatchToProps)
+const connector = connect(mapStateToProps, {})
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(PageContainer)
+export default connector(PropyKeysHomeListingLikeZone)

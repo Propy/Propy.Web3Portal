@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 
 import { Web3ModalButtonWagmi } from './Web3ModalButtonWagmi';
 
-import { PropsFromRedux } from '../containers/NFTLikeZoneContainer';
+import { PropsFromRedux } from '../containers/PropyKeysHomeListingLikeZoneContainer';
 
 import {
   INonceResponse,
@@ -27,7 +27,7 @@ import {
 
 import {
   SignerService,
-  NFTService,
+  PropyKeysListingService,
 } from '../services/api';
 
 import {
@@ -52,16 +52,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface INFTLikeZone {
+interface IPropyKeysHomeListingLikeZone {
   title?: string,
-  tokenAddress: string,
-  tokenId: string,
-  tokenNetwork: string,
+  propyKeysHomeListingId: string,
   onSuccess?: () => void,
   compact?: boolean,
 }
 
-const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
+const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeListingLikeZone) => {
 
   const [likeCount, setLikeCount] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -81,9 +79,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
 
   const {
     darkMode,
-    tokenAddress,
-    tokenId,
-    tokenNetwork,
+    propyKeysHomeListingId,
     onSuccess,
     compact = false,
   } = props;
@@ -93,8 +89,8 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     const getLikeStatus = async () => {
       if(address) {
         let [likeStatusResponse, likeCountResponse] = await Promise.all([
-          NFTService.getLikedByStatus(tokenNetwork, tokenAddress, tokenId, address),
-          NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
+          PropyKeysListingService.getLikedByStatus(propyKeysHomeListingId, address),
+          PropyKeysListingService.getLikeCount(propyKeysHomeListingId),
         ]);
         if(isMounted) {
           if(likeStatusResponse?.data?.like_status) {
@@ -102,13 +98,14 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
           } else {
             setIsLiked(false);
           }
+          console.log({likeCountResponse})
           if(!isNaN(likeCountResponse?.data?.like_count)) {
             setLikeCount(likeCountResponse?.data?.like_count);
           }
         }
       } else {
         let [likeCountResponse] = await Promise.all([
-          NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
+          PropyKeysListingService.getLikeCount(propyKeysHomeListingId),
         ]);
         if(isMounted) {
           if(!isNaN(likeCountResponse?.data?.like_count)) {
@@ -122,16 +119,16 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     return () => {
       isMounted = false;
     }
-  }, [tokenNetwork, tokenAddress, tokenId, address, reloadIndex])
+  }, [propyKeysHomeListingId, address, reloadIndex])
 
-  const signLike = async (type: 'add_like_nft' | 'remove_like_nft') => {
+  const signLike = async (type: 'add_like_propykeys_listing' | 'remove_like_propykeys_listing') => {
     if(signMessageAsync && address && chainId) {
       let signerAccount = address;
       let nonceResponse : INonceResponse = await SignerService.getSignerNonce(address);
       let {
         data,
       } = nonceResponse;
-      if(data && tokenAddress && tokenId) {
+      if(data && propyKeysHomeListingId) {
         let {
           nonce,
           salt,
@@ -143,9 +140,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
           chainId,
           type,
           {
-            token_address: tokenAddress,
-            token_id: tokenId,
-            token_network: tokenNetwork,
+            listing_id: propyKeysHomeListingId,
           }
         );
         if(messageForSigning) {
@@ -160,16 +155,16 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                   onSuccess();
                 }
                 setReloadIndex(reloadIndex + 1);
-                if(type === 'add_like_nft') {
+                if(type === 'add_like_propykeys_listing') {
                   setIsLiked(true);
                   setLikeCount(likeCount + 1);
                 } else {
                   setIsLiked(false);
                   setLikeCount(likeCount - 1);
                 }
-                toast.success(`Like ${type === 'add_like_nft' ? "added" : "removed"} successfully!`);
+                toast.success(`Like ${type === 'add_like_propykeys_listing' ? "added" : "removed"} successfully!`);
               } else {
-                toast.error(`Unable to ${type === 'add_like_nft' ? "add" : "remove"} like`);
+                toast.error(`Unable to ${type === 'add_like_propykeys_listing' ? "add" : "remove"} like`);
               }
             }
           } catch (e: any) {
@@ -219,7 +214,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                signLike(isLiked ? 'remove_like_nft' : 'add_like_nft')
+                signLike(isLiked ? 'remove_like_propykeys_listing' : 'add_like_propykeys_listing')
               }}
               onTouchStart={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
@@ -236,4 +231,4 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
   )
 }
 
-export default NFTLikeZone;
+export default PropyKeysHomeListingLikeZone;

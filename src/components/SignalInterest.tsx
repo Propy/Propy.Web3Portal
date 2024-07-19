@@ -84,7 +84,7 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
 
   const classes = useStyles();
 
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const { 
     // data,
@@ -106,7 +106,7 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
   } = props;
 
   const signOfferMessage = async (proAmount: string) => {
-    if(signMessageAsync && address) {
+    if(signMessageAsync && address && chainId) {
       let signerAccount = address;
       let nonceResponse : INonceResponse = await SignerService.getSignerNonce(address);
       let {
@@ -121,6 +121,7 @@ const SignalInterest = (props: PropsFromRedux & ISignalInterest) => {
           signerAccount,
           nonce,
           salt,
+          chainId,
           "make_offchain_offer",
           {
             token_address: tokenAddress,
