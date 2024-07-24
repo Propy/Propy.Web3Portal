@@ -90,6 +90,7 @@ const HomePage = () => {
                             collectionSlug={entry.slug}
                             overrideTitle={entry.overrideTitle}
                             filterShims={entry.filterShims}
+                            showHeroGallery={entry.showHeroGallery}
                         />
                     </div>
                 )}

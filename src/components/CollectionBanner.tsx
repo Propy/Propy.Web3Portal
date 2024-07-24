@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { Theme } from '@mui/material/styles';
 
@@ -34,6 +36,7 @@ import {
 import {
   VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES,
 } from '../utils/constants';
+import CollectionExplorerGalleryContainer from '../containers/CollectionExplorerGalleryContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -76,6 +79,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     activeFilterZone: {
       marginBottom: theme.spacing(1),
+    },
+    collectionExplorerGalleryContainer: {
+      marginBottom: theme.spacing(4),
+      marginTop: theme.spacing(2),
     }
   }),
 );
@@ -92,7 +99,8 @@ interface ICollectionBanner {
   firstElementShim?: React.ReactNode,
   showFilters?: boolean,
   overrideTitle?: string,
-  filterShims?: string[]
+  filterShims?: string[],
+  showHeroGallery?: boolean,
 }
 
 interface INftAssets {
@@ -101,19 +109,15 @@ interface INftAssets {
 
 const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
 
+  const location = useLocation();
   let [searchParams, setSearchParams] = useSearchParams();
 
-  const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
-  const [nftAssets, setNftAssets] = useState<INftAssets>({});
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [perPage, setPerPage] = useState(20);
-  const [paginationTotalPages, setPaginationTotalPages] = useState(0);
-  const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
-  const [title, setTitle] = useState("Loading...");
-  const [isInitialLoad, setIsInitialLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeFilters, setActiveFilters] = useState<ICollectionQueryFilter[]>([]);
+  
+  const searchParamsMemo = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return Object.fromEntries(params.entries());
+  }, [location.search]);
 
   const classes = useStyles();
 
@@ -130,16 +134,21 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     showFilters = false,
     overrideTitle,
     filterShims,
+    showHeroGallery = false,
   } = props;
 
   if(firstElementShim && maxRecords) {
     maxRecords = maxRecords - 1;
   }
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCollection = async () => {
-      setIsLoading(true);
+  const perPage = 20;
+
+  const { 
+    data: collectionDataTanstack,
+    isLoading: isLoadingCollectionDataTanstack,
+  } = useQuery({
+    queryKey: [contractNameOrCollectionNameOrAddress, network, perPage, page, searchParamsMemo, filterShims, overrideTitle],
+    queryFn: async () => {
       let additionalFilters : ICollectionQueryFilter[] = [];
       if(searchParams.get("city")) {
         additionalFilters.push({filter_type: "city", value: `${searchParams.get("city")}`});
@@ -159,7 +168,6 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("attached_deed")) {
         additionalFilters.push({filter_type: "attached_deed", value: true});
       }
-      setActiveFilters(additionalFilters);
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
         contractNameOrCollectionNameOrAddress,
@@ -167,9 +175,8 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         page,
         additionalFilters,
       )
-      setIsInitialLoading(false);
-      setIsLoading(false);
-      if(collectionResponse?.status && collectionResponse?.data && isMounted) {
+      let title = "No records found";
+      if(collectionResponse?.status && collectionResponse?.data) {
         let renderResults : INFTRecord[] = [];
         let assetResults : INftAssets = {};
         let apiResponseData : IRecentlyMintedResult = collectionResponse.data;
@@ -177,58 +184,60 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           for(let nftRecord of apiResponseData?.data) {
             if(nftRecord?.asset?.address && !assetResults[nftRecord?.asset?.address]) {
               assetResults[nftRecord.asset.address] = nftRecord.asset;
-              let useTitle = "Collection not found";
+              title = "Collection not found";
               if(nftRecord.asset.collection_name) {
-                useTitle = nftRecord.asset.collection_name;
+                title = nftRecord.asset.collection_name;
               } else if (nftRecord.asset.name) {
-                useTitle = nftRecord.asset.name;
+                title = nftRecord.asset.name;
               } else if (nftRecord.asset.address) {
-                useTitle = nftRecord.asset.address;
+                title = nftRecord.asset.address;
               }
               if(overrideTitle) {
-                useTitle = overrideTitle;
+                title = overrideTitle;
               }
-              setTitle(useTitle);
             }
             renderResults = [...renderResults, nftRecord];
           }
-          if(apiResponseData?.metadata?.pagination?.totalPages) {
-            setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
-          } else {
-            setPaginationTotalPages(0);
-          }
-          if(apiResponseData?.metadata?.pagination?.total) {
-            setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
-          } else {
-            setPaginationTotalRecords(0);
+        }
+        return {
+          title,
+          nftRecords: renderResults,
+          nftAssets: assetResults,
+          activeFilters: additionalFilters,
+          pagination: {
+            totalPages: apiResponseData?.metadata?.pagination?.totalPages ? apiResponseData?.metadata?.pagination?.totalPages : 0,
+            totalRecords: apiResponseData?.metadata?.pagination?.total ? apiResponseData?.metadata?.pagination?.total : 0,
           }
         }
-        if(renderResults.length === 0) {
-          setTitle("No records found");
+      }
+      return {
+        title,
+        nftRecords: [],
+        nftAssets: {},
+        activeFilters: [],
+        pagination: {
+          totalPages: 0,
+          totalRecords: 0,
         }
-        setNftRecords(renderResults);
-        setNftAssets(assetResults);
-      } else {
-        setNftRecords([]);
-        setNftAssets({});
       }
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      } else if(searchParams.get("page")) {
-        setSearchParams((params => {
-          params.delete("page");
-          return params;
-        }));
-      }
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
+
+  useEffect(() => {
+    if(page > 1) {
+      setSearchParams((params => {
+        params.set("page", page.toString());
+        return params;
+      }));
+    } else if(searchParams.get("page")) {
+      setSearchParams((params => {
+        params.delete("page");
+        return params;
+      }));
     }
-    fetchCollection();
-    return () => {
-      isMounted = false;
-    }
-  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParams, filterShims, overrideTitle])
+  }, [page, searchParams, setSearchParams]);
 
   return (
     <>
@@ -236,12 +245,12 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         <>
           <div className={[showFilters ? classes.titleContainerWithFilters : classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
             <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
-              {title ? title : "Loading..."}
+              {collectionDataTanstack?.title ? collectionDataTanstack?.title : "Loading..."}
             </Typography>
-            {showCollectionLink && 
+            {showCollectionLink && collectionDataTanstack?.title && 
               <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`collection/${network}/${collectionSlug}`}>
                 <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
-                  View {title}
+                  View {collectionDataTanstack?.title}
                 </Button>
               </LinkWrapper>
             }
@@ -253,7 +262,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
                     collectionSlug={collectionSlug}
                     contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}
                     network={network}
-                    isLoading={isLoading}
+                    isLoading={isLoadingCollectionDataTanstack}
                     setPage={setPage}
                   />
                 </div>
@@ -262,30 +271,45 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           {
             showFilters &&
             (VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
-            (activeFilters.length > 0) &&
+            (collectionDataTanstack?.activeFilters && collectionDataTanstack?.activeFilters.length > 0) &&
               <div className={classes.activeFilterZone}>
-                <PropyKeysActiveFiltersZoneContainer activeFilters={activeFilters} />
+                <PropyKeysActiveFiltersZoneContainer activeFilters={collectionDataTanstack?.activeFilters} />
               </div>
           }
         </>
       }
-      <Grid className={[classes.sectionSpacer, isLoading ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
-        {!isInitialLoad && nftRecords && firstElementShim && 
+      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && showHeroGallery && 
+        <div className={classes.collectionExplorerGalleryContainer}>
+          <CollectionExplorerGalleryContainer 
+            explorerEntries={
+              collectionDataTanstack?.nftRecords.map((item, index) => ({
+                nftRecord: item,
+                assetRecord: collectionDataTanstack?.nftAssets[item?.asset_address],
+              }))
+            }
+            fullWidth={true}
+            overrideTitle={overrideTitle}
+            overrideSlug={collectionSlug}
+          />
+        </div>
+      }
+      <Grid className={[classes.sectionSpacer, isLoadingCollectionDataTanstack ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
+        {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && firstElementShim && 
           <Grid key={`single-token-card-first-element-shim-${new Date().getTime()}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             {firstElementShim}
           </Grid>
         }
-        {!isInitialLoad && nftRecords && nftRecords.sort((a, b) => {
-          if(nftAssets[a?.asset_address]?.standard && nftAssets[b?.asset_address]?.standard) {
-            return (nftAssets[a?.asset_address]?.standard).localeCompare(nftAssets[b?.asset_address]?.standard);
+        {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && collectionDataTanstack?.nftRecords.sort((a, b) => {
+          if(collectionDataTanstack?.nftAssets[a?.asset_address]?.standard && collectionDataTanstack?.nftAssets[b?.asset_address]?.standard) {
+            return (collectionDataTanstack?.nftAssets[a?.asset_address]?.standard).localeCompare(collectionDataTanstack?.nftAssets[b?.asset_address]?.standard);
           }
           return 0;
-        }).slice(0,(maxRecords && (nftRecords.length > maxRecords)) ? maxRecords : nftRecords.length).map((item, index) => 
+        }).slice(0,(maxRecords && (collectionDataTanstack?.nftRecords.length > maxRecords)) ? maxRecords : collectionDataTanstack?.nftRecords.length).map((item, index) => 
           <Grid key={`single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-            <SingleTokenCard nftRecord={item} assetRecord={nftAssets[item?.asset_address]} />
+            <SingleTokenCard nftRecord={item} assetRecord={collectionDataTanstack?.nftAssets[item?.asset_address]} />
           </Grid>
         )}
-        {isInitialLoad && maxRecords &&
+        {isLoadingCollectionDataTanstack && maxRecords &&
           Array.from({length: maxRecords}).map((entry, index) => 
             <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCardLoading />
@@ -293,15 +317,15 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           )
         }
       </Grid>
-      {paginationTotalPages > 1 && showPagination &&
+      {collectionDataTanstack?.pagination && collectionDataTanstack?.pagination?.totalPages > 1 && showPagination &&
         <>
           <div className={classes.paginationContainer}>
-            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={collectionDataTanstack?.pagination?.totalPages} variant="outlined" color="primary" />
           </div>
           {
-            paginationTotalRecords &&
+            collectionDataTanstack?.pagination?.totalRecords &&
             <Typography variant="subtitle1" className={classes.paginationTotalContainer}>
-              {paginationTotalRecords} total records
+              {collectionDataTanstack?.pagination?.totalRecords} total records
             </Typography>
           }
         </>
