@@ -224,7 +224,7 @@ export const priceFormat = (number: number | string, decimals = 2, currency = "$
 	return result;
 }
 
-export function getResolvableIpfsLink(ipfsUrl: string) {
+export function getResolvableIpfsLink(ipfsUrl: string = "") {
 	return ipfsUrl.replace('ipfs://', 'https://propy.mypinata.cloud/ipfs/');
 }
 

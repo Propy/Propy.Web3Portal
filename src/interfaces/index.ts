@@ -143,6 +143,11 @@ export interface INFTRecord {
     transfer_events_erc721?: ITransferEventERC721Record[];
 }
 
+export interface IExplorerGalleryEntry {
+    nftRecord: INFTRecord,
+    assetRecord: IAssetRecord,
+}
+
 export interface ICoordinate {
     longitude: number
     latitude: number

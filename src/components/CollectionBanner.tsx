@@ -36,6 +36,7 @@ import {
 import {
   VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES,
 } from '../utils/constants';
+import CollectionExplorerGalleryContainer from '../containers/CollectionExplorerGalleryContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -78,6 +79,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     activeFilterZone: {
       marginBottom: theme.spacing(1),
+    },
+    collectionExplorerGalleryContainer: {
+      marginBottom: theme.spacing(4),
+      marginTop: theme.spacing(2),
     }
   }),
 );
@@ -94,7 +99,8 @@ interface ICollectionBanner {
   firstElementShim?: React.ReactNode,
   showFilters?: boolean,
   overrideTitle?: string,
-  filterShims?: string[]
+  filterShims?: string[],
+  showHeroGallery?: boolean,
 }
 
 interface INftAssets {
@@ -128,6 +134,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     showFilters = false,
     overrideTitle,
     filterShims,
+    showHeroGallery = false,
   } = props;
 
   if(firstElementShim && maxRecords) {
@@ -168,7 +175,6 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         page,
         additionalFilters,
       )
-      console.log({collectionResponse})
       let title = "No records found";
       if(collectionResponse?.status && collectionResponse?.data) {
         let renderResults : INFTRecord[] = [];
@@ -216,7 +222,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
     },
     gcTime: 5 * 60 * 1000,
-    staleTime: 0,
+    staleTime: 60 * 1000,
   });
 
   useEffect(() => {
@@ -241,7 +247,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
             <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
               {collectionDataTanstack?.title ? collectionDataTanstack?.title : "Loading..."}
             </Typography>
-            {showCollectionLink && 
+            {showCollectionLink && collectionDataTanstack?.title && 
               <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`collection/${network}/${collectionSlug}`}>
                 <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
                   View {collectionDataTanstack?.title}
@@ -271,6 +277,21 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
               </div>
           }
         </>
+      }
+      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && showHeroGallery && 
+        <div className={classes.collectionExplorerGalleryContainer}>
+          <CollectionExplorerGalleryContainer 
+            explorerEntries={
+              collectionDataTanstack?.nftRecords.map((item, index) => ({
+                nftRecord: item,
+                assetRecord: collectionDataTanstack?.nftAssets[item?.asset_address],
+              }))
+            }
+            fullWidth={true}
+            overrideTitle={overrideTitle}
+            overrideSlug={collectionSlug}
+          />
+        </div>
       }
       <Grid className={[classes.sectionSpacer, isLoadingCollectionDataTanstack ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
         {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && firstElementShim && 
