@@ -84,6 +84,7 @@ const COLLECTIONS_ENTRIES_PROD = [
     overrideTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
     showHeroGallery: true,
+    sortBy: "likes"
   },
   {
     network: "base",
@@ -260,6 +261,7 @@ interface ICollectionEntry {
   overrideTitle?: string;
   filterShims?: string[];
   showHeroGallery?: boolean;
+  sortBy?: "likes";
 }
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];

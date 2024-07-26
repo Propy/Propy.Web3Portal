@@ -101,6 +101,7 @@ interface ICollectionBanner {
   overrideTitle?: string,
   filterShims?: string[],
   showHeroGallery?: boolean,
+  sortBy?: "likes",
 }
 
 interface INftAssets {
@@ -135,6 +136,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     overrideTitle,
     filterShims,
     showHeroGallery = false,
+    sortBy,
   } = props;
 
   if(firstElementShim && maxRecords) {
@@ -147,7 +149,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     data: collectionDataTanstack,
     isLoading: isLoadingCollectionDataTanstack,
   } = useQuery({
-    queryKey: [contractNameOrCollectionNameOrAddress, network, perPage, page, searchParamsMemo, filterShims, overrideTitle],
+    queryKey: [contractNameOrCollectionNameOrAddress, network, perPage, page, searchParamsMemo, filterShims, overrideTitle, sortBy],
     queryFn: async () => {
       let additionalFilters : ICollectionQueryFilter[] = [];
       if(searchParams.get("city")) {
@@ -167,6 +169,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
       if(searchParams.get("attached_deed")) {
         additionalFilters.push({filter_type: "attached_deed", value: true});
+      }
+      if(sortBy) {
+        additionalFilters.push({filter_type: "sort_by", value: sortBy});
       }
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
