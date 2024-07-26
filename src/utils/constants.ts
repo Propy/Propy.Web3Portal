@@ -81,8 +81,10 @@ const COLLECTIONS_ENTRIES_PROD = [
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
     slug: "propykeys?landmark=true",
-    overrideTitle: "PropyKeys Landmarks",
+    overrideTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
+    showHeroGallery: true,
+    sortBy: "likes"
   },
   {
     network: "base",
@@ -258,6 +260,8 @@ interface ICollectionEntry {
   slug: string;
   overrideTitle?: string;
   filterShims?: string[];
+  showHeroGallery?: boolean;
+  sortBy?: "likes";
 }
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
@@ -269,5 +273,5 @@ export const LISTING_COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.en
 
 export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA", "CA"];
 
-export const HOME_LISTING_CARD_HEIGHT = 309;
+export const HOME_LISTING_CARD_HEIGHT = 327;
 export const HOME_LISTING_CARD_MEDIA_HEIGHT = 220;
