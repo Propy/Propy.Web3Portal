@@ -131,6 +131,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     collectionSlug,
     showPagination = false,
     isConsideredMobile,
+    isConsideredMedium,
     firstElementShim,
     showFilters = false,
     overrideTitle,
@@ -283,7 +284,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
         </>
       }
-      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && showHeroGallery && 
+      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && !isConsideredMobile && !isConsideredMedium && showHeroGallery && 
         <div className={classes.collectionExplorerGalleryContainer}>
           <CollectionExplorerGalleryContainer 
             explorerEntries={
