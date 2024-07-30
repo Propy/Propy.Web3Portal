@@ -25,6 +25,8 @@ const activeFilterToDisplayName = (activeFilter: ICollectionQueryFilter) => {
       return "Only Landmarks";
     case "attached_deed":
       return "Only Attached Deeds";
+    case "sort_by":
+      return `${capitalizeEachFirstLetterWithDelimiter(activeFilter.filter_type, '_')}: ${capitalizeEachFirstLetterWithDelimiter(activeFilter.value as string, '_')}`;
     default:
       return `${capitalizeEachFirstLetterWithDelimiter(activeFilter.filter_type, '_')}: ${activeFilter.value}`;
   }
