@@ -174,6 +174,8 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
       if(sortBy) {
         additionalFilters.push({filter_type: "sort_by", value: sortBy});
+      } else if(searchParams.get("sort_by")) {
+        additionalFilters.push({filter_type: "sort_by", value: `${searchParams.get("sort_by")}`});
       }
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
