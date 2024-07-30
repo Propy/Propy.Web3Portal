@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useId } from 'react'
 
 import { useSearchParams, URLSearchParamsInit, NavigateOptions } from "react-router-dom";
 
@@ -30,9 +30,9 @@ const activeFilterToDisplayName = (activeFilter: ICollectionQueryFilter) => {
   }
 }
 
-const renderActiveFilter = (activeFilter: ICollectionQueryFilter, setSearchParams: SetURLSearchParams) => {
+const renderActiveFilter = (activeFilter: ICollectionQueryFilter, setSearchParams: SetURLSearchParams, uniqueId: string) => {
   return (
-    <Chip color="primary" variant="outlined" key={`active-filter-${activeFilter.filter_type}-${activeFilter.value}`} style={{marginRight: 8, marginBottom: 8}} label={activeFilterToDisplayName(activeFilter)} onDelete={() => {
+    <Chip color="primary" variant="outlined" key={`${uniqueId}-active-filter-${activeFilter.filter_type}-${activeFilter.value}`} style={{marginRight: 8, marginBottom: 8}} label={activeFilterToDisplayName(activeFilter)} onDelete={() => {
       setSearchParams((params => {
         params.delete(activeFilter.filter_type);
         return params;
@@ -47,12 +47,14 @@ const PropyKeysActiveFiltersZone = (props: IPropyKeysActiveFiltersZone & PropsFr
     activeFilters,
   } = props;
 
+  const uniqueId = useId();
+
   // eslint-disable-next-line
   let [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <>
-      {activeFilters && activeFilters.map((activeFilter) => renderActiveFilter(activeFilter, setSearchParams))}
+      {activeFilters && activeFilters.map((activeFilter) => renderActiveFilter(activeFilter, setSearchParams, uniqueId))}
     </>
   )
 }

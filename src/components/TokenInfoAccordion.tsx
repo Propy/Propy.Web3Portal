@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 
 import { shortenAddress } from '@usedapp/core'
 
@@ -125,6 +125,8 @@ interface ITokenInfoAccordian {
 const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
     const classes = useStyles();
 
+    const uniqueId = useId();
+
     const {
       tokenRecord,
       tokenMetadata,
@@ -176,7 +178,7 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                     expanded={expandedSectionIndex === index}
                     onChange={() => toggleSectionIndexExpansion(index)}
                     className={[classes.sectionItem, expandedSectionIndex === index ? classes.sectionItemOpened : ''].join(' ')}
-                    key={`token-info-accordion-${item.sectionTitle}-${index}`}
+                    key={`${uniqueId}-token-info-accordion-${item.sectionTitle}-${index}`}
                   >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
@@ -205,7 +207,7 @@ const TokenInfoAccordion = (props: PropsFromRedux & ITokenInfoAccordian) => {
                             let attributeValue = renderAttribute(attributeEntry.value);
                             if(attributeValue) {
                               return (
-                                <Grid item xs={12} sm={6} lg={6} xl={6} key={`token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
+                                <Grid item xs={12} sm={6} lg={6} xl={6} key={`${uniqueId}-token-info-accordion-${item.sectionId}-${index}-${attributeIndex}`}>
                                   <div className={classes.attributeContainer}>
                                     <div className={classes.attributeNameAndPrefilterRow}>
                                       <Typography className={classes.attributeText} style={{fontWeight: 400}} variant="subtitle2">{attributeEntry.trait_type}</Typography>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import Fab from '@mui/material/Fab';
@@ -122,6 +122,8 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
 
   const classes = useStyles();
 
+  const uniqueId = useId();
+
   const {
     images,
     // isConsideredMobile,
@@ -238,7 +240,7 @@ const ListingGallery = (props: PropsFromRedux & IListingGallery) => {
             <div 
               ref={(el) => (previewImageRefs.current[index] = el)}
               onClick={() => handleImageSelection(index)}
-              key={`${index}-${imageLink}`}
+              key={`${uniqueId}-${index}-${imageLink}`}
               className={[classes.previewImageEntryOuter, index === selectedImageIndex ? classes.previewImageSelected : classes.previewImageUnselected].join(" ")}
             >
               <div className={classes.previewImageEntryInner} style={{backgroundImage: `url(${imageLink})`}}/>

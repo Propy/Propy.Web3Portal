@@ -379,7 +379,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
             }
           </Typography>
           <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={{display: 'flex', justifyContent: 'center'}} className={classes.sectionSpacerSmall}>
-            <Grid key={`single-token-card-propy-og`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <Grid item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCardBaseline
                 subtleDisableInteraction={true}
                 tokenLink={''}
@@ -394,7 +394,7 @@ const PropyKeyRepossession = (props: PropsFromRedux & IPropyKeyRepossession) => 
             </Grid>
           </Grid>
           <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={{display: 'flex', justifyContent: 'center'}} className={classes.sectionSpacerSmall}>
-            <Grid key={`single-token-card-propy-og`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <Grid item xs={4} sm={4} md={6} lg={5} xl={6}>
               {isOwnerOfPropyKey && isRepossessionContractApproved &&
                 <FloatingActionButton
                   className={classes.submitButton}

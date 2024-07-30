@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useId } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
@@ -67,6 +67,8 @@ const useStyles = makeStyles((theme: Theme) =>
 // }
 
 const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
+
+  const uniqueId = useId();
 
   const {
     zoom = 2,
@@ -175,7 +177,7 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
         >
           {markers && markers.map((marker, index) =>
             <Marker 
-              key={`${marker.latitude}-${marker.longitude}-${index}`}
+              key={`${uniqueId}-${marker.latitude}-${marker.longitude}-${index}`}
               position={[marker.latitude, marker.longitude]} 
               icon={new Icon({iconUrl: markerIconPropy3D, iconSize: [50, 50], iconAnchor: [25, 50]})}
               eventHandlers={{

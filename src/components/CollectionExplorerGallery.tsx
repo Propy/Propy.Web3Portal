@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 
 import { animated, useTransition } from '@react-spring/web';
 
@@ -32,9 +32,16 @@ import {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    rootDesktop: {
       width: '100%',
       height: '512px',  // Adjust as needed
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+    },
+    rootMobile: {
+      width: '100%',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -47,17 +54,29 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       width: '100%',
     },
+    rootChildDesktop: {
+      flexDirection: "row",
+    },
+    rootChildMobile: {
+      flexDirection: "column",
+    },
     carouselContainer: {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      width: '512px',
-      height: '512px',
       overflow: 'hidden',
       boxShadow: '0px 0px 5px -1px rgba(0, 0, 0, 0.5)',
       borderRadius: 15,
       position: 'relative',
       border: '4px solid white',
+    },
+    carouselContainerDesktop: {
+      width: '512px',
+      height: '512px',
+    },
+    carouselContainerMobile: {
+      width: '100%',
+      aspectRatio: '1 / 1',
     },
     image: {
       position: 'absolute',
@@ -88,9 +107,14 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       padding: theme.spacing(2),
     },
-    infoZone: {
+    infoZoneDesktop: {
       paddingLeft: theme.spacing(4),
       width: 'calc(100% - 512px)',
+      alignSelf: 'flex-start',
+    },
+    infoZoneMobile: {
+      marginTop: theme.spacing(2),
+      width: 'calc(100%)',
       alignSelf: 'flex-start',
     },
     animatedTitle: {
@@ -115,10 +139,13 @@ interface ICollectionExplorerGallery {
 const CollectionExplorerGallery = ({ 
   explorerEntries,
   isConsideredMobile,
+  isConsideredMedium,
   fullWidth,
   overrideTitle,
   overrideSlug,
 }: ICollectionExplorerGallery & PropsFromRedux) => {
+
+  const uniqueId = useId();
 
   const classes = useStyles()
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0)
@@ -193,12 +220,12 @@ const CollectionExplorerGallery = ({
   } = explorerEntries[selectedEntryIndex]?.assetRecord ? explorerEntries[selectedEntryIndex]?.assetRecord : {};
 
   return (
-    <div className={classes.root}>
-      <div className={classes.rootChild}>
-        <div className={classes.carouselContainer}>
+    <div className={isConsideredMobile ? classes.rootMobile : classes.rootDesktop}>
+      <div className={[classes.rootChild, isConsideredMobile ? classes.rootChildMobile : classes.rootChildDesktop].join(" ")}>
+        <div className={[classes.carouselContainer, isConsideredMobile ? classes.carouselContainerMobile : classes.carouselContainerDesktop].join(" ")}>
           {transitions((style, index) => (
             <animated.img
-              key={index}
+              key={`${uniqueId}-index`}
               style={style}
               className={classes.image}
               src={getResolvableIpfsLink(explorerEntries[index]?.nftRecord?.metadata?.image ? explorerEntries[index]?.nftRecord?.metadata?.image : "")}
@@ -214,7 +241,7 @@ const CollectionExplorerGallery = ({
             </Fab>
           </div>
         </div>
-        <div className={classes.infoZone}>
+        <div className={isConsideredMobile ? classes.infoZoneMobile : classes.infoZoneDesktop}>
             <LinkWrapper link={`collection/${network_name}/${overrideSlug ? overrideSlug : slug}`}>
               <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
                 {!overrideTitle &&

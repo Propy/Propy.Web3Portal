@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useId } from 'react'
 
 import { Theme } from '@mui/material/styles';
 
@@ -140,7 +140,7 @@ interface IQuickSpecs {
   value: string;
 }
 
-const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
+const SingleListingCardBaseline = (props: ISingleTokenCardBaselineProps) => {
 
   const {
     balanceRecord,
@@ -154,6 +154,8 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
     tokenTitle,
     listingRecord,
   } = props;
+
+  const uniqueId = useId();
 
   const classes = useStyles();
 
@@ -230,7 +232,7 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
             {quickSpecs.length > 0 &&
               <div className={[classes.quickSpecsZone].join(" ")}>
                 {quickSpecs.map((entry, index) => 
-                  <div className={classes.quickSpecEntry}>
+                  <div key={`${uniqueId}-quick-spec-${index}`} className={classes.quickSpecEntry}>
                     <img alt={entry.value} className={classes.quickSpecEntryIcon} src={entry.icon} />
                     <Typography className={classes.quickSpecEntryText} variant="button">{entry.value}</Typography>
                   </div>
@@ -265,4 +267,4 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
   )
 }
 
-export default SingleTokenCardBaseline;
+export default SingleListingCardBaseline;

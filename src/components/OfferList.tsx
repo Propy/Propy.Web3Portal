@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -123,6 +123,8 @@ const OfferList = (props: PropsFromRedux & ITokenOfferList) => {
       offerRecords,
     } = props;
 
+    const uniqueId = useId();
+
     return (
         <>
           <div className={classes.root}>
@@ -130,7 +132,7 @@ const OfferList = (props: PropsFromRedux & ITokenOfferList) => {
                 {offerRecords && offerRecords.sort((a, b) => {
                   return Number(b.timestamp_unix) - Number(a.timestamp_unix)
                 }).map((offerRecord, index) => 
-                  <div className={classes.offerRecord} key={`offer-list-${index}-${offerRecord.token_id}`}>
+                  <div className={classes.offerRecord} key={`${uniqueId}-offer-list-${index}-${offerRecord.token_id}`}>
                     <div className={classes.eventIconOuterContainer}>
                       <div className={classes.eventIconInnerContainer}>
                         {getOfferIcon()}

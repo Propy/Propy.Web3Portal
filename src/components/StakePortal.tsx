@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -306,6 +306,8 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     postStakeSuccess,
     version,
   } = props;
+
+  const uniqueId = useId();
 
   const classes = useStyles();
 
@@ -1087,7 +1089,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     <div className={classes.root}>
       {(isDeprecatedStakingVersion && (mode === "enter")) &&
         <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
-          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+          <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
               <Typography variant="h6" style={{textAlign: 'left'}}>
                   This version of the staking contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`stake/v${latestStakingVersion}`}>here</LinkWrapper>.
               </Typography>
@@ -1096,7 +1098,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
       }
       {(isBlacklistedOrigin && !isDeprecatedStakingVersion && (mode === "enter")) &&
         <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
-          <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+          <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
               <Typography variant="h6" style={{textAlign: 'left'}}>
                   For regulatory reasons, entering the staking protocol is not allowed from your location.
               </Typography>
@@ -1107,7 +1109,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
         <>
           <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
             {!(isLoading || isLoadingGeoLocation) && ((ogKeysNFT && ogKeysNFT.length > 0) || (propyKeysNFT && propyKeysNFT.length > 0)) &&
-              <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+              <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="body1" style={{textAlign: 'left'}}>
                   {(propyKeysNFTPaginationData && propyKeysNFTPaginationData?.total > 0) &&
                     <>
@@ -1124,25 +1126,25 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
               </Grid>
             }
             {!(isLoading || isLoadingGeoLocation) && propyKeysNFT && propyKeysNFT.map((balanceRecord, index) => (
-              <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+              <Grid key={`${uniqueId}-single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
                 <SingleTokenCard disabled={(selectedTokenAddress === BASE_OG_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
               </Grid>  
             ))}
             {!(isLoading || isLoadingGeoLocation) && ogKeysNFT && ogKeysNFT.map((balanceRecord, index) => (
-              <Grid key={`single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+              <Grid key={`${uniqueId}-single-token-card-${index}-${balanceRecord.asset_address}-${balanceRecord.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
                 <SingleTokenCard disabled={(selectedTokenAddress === BASE_PROPYKEYS_STAKING_NFT)} selected={(selectedTokenIds.indexOf(Number(balanceRecord.token_id)) > -1) && (selectedTokenAddress === BASE_OG_STAKING_NFT)} onBalanceRecordSelected={handleBalanceRecordSelected} selectable={true} balanceRecord={balanceRecord} assetRecord={nftAssets[balanceRecord?.asset_address]} />
               </Grid>  
             ))}
             {(isLoading || isLoadingGeoLocation) && 
               <>
-                <Grid key={`guidance-text`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+                <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
                   <Typography variant="body1" style={{textAlign: 'left'}}>
                     Loading...
                   </Typography>
                 </Grid>
                 {
                   Array.from({length: 15}).map((entry, index) => 
-                    <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+                    <Grid key={`${uniqueId}-single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
                       <SingleTokenCardLoading />
                     </Grid>
                   )
@@ -1182,7 +1184,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                 </div>
             }
             {!(isLoading || isLoadingGeoLocation) && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
-              <Grid key={`single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
+              <Grid key={`${uniqueId}-single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="h6" style={{textAlign: 'left'}}>
                     {mode === "enter" ? "No unstaked tokens found" : "No staked tokens found"}
                 </Typography>
@@ -1235,13 +1237,13 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                       <div style={{maxWidth: 350, marginLeft: 'auto', marginRight: 'auto'}}>
                         {/* TODO feed getActiveStep the proper allowance required param */}
                         <Stepper activeStep={activeStep} alternativeLabel>
-                          <Step key={"Approve NFT"}>
+                          <Step key={`${uniqueId}-Approve NFT`}>
                             <StepLabel>{"Approve NFT"}</StepLabel>
                           </Step>
-                          <Step key={"Approve PRO"}>
+                          <Step key={`${uniqueId}-Approve PRO`}>
                             <StepLabel>{"Approve PRO"}</StepLabel>
                           </Step>
-                          <Step key={"Enter Staking"}>
+                          <Step key={`${uniqueId}-Enter Staking`}>
                             <StepLabel>{"Enter Staking"}</StepLabel>
                           </Step>
                         </Stepper>
@@ -1316,10 +1318,10 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
                   <>
                     <Box className={classes.stepContainer}>
                       <Stepper activeStep={activeStep} alternativeLabel>
-                        <Step key={"Approve pSTAKE"}>
+                        <Step key={`${uniqueId}-Approve pSTAKE`}>
                           <StepLabel>{"Approve pSTAKE"}</StepLabel>
                         </Step>
-                        <Step key={"Unstake"}>
+                        <Step key={`${uniqueId}-Unstake`}>
                           <StepLabel>{"Unstake"}</StepLabel>
                         </Step>
                       </Stepper>

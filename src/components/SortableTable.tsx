@@ -58,6 +58,7 @@ interface EnhancedTableProps {
   orderBy: string;
   rowCount: number;
   loadingRows: number;
+  uniqueId: string;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -68,6 +69,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort,
     showNoRecordsFound,
     loadingRows,
+    uniqueId,
   } = props;
   const createSortHandler =
     (property: string) => (event: React.MouseEvent<unknown>) => {
@@ -79,7 +81,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
       <TableRow>
         {!showNoRecordsFound && (loadingRows === 0) && columnConfig.map((columnConfigEntry) => (
           <TableCell
-            key={columnConfigEntry.id}
+            key={`${uniqueId}-${columnConfigEntry.id}`}
             align={'left'}
             padding={columnConfigEntry.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === columnConfigEntry.id ? order : false}
@@ -176,6 +178,8 @@ export default function SortableTable(props: ISortableTableProps) {
     uniqueRowKey,
     loadingRows = 0,
   } = props;
+
+  const uniqueId = React.useId();
   
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState(defaultSortValueKey);
@@ -226,6 +230,7 @@ export default function SortableTable(props: ISortableTableProps) {
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={tableData.length}
+              uniqueId={uniqueId}
             />
             <TableBody>
               {sortData(tableData, columnConfig, order, orderBy)
@@ -237,12 +242,12 @@ export default function SortableTable(props: ISortableTableProps) {
                       hover
                       onClick={(event) => handleClick(event, index)}
                       tabIndex={-1}
-                      key={`table-row-${row[uniqueRowKey]}-${index}`}
+                      key={`${uniqueId}-table-row-${row[uniqueRowKey]}-${index}`}
                     >
                       {columnConfig.map((columnConfigEntry, index) => {
                         return (
                           <TableCell
-                            key={`${labelId}-${index}`}
+                            key={`${uniqueId}-${labelId}-${index}`}
                             component="th"
                             scope="row"
                             align={index > 0 ? "left" : "left"}
