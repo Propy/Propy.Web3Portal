@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useId } from 'react';
 import { createPortal } from 'react-dom';
 
 import Typography from '@mui/material/Typography';
@@ -135,6 +135,8 @@ const FullScreenGallery = (props: PropsFromRedux & IFullScreenGallery) => {
 
   const classes = useStyles();
 
+  const uniqueId = useId();
+
   const {
     fullScreenGalleryConfig,
     setFullScreenGalleryConfig,
@@ -207,7 +209,7 @@ const FullScreenGallery = (props: PropsFromRedux & IFullScreenGallery) => {
           >
             <div className={[classes.primaryImageBackgroundContainer, 'image-filter-blur-heavy'].join(' ')} style={fullScreenGalleryConfig?.images?.length > 0 ? { backgroundImage: `url(${fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex]})` } : {}} />
             <div className={classes.primaryImageForegroundContainer}>
-              <img alt={`fullscreen listing ${fullScreenGalleryConfig?.selectedImageIndex}`} key={`listing-image-${fullScreenGalleryConfig?.selectedImageIndex}`} className={classes.primaryImage} src={fullScreenGalleryConfig?.images?.length > 0 ? fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex] : ""}/>
+              <img alt={`fullscreen listing ${fullScreenGalleryConfig?.selectedImageIndex}`} key={`${uniqueId}-listing-image-${fullScreenGalleryConfig?.selectedImageIndex}`} className={classes.primaryImage} src={fullScreenGalleryConfig?.images?.length > 0 ? fullScreenGalleryConfig?.images[fullScreenGalleryConfig?.selectedImageIndex] : ""}/>
             </div>
             <div className={classes.controlsOverlayContainer}>
               <div className={classes.primaryImageControlsTopRow}>

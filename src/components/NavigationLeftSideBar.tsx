@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useId} from 'react';
 
 import { useAccount } from 'wagmi';
 
@@ -184,6 +184,8 @@ const useStyles = makeStyles({
 function NavigationLeftSideBar(props: PropsFromRedux) {
   const classes = useStyles();
 
+  const uniqueId = useId();
+
   const pathMatch = useCurrentPath();
 
   const { address } = useAccount();
@@ -264,7 +266,7 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
 
   return (
     <div>
-        <React.Fragment key={'left'}>
+        <React.Fragment key={`${uniqueId}-left`}>
             <Drawer style={{zIndex: 2100}} anchor={'left'} open={localShowLeftMenu} onClose={toggleDrawer(false)}>
                 <div
                     className={classes.list}
@@ -273,7 +275,7 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                   <List>
                       {navigationMenu.map((item, index) => 
                           (!item.onlyConnected || (item.onlyConnected && address)) ?
-                            <Fragment key={`parent-${index}`}>
+                            <Fragment key={`${uniqueId}-parent-${index}`}>
                               <div
                                 className={classes.entryContainerMargin}
                               >
@@ -309,7 +311,7 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                       <div
-                                        key={`parent-${index}-child-${childIndex}`}
+                                        key={`${uniqueId}-parent-${index}-child-${childIndex}`}
                                         className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItemNested].join(" ")}
                                       >
                                         <LinkWrapper 
@@ -322,7 +324,7 @@ function NavigationLeftSideBar(props: PropsFromRedux) {
                                                 props.setShowLeftMenu(false)
                                               }
                                             }}
-                                            key={`child-${index}-${childIndex}`}
+                                            key={`${uniqueId}-child-${index}-${childIndex}`}
                                             className={[(child.path && ((pathMatch === child.path) || (child?.pathExtended && child?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                             sx={{ 
                                               pl: 4,

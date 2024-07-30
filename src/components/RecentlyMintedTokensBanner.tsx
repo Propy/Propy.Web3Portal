@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useId } from 'react'
 
 import { useSearchParams } from "react-router-dom";
 
@@ -69,6 +69,8 @@ interface IRecentlyMintedTokenAssets {
 const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFromRedux) => {
 
   let [searchParams, setSearchParams] = useSearchParams();
+
+  const uniqueId = useId();
 
   const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
   const [nftAssets, setNftAssets] = useState<IRecentlyMintedTokenAssets>({});
@@ -168,13 +170,13 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
             }
             return 0;
           }).slice(0,(maxRecords && (nftRecords.length > maxRecords)) ? maxRecords : nftRecords.length).map((item, index) => 
-            <Grid key={`single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <Grid key={`${uniqueId}-single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCard nftRecord={item} assetRecord={nftAssets[item?.asset_address]} />
             </Grid>
           )}
           {isLoading && maxRecords &&
             Array.from({length: maxRecords}).map((entry, index) => 
-              <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+              <Grid key={`${uniqueId}-single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
                 <SingleTokenCardLoading />
               </Grid>
             )
