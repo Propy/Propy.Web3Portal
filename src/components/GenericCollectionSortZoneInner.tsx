@@ -144,7 +144,7 @@ const GenericCollectionSortZoneInner = (props: ICollectionSortZone) => {
         <DialogActions style={{display: 'flex', justifyContent: 'space-between'}}>
           {
             (isSomeFilterSet) &&
-            <Button onClick={handleClearFilters} color="error">Clear Filters</Button>
+            <Button onClick={handleClearFilters} color="error">Clear Sorting</Button>
           }
           {
             (!isSomeFilterSet) &&
