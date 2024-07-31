@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
@@ -10,6 +10,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 
 import { useParams } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { toast } from 'sonner'
 
@@ -55,7 +57,7 @@ import {
 
 import {
   getResolvableIpfsLink,
-  priceFormat,
+  // priceFormat,
 } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -138,15 +140,9 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
 
     const classes = useStyles();
 
-    const [tokenRecord, setTokenRecord] = useState<IAssetRecord | null>(null);
-    const [tokenEventRecord, setTokenEventRecord] = useState<ITransferEventERC721Record[] | ITransferEventERC20Record[] | null>(null);
-    const [tokenOfferList, setTokenOfferList] = useState<IOfferRecord[] | null>(null);
-    const [tokenMetadata, setTokenMetadata] = useState<ITokenMetadata | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
-    const [tokenStandard, setTokenStandard] = useState<TokenStandard | null>(null);
     const [allowSignalInterest] = useState(true);
-    const [listingRecord, setListingRecord] = useState<null | IPropyKeysHomeListingRecord>(null);
 
     let { 
       network,
@@ -154,86 +150,64 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
       tokenId,
     } = useParams();
 
-    const matchedListingRecord = listingRecord ? COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.address === listingRecord.asset_address) : false;
-
-    useEffect(() => {
-      let isMounted = true;
-      const fetchToken = async () => {
+    const { 
+      data: tokenDataTanstack,
+      // isLoading: isLoadingTokenDataTanstack,
+    } = useQuery({
+      queryKey: ['token-page', network, tokenAddress, tokenId, fetchIndex],
+      queryFn: async () => {
         let queryUrl = `${API_ENDPOINT}/asset/${network}/${tokenAddress}`;
         if(tokenId) {
           queryUrl = `${API_ENDPOINT}/nft/${network}/${tokenAddress}/${tokenId}`;
         }
         let tokenRecordQueryResponse = await fetch(queryUrl).then(resp => resp.json());
-        if(tokenRecordQueryResponse?.status && tokenRecordQueryResponse?.data && isMounted) {
-          setTokenRecord(tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset : tokenRecordQueryResponse?.data);
-          setTokenStandard(tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset?.standard : tokenRecordQueryResponse?.data?.standard);
-          if(tokenRecordQueryResponse?.data?.transfer_event_erc20_count) {
-            MetadataPRO.attributes.push({
-              trait_type: "Transfers",
-              value: priceFormat(tokenRecordQueryResponse?.data?.transfer_event_erc20_count, 0, ''),
-            })
-          }
+        let tokenRecord : IAssetRecord | null = null;
+        let tokenStandard : TokenStandard | null = null;
+        let tokenMetadata : ITokenMetadata | null =null;
+        let tokenEventRecord : ITransferEventERC721Record[] | ITransferEventERC20Record[] | null = null;
+        let tokenOfferList : IOfferRecord[] | null = null;
+        let listingRecord : IPropyKeysHomeListingRecord | null = null;
+        if(tokenRecordQueryResponse?.status && tokenRecordQueryResponse?.data) {
+          tokenRecord = tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset : tokenRecordQueryResponse?.data;
+          tokenStandard = tokenRecordQueryResponse?.data?.asset ? tokenRecordQueryResponse?.data?.asset?.standard : tokenRecordQueryResponse?.data?.standard;
+          // if(tokenRecordQueryResponse?.data?.transfer_event_erc20_count) {
+          //   MetadataPRO.attributes.push({
+          //     trait_type: "Transfers",
+          //     value: priceFormat(tokenRecordQueryResponse?.data?.transfer_event_erc20_count, 0, ''),
+          //   })
+          // }
           if(tokenRecordQueryResponse?.data?.transfer_events_erc721) {
-            setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc721);
+            tokenEventRecord = tokenRecordQueryResponse?.data?.transfer_events_erc721;
           } else if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
-            setTokenEventRecord(tokenRecordQueryResponse?.data?.transfer_events_erc20);
-          } else {
-            setTokenEventRecord(null)
+            tokenEventRecord = tokenRecordQueryResponse?.data?.transfer_events_erc20;
           }
           if(tokenRecordQueryResponse?.data?.offchain_offers) {
-            setTokenOfferList(tokenRecordQueryResponse?.data?.offchain_offers);
-          } else {
-            setTokenOfferList(null);
+            tokenOfferList = tokenRecordQueryResponse?.data?.offchain_offers;
           }
           if(tokenRecordQueryResponse?.data?.propykeys_home_listing) {
-            setListingRecord(tokenRecordQueryResponse?.data?.propykeys_home_listing);
-          } else {
-            setListingRecord(null);
+            listingRecord = tokenRecordQueryResponse?.data?.propykeys_home_listing;
           }
           if(tokenRecordQueryResponse?.data?.metadata) {
             let metadata = tokenRecordQueryResponse?.data?.metadata ? tokenRecordQueryResponse?.data?.metadata : {};
-            // // temp timeline shim for testing design
-            // if(network === 'goerli') {
-            //   metadata.timeline = [
-            //     {
-            //       milestone: "Offer signed",
-            //       due_date: 1695301253,
-            //       complete: false,
-            //     },
-            //     {
-            //       milestone: "Deposit payment",
-            //       due_date: 1695819674,
-            //       complete: false,
-            //     },
-            //     {
-            //       milestone: "Inspection",
-            //       due_date: 1696424490,
-            //       complete: false,
-            //       is_estimate: true,
-            //     },
-            //     {
-            //       milestone: "Closing",
-            //       due_date: 1697029313,
-            //       complete: false,
-            //     }
-            //   ]
-            // }
-            if(metadata && metadata.name !== null && isMounted) {
-              setTokenMetadata(metadata);
+            if(metadata && metadata.name !== null) {
+              tokenMetadata = metadata;
             }
           }
-        } else if(isMounted) {
-          setTokenRecord(null);
-          setTokenMetadata(null);
-          setTokenStandard(null);
-          setTokenEventRecord(null);
         }
-      }
-      fetchToken();
-      return () => {
-        isMounted = false;
-      }
-    }, [network, tokenAddress, tokenId, fetchIndex])
+        return {
+          tokenRecord,
+          tokenStandard,
+          tokenMetadata,
+          tokenEventRecord,
+          tokenOfferList,
+          listingRecord,
+        }
+      },
+      gcTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
+    });
+
+    const matchedListingRecord = tokenDataTanstack?.listingRecord?.asset_address ? COLLECTIONS_PAGE_ENTRIES.find((entry) => entry.address === tokenDataTanstack?.listingRecord?.asset_address) : false;
 
     const refreshTokenMetadata = async () => {
       if(network && tokenAddress && tokenId) {
@@ -253,22 +227,22 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
     }
 
     const renderPrimaryContent = () => {
-      if(tokenRecord) {
+      if(tokenDataTanstack?.tokenRecord) {
         return (
           <>
-            <LinkWrapper link={`collection/${tokenRecord.network_name}/${tokenRecord.slug}`}>
+            <LinkWrapper link={`collection/${tokenDataTanstack?.tokenRecord.network_name}/${tokenDataTanstack?.tokenRecord.slug}`}>
               <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
                 {
-                  `${tokenRecord.collection_name ? tokenRecord.collection_name : tokenRecord.name} `
+                  `${tokenDataTanstack?.tokenRecord.collection_name ? tokenDataTanstack?.tokenRecord.collection_name : tokenDataTanstack?.tokenRecord.name} `
                 }
               </Typography>
             </LinkWrapper>
             <Typography variant="h3" style={{fontWeight: 'bold'}}>
               {
-                tokenMetadata && `${TOKEN_NAME_PREFIX[tokenRecord.address] ? `${TOKEN_NAME_PREFIX[tokenRecord.address]} ${tokenMetadata.name}` : tokenMetadata.name}`
+                tokenDataTanstack?.tokenMetadata && `${TOKEN_NAME_PREFIX[tokenDataTanstack?.tokenRecord.address] ? `${TOKEN_NAME_PREFIX[tokenDataTanstack?.tokenRecord.address]} ${tokenDataTanstack?.tokenMetadata.name}` : tokenDataTanstack?.tokenMetadata.name}`
               }
               {
-                TOKEN_NAME_HIDE_ID[tokenRecord.address] && tokenMetadata ? '' : ` #${tokenId}`
+                TOKEN_NAME_HIDE_ID[tokenDataTanstack?.tokenRecord.address] && tokenDataTanstack?.tokenMetadata ? '' : ` #${tokenId}`
               }
             </Typography>
             <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
@@ -283,10 +257,10 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
                 <NFTLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />
               </div>
             }
-            {tokenMetadata?.description &&
+            {tokenDataTanstack?.tokenMetadata?.description &&
               <>
                 <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
-                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : ''}>{tokenMetadata?.description}</Typography>
+                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : ''}>{tokenDataTanstack?.tokenMetadata?.description}</Typography>
               </>
             }
           </>
@@ -296,46 +270,46 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
 
     return (
         <GenericPageContainer>
-          {(!tokenStandard || tokenStandard === 'ERC-721') &&
+          {(!tokenDataTanstack?.tokenStandard || tokenDataTanstack?.tokenStandard === 'ERC-721') &&
             <Grid container spacing={6} columns={12}>
               <Grid item xs={12} sm={12} md={12} lg={5}>
                 {isConsideredMobile && renderPrimaryContent()}
-                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenMetadata?.image ? getResolvableIpfsLink(tokenMetadata?.image) : PlaceholderImage}")`}}/>
-                {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
+                <div className={classes.tokenImage} style={{backgroundImage: `url("${tokenDataTanstack?.tokenMetadata?.image ? getResolvableIpfsLink(tokenDataTanstack?.tokenMetadata?.image) : PlaceholderImage}")`}}/>
+                {tokenDataTanstack?.tokenMetadata?.attributes && tokenDataTanstack?.tokenMetadata?.attributes?.length > 0 && 
                   <div className={classes.sectionSpacer}>
-                    <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
+                    <TokenInfoAccordionContainer tokenRecord={tokenDataTanstack?.tokenRecord} tokenMetadata={tokenDataTanstack?.tokenMetadata} />
                   </div>
                 }
-                {listingRecord && tokenRecord &&
+                {tokenDataTanstack?.listingRecord && tokenDataTanstack?.tokenRecord &&
                   <>
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated Home Listing"/>
                     <div style={{maxWidth: 350}}>
                       <SingleListingCard 
                         listingCollectionName={matchedListingRecord && matchedListingRecord?.overrideTitle ? matchedListingRecord?.overrideTitle : ""} 
-                        listingRecord={listingRecord}
-                        assetRecord={tokenRecord}
+                        listingRecord={tokenDataTanstack?.listingRecord}
+                        assetRecord={tokenDataTanstack?.tokenRecord}
                       />
                     </div>
                   </>
                 }
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={7}>
-                {tokenRecord &&
+                {tokenDataTanstack?.tokenRecord &&
                   <>
                     {!isConsideredMobile && renderPrimaryContent()}
-                    {tokenMetadata?.timeline && tokenMetadata?.timeline.length > 0 &&
+                    {tokenDataTanstack?.tokenMetadata?.timeline && tokenDataTanstack?.tokenMetadata?.timeline.length > 0 &&
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title={getTimelineTitle(tokenAddress)} />
-                        <TokenMetadataTimelineContainer timeline={tokenMetadata?.timeline} />
+                        <TokenMetadataTimelineContainer timeline={tokenDataTanstack?.tokenMetadata?.timeline} />
                       </>
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
-                    {tokenEventRecord && <EventHistoryContainer eventRecords={tokenEventRecord} assetRecord={tokenRecord} />}
+                    {tokenDataTanstack?.tokenEventRecord && <EventHistoryContainer eventRecords={tokenDataTanstack?.tokenEventRecord} assetRecord={tokenDataTanstack?.tokenRecord} />}
                     {allowSignalInterest && tokenId && tokenAddress && network && 
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Offers" actionComponent={<SignalInterestContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />}/>
                         <div className={classes.sectionSpacer}>
-                          {tokenEventRecord && <OfferListContainer offerRecords={tokenOfferList} />}
+                          {tokenDataTanstack?.tokenEventRecord && <OfferListContainer offerRecords={tokenDataTanstack?.tokenOfferList} />}
                         </div>
                       </>
                     }
@@ -344,16 +318,16 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
               </Grid>
             </Grid>
           }
-          {(tokenStandard === 'ERC-20') &&
+          {(tokenDataTanstack?.tokenStandard === 'ERC-20') &&
             <Grid container spacing={6} columns={12}>
               <Grid item xs={12} md={5}>
                 <div className={classes.tokenImage} style={{backgroundImage: `url("${DefaultTokenImage}")`}}/>
                 <div className={classes.sectionSpacer}>
-                  <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={MetadataPRO} />
+                  <TokenInfoAccordionContainer tokenRecord={tokenDataTanstack?.tokenRecord} tokenMetadata={MetadataPRO} />
                 </div>
               </Grid>
               <Grid item xs={12} md={7}>
-                {tokenRecord &&
+                {tokenDataTanstack?.tokenRecord &&
                   <>
                     <Typography variant="h2" style={{fontWeight: 'bold'}}>{`PRO Token`}</Typography>
                     {/* <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
@@ -364,19 +338,19 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
                       </div>
                     </div> */}
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginBottom={12} marginTop={16} title="History"/>
-                    {tokenRecord?.transfer_events_erc20 && <EventHistoryContainer eventRecords={tokenRecord?.transfer_events_erc20} assetRecord={tokenRecord} />}
+                    {tokenDataTanstack?.tokenRecord?.transfer_events_erc20 && <EventHistoryContainer eventRecords={tokenDataTanstack?.tokenRecord?.transfer_events_erc20} assetRecord={tokenDataTanstack?.tokenRecord} />}
                   </>
                 }
               </Grid>
             </Grid>
           }
-          {/* {`tokenRecord:`}
+          {/* {`tokenDataTanstack?.tokenRecord:`}
           <pre style={{maxWidth: '500px', overflow: 'scroll'}}>
-            {JSON.stringify(tokenRecord, null, 4)}
+            {JSON.stringify(tokenDataTanstack?.tokenRecord, null, 4)}
           </pre>
-          {`tokenMetadata:`}
+          {`tokenDataTanstack?.tokenMetadata:`}
           <pre style={{maxWidth: '500px', overflow: 'scroll'}}>
-            {JSON.stringify(tokenMetadata, null, 4)}
+            {JSON.stringify(tokenDataTanstack?.tokenMetadata, null, 4)}
           </pre> */}
         </GenericPageContainer>
     )

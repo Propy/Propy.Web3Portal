@@ -1,4 +1,4 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {useState, Fragment, useEffect, useId} from 'react';
 
 import { useAccount } from 'wagmi';
 
@@ -202,6 +202,8 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
 
   const { address } = useAccount();
 
+  const uniqueId = useId();
+
   const {
     darkMode,
   } = props;
@@ -260,7 +262,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
 
   return (
     <div>
-        <React.Fragment key={'left'}>
+        <React.Fragment key={`${uniqueId}-left`}>
             <Drawer
               anchor={'left'}
               variant="persistent"
@@ -283,7 +285,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                   <List>
                       {navigationMenu.map((item, index) => 
                           (!item.onlyConnected || (item.onlyConnected && address)) ?
-                            <Fragment key={`parent-${index}`}>
+                            <Fragment key={`${uniqueId}-parent-${index}`}>
                               <div
                                 className={classes.entryContainerMargin}
                               >
@@ -330,7 +332,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                   <List component="div" disablePadding>
                                     {item.children.map((child, childIndex) => 
                                         <div
-                                          key={`parent-${index}-child-${childIndex}`}
+                                          key={`${uniqueId}-parent-${index}-child-${childIndex}`}
                                           className={[(item.path && ((pathMatch === item.path) || (item?.pathExtended && item?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItemNested].join(" ")}
                                         >
                                           <LinkWrapper 
@@ -343,7 +345,7 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                                   props.setShowLeftMenu(false)
                                                 }
                                               }}
-                                              key={`child-${index}-${childIndex}`}
+                                              key={`${uniqueId}-child-${index}-${childIndex}`}
                                               className={[(child.path && ((pathMatch === child.path) || (child?.pathExtended && child?.pathExtended?.indexOf(pathMatch) > -1))) ? currentSelectionClass() : "", classes.menuEntryItem, menuEntryItemThemed()].join(" ")}
                                               sx={{ 
                                                 pl: 4,

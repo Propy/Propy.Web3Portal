@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -189,6 +189,8 @@ const EventHistory = (props: PropsFromRedux & ITokenEventHistory) => {
       assetRecord,
     } = props;
 
+    const uniqueId = useId();
+
     return (
         <>
           <div className={classes.root}>
@@ -196,7 +198,7 @@ const EventHistory = (props: PropsFromRedux & ITokenEventHistory) => {
                 {eventRecords && eventRecords.sort((a, b) => {
                   return Number(b.evm_transaction?.block_timestamp) - Number(a.evm_transaction?.block_timestamp)
                 }).map((eventRecord, index) => 
-                  <div className={classes.eventRecord} key={`event-history-${eventRecord.transaction_hash}-${index}`}>
+                  <div className={classes.eventRecord} key={`${uniqueId}-event-history-${eventRecord.transaction_hash}-${index}`}>
                     <div className={classes.eventIconOuterContainer}>
                       <div className={classes.eventIconInnerContainer}>
                         {getEventIcon(eventRecord)}

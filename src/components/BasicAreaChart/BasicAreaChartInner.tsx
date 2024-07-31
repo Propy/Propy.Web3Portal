@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useId } from 'react';
 import { AreaClosed, Line, Bar, LinePath } from '@visx/shape';
 import { curveStep } from '@visx/curve';
 import { scaleLinear, scaleTime, scaleSymlog } from "d3-scale";
@@ -80,6 +80,8 @@ export default withTooltip<AreaProps, ITimeseries>(
     scaleType = 'linear',
   }: AreaProps & WithTooltipProvidedProps<ITimeseries>) => {
     if (width < 10) return null;
+
+    const uniqueId = useId();
 
     const [tooltipDateTranslateLeft, setTooltipDateTranslateLeft] = useState(false);
     const [tooltipDateTranslateRight, setTooltipDateTranslateRight] = useState(false);
@@ -340,7 +342,7 @@ export default withTooltip<AreaProps, ITimeseries>(
         {tooltipData && (
           <div>
             <TooltipWithBounds
-              key={Math.random()}
+              key={`${uniqueId}-tooltip`}
               top={((innerHeight - tooltipTop) < 30) ? (innerHeight - 40) : tooltipTop - 12}
               left={tooltipLeft + 12}
               style={{

@@ -5,14 +5,19 @@ import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 
-import FilterListIcon from '@mui/icons-material/FilterList';
+import SortIcon from '@mui/icons-material/FilterList';
+import FilterIcon from '@mui/icons-material/FilterAlt';
 
 import PropyKeysCollectionFilterZoneInner from './PropyKeysCollectionFilterZoneInner';
+import GenericCollectionSortZoneInner from './GenericCollectionSortZoneInner';
 
 import { PropsFromRedux } from '../containers/CollectionBannerContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    filterButtonSpacerDesktop: {
+      marginRight: theme.spacing(1),
+    },
     filterButtonSpacerMobile: {
       marginTop: theme.spacing(1),
     }
@@ -40,16 +45,23 @@ const PropyKeysCollectionFilterZone = (props: ICollectionFilterZone & PropsFromR
     setPage,
   } = props;
 
-  const [open, setOpen] = React.useState(false);
+  const [openFilters, setOpenFilters] = React.useState(false);
+  const [openSort, setOpenSort] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpenFilters = () => {
+    setOpenFilters(true);
+  };
+
+  const handleClickOpenSort = () => {
+    setOpenSort(true);
   };
 
   return (
     <>
-      <Button className={isConsideredMobile ? classes.filterButtonSpacerMobile : ''} disabled={isLoading} variant={'outlined'} color={"primary"} onClick={() => handleClickOpen()} startIcon={<FilterListIcon />}>{"Filters"}</Button>
-      <PropyKeysCollectionFilterZoneInner open={open} setPage={setPage} isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} setOpen={setOpen} />
+      <Button className={isConsideredMobile ? classes.filterButtonSpacerMobile : classes.filterButtonSpacerDesktop} disabled={isLoading} variant={'outlined'} color={"primary"} onClick={() => handleClickOpenFilters()} startIcon={<FilterIcon />}>{"Filters"}</Button>
+      <Button className={isConsideredMobile ? classes.filterButtonSpacerMobile : ''} disabled={isLoading} variant={'outlined'} color={"primary"} onClick={() => handleClickOpenSort()} startIcon={<SortIcon />}>{"Sorting"}</Button>
+      <PropyKeysCollectionFilterZoneInner open={openFilters} setOpen={setOpenFilters} setPage={setPage} isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} />
+      <GenericCollectionSortZoneInner open={openSort} setOpen={setOpenSort} setPage={setPage} isConsideredMobile={isConsideredMobile} isLoading={isLoading} collectionSlug={collectionSlug} contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress} network={network} />
     </>
   )
 }

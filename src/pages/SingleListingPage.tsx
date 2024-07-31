@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
@@ -12,6 +12,8 @@ import Grid from '@mui/material/Grid';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 import { useParams } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { toast } from 'sonner'
 
@@ -131,39 +133,39 @@ const SingleListingPage = (props: ISingleListingPage) => {
 
     const classes = useStyles();
 
-    const [listingRecord, setListingRecord] = useState<IPropyKeysHomeListingRecord | null>(null);
     const [fetchIndex, setFetchIndex] = useState<number>(0);
     const [isMetadataRefreshing, setIsMetadataRefreshing] = useState<boolean>(false);
-    const [nftRecord, setNftRecord] = useState<null | INFTRecord>(null);
 
     let { 
       network,
       tokenAddress,
       tokenId,
     } = useParams();
-
-    useEffect(() => {
-      let isMounted = true;
-      const fetchListing = async () => {
+    
+    const { 
+      data: listingDataTanstack,
+      // isLoading: isLoadingListingDataTanstack,
+    } = useQuery({
+      queryKey: ['listing-page', network, tokenAddress, tokenId, fetchIndex],
+      queryFn: async () => {
         let queryUrl = `${API_ENDPOINT}/listing/propykeys/${network}/${tokenAddress}/${tokenId}`;
         let listingRecordQueryResponse = await fetch(queryUrl).then(resp => resp.json());
-        if(listingRecordQueryResponse?.status && listingRecordQueryResponse?.data && isMounted) {
-          setListingRecord(listingRecordQueryResponse?.data);
+        let listingRecord : IPropyKeysHomeListingRecord | null = null;
+        let nftRecord : INFTRecord | null = null;
+        if(listingRecordQueryResponse?.status && listingRecordQueryResponse?.data) {
+          listingRecord = listingRecordQueryResponse?.data;
           if(listingRecordQueryResponse?.data?.nft) {
-            setNftRecord(listingRecordQueryResponse?.data?.nft);
-          } else {
-            setNftRecord(null);
+            nftRecord = listingRecordQueryResponse?.data?.nft;
           }
-        } else if(isMounted) {
-          setListingRecord(null);
-          setNftRecord(null);
         }
-      }
-      fetchListing();
-      return () => {
-        isMounted = false;
-      }
-    }, [network, tokenAddress, tokenId, fetchIndex])
+        return {
+          listingRecord,
+          nftRecord,
+        }
+      },
+      gcTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
+    });
 
     const refreshTokenMetadata = async () => {
       if(network && tokenAddress && tokenId) {
@@ -185,31 +187,31 @@ const SingleListingPage = (props: ISingleListingPage) => {
     const renderPrimaryContent = () => {
       let quickSpecs = [];
 
-      if(listingRecord?.bathrooms) {
+      if(listingDataTanstack?.listingRecord?.bathrooms) {
         quickSpecs.push({
           icon: BathroomIcon,
-          value: `${listingRecord?.bathrooms} ba`
+          value: `${listingDataTanstack?.listingRecord?.bathrooms} ba`
         })
       }
 
-      if(listingRecord?.bedrooms) {
+      if(listingDataTanstack?.listingRecord?.bedrooms) {
         quickSpecs.push({
           icon: BedroomIcon,
-          value: `${listingRecord?.bedrooms} bd`
+          value: `${listingDataTanstack?.listingRecord?.bedrooms} bd`
         })
       }
 
-      if(listingRecord?.lot_size) {
+      if(listingDataTanstack?.listingRecord?.lot_size) {
         quickSpecs.push({
           icon: LotSizeIcon,
-          value: `${listingRecord?.lot_size} ft²`
+          value: `${listingDataTanstack?.listingRecord?.lot_size} ft²`
         })
       }
 
-      if(listingRecord) {
+      if(listingDataTanstack?.listingRecord) {
         return (
           <>
-            <LinkWrapper link={`listings/${listingRecord.network_name}/${listingRecord.asset_address}`}>
+            <LinkWrapper link={`listings/${listingDataTanstack?.listingRecord.network_name}/${listingDataTanstack?.listingRecord.asset_address}`}>
               <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
                 {
                   `PropyKeys Home Listings`
@@ -218,7 +220,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
             </LinkWrapper>
             <Typography variant="h3" style={{fontWeight: 'bold'}}>
               {
-                listingRecord && listingRecord.full_address
+                listingDataTanstack?.listingRecord && listingDataTanstack?.listingRecord.full_address
               }
             </Typography>
             <div className={[classes.actionInfoContainer, 'secondary-text-light-mode'].join(" ")}>
@@ -230,7 +232,7 @@ const SingleListingPage = (props: ISingleListingPage) => {
             </div>
             <Typography className={classes.priceZone} variant="h5" style={{fontWeight: 'bold'}}>
               {
-                listingRecord?.price && priceFormat(listingRecord.price, 2, "$")
+                listingDataTanstack?.listingRecord?.price && priceFormat(listingDataTanstack?.listingRecord.price, 2, "$")
               }
             </Typography>
             {quickSpecs.length > 0 &&
@@ -250,18 +252,18 @@ const SingleListingPage = (props: ISingleListingPage) => {
 
     const renderSecondaryContent = () => {
 
-      if(listingRecord) {
+      if(listingDataTanstack?.listingRecord) {
         return (
           <>
-            {listingRecord?.id && 
+            {listingDataTanstack?.listingRecord?.id && 
               <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                <PropyKeysHomeListingLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} propyKeysHomeListingId={listingRecord?.id.toString()} />
+                <PropyKeysHomeListingLikeZoneContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} propyKeysHomeListingId={listingDataTanstack?.listingRecord?.id.toString()} />
               </div>
             }
-            {listingRecord?.description &&
+            {listingDataTanstack?.listingRecord?.description &&
               <>
                 <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Description"/>
-                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : classes.descriptionSpacerDesktop}>{listingRecord?.description}</Typography>
+                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : classes.descriptionSpacerDesktop}>{listingDataTanstack?.listingRecord?.description}</Typography>
               </>
             }
           </>
@@ -274,33 +276,33 @@ const SingleListingPage = (props: ISingleListingPage) => {
           <Grid container spacing={6} columns={12}>
             <Grid item xs={12} sm={12} md={12} lg={7}>
               {isConsideredMobile && renderPrimaryContent()}
-              <ListingGalleryContainer images={listingRecord?.images ? listingRecord?.images : []} />
+              <ListingGalleryContainer images={listingDataTanstack?.listingRecord?.images ? listingDataTanstack?.listingRecord?.images : []} />
               {isConsideredMobile && renderSecondaryContent()}
               {/* {tokenMetadata?.attributes && tokenMetadata?.attributes?.length > 0 && 
                 <div className={classes.sectionSpacer}>
                   <TokenInfoAccordionContainer tokenRecord={tokenRecord} tokenMetadata={tokenMetadata} />
                 </div>
               } */}
-              {nftRecord &&
+              {listingDataTanstack?.nftRecord &&
                 <>
                   <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} title="Associated PropyKeys Record"/>
                   <div style={{maxWidth: 350}}>
                     <SingleTokenCardBaseline
-                      tokenLink={`token/${nftRecord?.network_name}/${nftRecord.asset_address}/${nftRecord.token_id}`}
-                      tokenImage={nftRecord?.metadata?.image ? getResolvableIpfsLink(nftRecord.metadata.image) : undefined}
-                      tokenStandard={nftRecord?.asset?.standard}
-                      tokenId={nftRecord?.token_id}
-                      tokenCollectionName={nftRecord?.asset?.collection_name}
-                      tokenContractAddress={nftRecord?.asset_address}
-                      tokenNetwork={nftRecord?.network_name}
-                      tokenTitle={nftRecord?.metadata?.name ? nftRecord?.metadata?.name : ""}
+                      tokenLink={`token/${listingDataTanstack?.nftRecord?.network_name}/${listingDataTanstack?.nftRecord.asset_address}/${listingDataTanstack?.nftRecord.token_id}`}
+                      tokenImage={listingDataTanstack?.nftRecord?.metadata?.image ? getResolvableIpfsLink(listingDataTanstack?.nftRecord.metadata.image) : undefined}
+                      tokenStandard={listingDataTanstack?.nftRecord?.asset?.standard}
+                      tokenId={listingDataTanstack?.nftRecord?.token_id}
+                      tokenCollectionName={listingDataTanstack?.nftRecord?.asset?.collection_name}
+                      tokenContractAddress={listingDataTanstack?.nftRecord?.asset_address}
+                      tokenNetwork={listingDataTanstack?.nftRecord?.network_name}
+                      tokenTitle={listingDataTanstack?.nftRecord?.metadata?.name ? listingDataTanstack?.nftRecord?.metadata?.name : ""}
                     />
                   </div>
                 </>
               }
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={5}>
-              {listingRecord &&
+              {listingDataTanstack?.listingRecord &&
                 <>
                   {!isConsideredMobile && renderPrimaryContent()}
                   {!isConsideredMobile && renderSecondaryContent()}

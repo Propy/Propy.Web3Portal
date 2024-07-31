@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useId, useMemo } from 'react'
 
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { Theme } from '@mui/material/styles';
 
@@ -92,7 +94,8 @@ interface ICollectionBanner {
   showPagination?: boolean
   showFilters?: boolean,
   overrideTitle?: string,
-  filterShims?: string[]
+  filterShims?: string[],
+  sortBy?: "likes",
 }
 
 interface INftAssets {
@@ -103,18 +106,11 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
 
   let [searchParams, setSearchParams] = useSearchParams();
 
-  const [listingRecords, setListingRecords] = useState<IPropyKeysHomeListingRecord[]>([]);
-  const [nftAssets, setNftAssets] = useState<INftAssets>({});
+  const uniqueId = useId();
+
+  const location = useLocation();
+
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [perPage, setPerPage] = useState(20);
-  const [paginationTotalPages, setPaginationTotalPages] = useState(0);
-  const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
-  const [title, setTitle] = useState("Loading...");
-  const [isInitialLoad, setIsInitialLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeFilters, setActiveFilters] = useState<ICollectionQueryFilter[]>([]);
-  const [nftAddress, setNftAddress] = useState<string>("");
 
   const classes = useStyles();
 
@@ -130,12 +126,22 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     showFilters = false,
     overrideTitle,
     filterShims,
+    sortBy,
   } = props;
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCollection = async () => {
-      setIsLoading(true);
+  const searchParamsMemo = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return Object.fromEntries(params.entries());
+  }, [location.search]);
+
+  const perPage = 20;
+
+  const { 
+    data: collectionDataTanstack,
+    isLoading: isLoadingCollectionDataTanstack,
+  } = useQuery({
+    queryKey: ['listing-banner', contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParamsMemo, filterShims, overrideTitle],
+    queryFn: async () => {
       let additionalFilters : ICollectionQueryFilter[] = [];
       if(searchParams.get("city")) {
         additionalFilters.push({filter_type: "city", value: `${searchParams.get("city")}`});
@@ -158,8 +164,11 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("min_lot_size")) {
         additionalFilters.push({filter_type: "min_lot_size", value: `${searchParams.get("min_lot_size")}`});
       }
-      setActiveFilters(additionalFilters);
-      console.log({contractNameOrCollectionNameOrAddress})
+      if(sortBy) {
+        additionalFilters.push({filter_type: "sort_by", value: sortBy});
+      } else if(searchParams.get("sort_by")) {
+        additionalFilters.push({filter_type: "sort_by", value: `${searchParams.get("sort_by")}`});
+      }
       let collectionResponse = await PropyKeysListingService.getCollectionPaginated(
         network,
         contractNameOrCollectionNameOrAddress,
@@ -167,74 +176,62 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         page,
         additionalFilters,
       )
-      setIsInitialLoading(false);
-      setIsLoading(false);
-      console.log({collectionResponse})
-      if(collectionResponse?.status && collectionResponse?.data && isMounted) {
+      let title = "No records found";
+      let nftAddress = "";
+      if(collectionResponse?.status && collectionResponse?.data) {
         let renderResults : IPropyKeysHomeListingRecord[] = [];
         let assetResults : INftAssets = {};
         let apiResponseData : IListingCollectionResult = collectionResponse.data;
         if(collectionResponse?.status && apiResponseData?.data) {
           for(let listingRecord of apiResponseData?.data) {
             if(listingRecord?.asset_address && !assetResults[listingRecord?.asset_address]) {
-              let useTitle = "Collection not found";
+              title = "Collection not found";
               if(listingRecord.collection_name) {
-                useTitle = listingRecord.collection_name;
+                title = listingRecord.collection_name;
               } else if (listingRecord.asset_address) {
-                useTitle = listingRecord.asset_address;
+                title = listingRecord.asset_address;
               }
               if(overrideTitle) {
-                useTitle = overrideTitle;
+                title = overrideTitle;
               }
               let matchedEntry = LISTING_COLLECTIONS_PAGE_ENTRIES.find((entry) => [entry.slug, entry.address].indexOf(contractNameOrCollectionNameOrAddress) > -1);
               if(matchedEntry?.overrideTitle) {
-                useTitle = matchedEntry?.overrideTitle;
+                title = matchedEntry?.overrideTitle;
               }
               if(matchedEntry?.address) {
-                setNftAddress(matchedEntry?.address);
+                nftAddress = matchedEntry?.address;
               }
-              setTitle(useTitle);
-              
             }
             renderResults = [...renderResults, listingRecord];
           }
-          if(apiResponseData?.metadata?.pagination?.totalPages) {
-            setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
-          } else {
-            setPaginationTotalPages(0);
-          }
-          if(apiResponseData?.metadata?.pagination?.total) {
-            setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
-          } else {
-            setPaginationTotalRecords(0);
+        }
+        return {
+          title,
+          listingRecords: renderResults,
+          nftAssets: assetResults,
+          nftAddress,
+          activeFilters: additionalFilters,
+          pagination: {
+            totalPages: apiResponseData?.metadata?.pagination?.totalPages ? apiResponseData?.metadata?.pagination?.totalPages : 0,
+            totalRecords: apiResponseData?.metadata?.pagination?.total ? apiResponseData?.metadata?.pagination?.total : 0,
           }
         }
-        if(renderResults.length === 0) {
-          setTitle("No records found");
+      }
+      return {
+        title,
+        listingRecords: [],
+        nftAssets: {},
+        nftAddress,
+        activeFilters: [],
+        pagination: {
+          totalPages: 0,
+          totalRecords: 0,
         }
-        setListingRecords(renderResults);
-        setNftAssets(assetResults);
-      } else {
-        setListingRecords([]);
-        setNftAssets({});
       }
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      } else if(searchParams.get("page")) {
-        setSearchParams((params => {
-          params.delete("page");
-          return params;
-        }));
-      }
-    }
-    fetchCollection();
-    return () => {
-      isMounted = false;
-    }
-  }, [contractNameOrCollectionNameOrAddress, network, perPage, page, setSearchParams, searchParams, filterShims, overrideTitle])
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
 
   return (
     <>
@@ -242,25 +239,26 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         <>
           <div className={[showFilters ? classes.titleContainerWithFilters : classes.titleContainer, isConsideredMobile ? "flex-column" : ""].join(" ")}>
             <Typography variant="h4" className={[classes.title, isConsideredMobile ? "full-width" : ""].join(" ")}>
-              {title ? title : "Loading..."}
+              {collectionDataTanstack?.title ? collectionDataTanstack?.title : "Loading..."}
             </Typography>
-            {showCollectionLink && 
+            {showCollectionLink && collectionDataTanstack && 
               <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`listings/${network}/${collectionSlug}`}>
                 <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
-                  View {title}
+                  View {collectionDataTanstack.title}
                 </Button>
               </LinkWrapper>
             }
             {
               showFilters &&
+              collectionDataTanstack &&
               (VALID_HOME_LISTING_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
                 <div className={[isConsideredMobile ? "" : classes.filterButtonSpacing, classes.filterButton].join(" ")}>
                   <HomeListingCollectionFilterZoneContainer
-                    nftContractAddress={nftAddress}
+                    nftContractAddress={collectionDataTanstack?.nftAddress}
                     collectionSlug={collectionSlug}
                     contractNameOrCollectionNameOrAddress={contractNameOrCollectionNameOrAddress}
                     network={network}
-                    isLoading={isLoading}
+                    isLoading={isLoadingCollectionDataTanstack}
                     setPage={setPage}
                   />
                 </div>
@@ -268,42 +266,43 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           </div>
           {
             showFilters &&
+            collectionDataTanstack &&
             (VALID_HOME_LISTING_COLLECTION_NAMES_OR_ADDRESSES.indexOf(collectionSlug) > -1) &&
-            (activeFilters.length > 0) &&
+            (collectionDataTanstack?.activeFilters.length > 0) &&
               <div className={classes.activeFilterZone}>
-                <PropyKeysActiveFiltersZoneContainer activeFilters={activeFilters} />
+                <PropyKeysActiveFiltersZoneContainer activeFilters={collectionDataTanstack?.activeFilters} />
               </div>
           }
         </>
       }
-      <Grid className={[classes.sectionSpacer, isLoading ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 40 }}>
-        {!isInitialLoad && listingRecords && listingRecords.sort((a, b) => {
-          if(nftAssets[a?.asset_address]?.standard && nftAssets[b?.asset_address]?.standard) {
-            return (nftAssets[a?.asset_address]?.standard).localeCompare(nftAssets[b?.asset_address]?.standard);
+      <Grid className={[classes.sectionSpacer, isLoadingCollectionDataTanstack ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 40 }}>
+        {collectionDataTanstack?.listingRecords && collectionDataTanstack?.listingRecords.sort((a, b) => {
+          if(collectionDataTanstack?.nftAssets[a?.asset_address]?.standard && collectionDataTanstack?.nftAssets[b?.asset_address]?.standard) {
+            return (collectionDataTanstack?.nftAssets[a?.asset_address]?.standard).localeCompare(collectionDataTanstack?.nftAssets[b?.asset_address]?.standard);
           }
           return 0;
-        }).slice(0,(maxRecords && (listingRecords.length > maxRecords)) ? maxRecords : listingRecords.length).map((item, index) => 
-          <Grid key={`single-listing-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={10}>
-            <SingleListingCard listingCollectionName={title} listingRecord={item} assetRecord={nftAssets[item?.asset_address]} />
+        }).slice(0,(maxRecords && (collectionDataTanstack?.listingRecords.length > maxRecords)) ? maxRecords : collectionDataTanstack?.listingRecords.length).map((item, index) => 
+          <Grid key={`${uniqueId}-single-listing-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={10}>
+            <SingleListingCard listingCollectionName={collectionDataTanstack?.title} listingRecord={item} assetRecord={collectionDataTanstack?.nftAssets[item?.asset_address]} />
           </Grid>
         )}
-        {isInitialLoad && maxRecords &&
+        {isLoadingCollectionDataTanstack && maxRecords &&
           Array.from({length: maxRecords}).map((entry, index) => 
-            <Grid key={`single-listing-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={10}>
+            <Grid key={`${uniqueId}-single-listing-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={10}>
               <SingleListingCardLoading />
             </Grid>
           )
         }
       </Grid>
-      {paginationTotalPages > 1 && showPagination &&
+      {collectionDataTanstack?.pagination?.totalPages && collectionDataTanstack?.pagination?.totalPages > 1 && showPagination &&
         <>
           <div className={classes.paginationContainer}>
-            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={collectionDataTanstack?.pagination?.totalPages} variant="outlined" color="primary" />
           </div>
           {
-            paginationTotalRecords &&
+            collectionDataTanstack?.pagination?.totalRecords &&
             <Typography variant="subtitle1" className={classes.paginationTotalContainer}>
-              {paginationTotalRecords} total records
+              {collectionDataTanstack?.pagination?.totalRecords} total records
             </Typography>
           }
         </>

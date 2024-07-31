@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useId } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -92,6 +92,8 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
     timeline,
   } = props;
 
+  const uniqueId = useId();
+
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ export default function VerticalLinearStepper(props: ITokenMetadataTimeline) {
     <Box sx={{ maxWidth: 400 }}>
       <Stepper activeStep={activeStep} orientation="vertical">
         {timeline.map((timelineEntry, index) => (
-          <Step key={timelineEntry.milestone} expanded={true} completed={timelineEntry.complete}>
+          <Step key={`${uniqueId}-timelineEntry.milestone`} expanded={true} completed={timelineEntry.complete}>
             <StepLabel StepIconComponent={QontoStepIcon} sx={{
               '& .MuiStepLabel-labelContainer': {
                 color: "#212121"

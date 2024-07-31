@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useId } from 'react'
 
 import { useLocation, useSearchParams } from 'react-router-dom';
 
@@ -110,6 +110,8 @@ interface INftAssets {
 
 const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
 
+  const uniqueId = useId();
+
   const location = useLocation();
   let [searchParams, setSearchParams] = useSearchParams();
 
@@ -131,7 +133,6 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     collectionSlug,
     showPagination = false,
     isConsideredMobile,
-    isConsideredMedium,
     firstElementShim,
     showFilters = false,
     overrideTitle,
@@ -150,7 +151,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     data: collectionDataTanstack,
     isLoading: isLoadingCollectionDataTanstack,
   } = useQuery({
-    queryKey: [contractNameOrCollectionNameOrAddress, network, perPage, page, searchParamsMemo, filterShims, overrideTitle, sortBy],
+    queryKey: ['collection-banner', contractNameOrCollectionNameOrAddress, network, perPage, page, searchParamsMemo, filterShims, overrideTitle, sortBy],
     queryFn: async () => {
       let additionalFilters : ICollectionQueryFilter[] = [];
       if(searchParams.get("city")) {
@@ -173,6 +174,8 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
       if(sortBy) {
         additionalFilters.push({filter_type: "sort_by", value: sortBy});
+      } else if(searchParams.get("sort_by")) {
+        additionalFilters.push({filter_type: "sort_by", value: `${searchParams.get("sort_by")}`});
       }
       let collectionResponse = await NFTService.getCollectionPaginated(
         network,
@@ -284,7 +287,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
         </>
       }
-      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && !isConsideredMobile && !isConsideredMedium && showHeroGallery && 
+      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && showHeroGallery && 
         <div className={classes.collectionExplorerGalleryContainer}>
           <CollectionExplorerGalleryContainer 
             explorerEntries={
@@ -301,7 +304,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
       <Grid className={[classes.sectionSpacer, isLoadingCollectionDataTanstack ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
         {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && firstElementShim && 
-          <Grid key={`single-token-card-first-element-shim-${new Date().getTime()}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+          <Grid key={`${uniqueId}-single-token-card-first-element-shim-${new Date().getTime()}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             {firstElementShim}
           </Grid>
         }
@@ -311,13 +314,13 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
           return 0;
         }).slice(0,(maxRecords && (collectionDataTanstack?.nftRecords.length > maxRecords)) ? maxRecords : collectionDataTanstack?.nftRecords.length).map((item, index) => 
-          <Grid key={`single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+          <Grid key={`${uniqueId}-single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
             <SingleTokenCard nftRecord={item} assetRecord={collectionDataTanstack?.nftAssets[item?.asset_address]} />
           </Grid>
         )}
         {isLoadingCollectionDataTanstack && maxRecords &&
           Array.from({length: maxRecords}).map((entry, index) => 
-            <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
+            <Grid key={`${uniqueId}-single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCardLoading />
             </Grid>
           )
