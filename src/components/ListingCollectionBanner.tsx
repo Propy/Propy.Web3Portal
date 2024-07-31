@@ -94,7 +94,8 @@ interface ICollectionBanner {
   showPagination?: boolean
   showFilters?: boolean,
   overrideTitle?: string,
-  filterShims?: string[]
+  filterShims?: string[],
+  sortBy?: "likes",
 }
 
 interface INftAssets {
@@ -125,6 +126,7 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
     showFilters = false,
     overrideTitle,
     filterShims,
+    sortBy,
   } = props;
 
   const searchParamsMemo = useMemo(() => {
@@ -161,6 +163,11 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       }
       if(searchParams.get("min_lot_size")) {
         additionalFilters.push({filter_type: "min_lot_size", value: `${searchParams.get("min_lot_size")}`});
+      }
+      if(sortBy) {
+        additionalFilters.push({filter_type: "sort_by", value: sortBy});
+      } else if(searchParams.get("sort_by")) {
+        additionalFilters.push({filter_type: "sort_by", value: `${searchParams.get("sort_by")}`});
       }
       let collectionResponse = await PropyKeysListingService.getCollectionPaginated(
         network,
