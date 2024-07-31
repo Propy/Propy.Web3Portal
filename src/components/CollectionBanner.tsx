@@ -101,7 +101,7 @@ interface ICollectionBanner {
   overrideTitle?: string,
   filterShims?: string[],
   showHeroGallery?: boolean,
-  sortBy?: "likes",
+  sortBy?: "most_liked",
 }
 
 interface INftAssets {

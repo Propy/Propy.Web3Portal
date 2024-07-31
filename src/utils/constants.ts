@@ -80,11 +80,11 @@ const COLLECTIONS_ENTRIES_PROD = [
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
-    slug: "propykeys?landmark=true",
+    slug: "propykeys?landmark=true&sort_by=most_liked",
     overrideTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
     showHeroGallery: true,
-    sortBy: "likes"
+    sortBy: "most_liked"
   },
   {
     network: "base",
@@ -261,7 +261,7 @@ interface ICollectionEntry {
   overrideTitle?: string;
   filterShims?: string[];
   showHeroGallery?: boolean;
-  sortBy?: "likes";
+  sortBy?: "most_liked";
 }
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
