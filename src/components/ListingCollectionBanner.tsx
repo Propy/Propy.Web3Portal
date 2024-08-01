@@ -276,7 +276,7 @@ const ListingCollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
         </>
       }
       <Grid className={[classes.sectionSpacer, isLoadingCollectionDataTanstack ? classes.loadingZone : ''].join(" ")} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 40 }}>
-        {collectionDataTanstack?.listingRecords && collectionDataTanstack?.listingRecords.sort((a, b) => {
+        {collectionDataTanstack?.listingRecords && collectionDataTanstack?.nftAssets && collectionDataTanstack?.listingRecords.sort((a, b) => {
           if(collectionDataTanstack?.nftAssets[a?.asset_address]?.standard && collectionDataTanstack?.nftAssets[b?.asset_address]?.standard) {
             return (collectionDataTanstack?.nftAssets[a?.asset_address]?.standard).localeCompare(collectionDataTanstack?.nftAssets[b?.asset_address]?.standard);
           }
