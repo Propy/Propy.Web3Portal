@@ -287,18 +287,19 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           }
         </>
       }
-      {!isLoadingCollectionDataTanstack && collectionDataTanstack?.nftRecords && showHeroGallery && 
+      {showHeroGallery && 
         <div className={classes.collectionExplorerGalleryContainer}>
           <CollectionExplorerGalleryContainer 
             explorerEntries={
-              collectionDataTanstack?.nftRecords.map((item, index) => ({
+              collectionDataTanstack?.nftRecords ? collectionDataTanstack?.nftRecords.map((item, index) => ({
                 nftRecord: item,
                 assetRecord: collectionDataTanstack?.nftAssets[item?.asset_address],
-              }))
+              })) : []
             }
             fullWidth={true}
             overrideTitle={overrideTitle}
             overrideSlug={collectionSlug}
+            isLoading={isLoadingCollectionDataTanstack}
           />
         </div>
       }
