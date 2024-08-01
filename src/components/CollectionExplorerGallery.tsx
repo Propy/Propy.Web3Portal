@@ -134,6 +134,7 @@ interface ICollectionExplorerGallery {
   fullWidth: boolean,
   overrideTitle?: string,
   overrideSlug?: string,
+  isLoading?: boolean,
 }
 
 const CollectionExplorerGallery = ({ 
@@ -143,6 +144,7 @@ const CollectionExplorerGallery = ({
   fullWidth,
   overrideTitle,
   overrideSlug,
+  isLoading,
 }: ICollectionExplorerGallery & PropsFromRedux) => {
 
   const uniqueId = useId();
@@ -152,20 +154,28 @@ const CollectionExplorerGallery = ({
 
   const handleNext = () => {
     setSelectedEntryIndex((prevIndex) => 
-      (prevIndex + 1) % explorerEntries.length
+      explorerEntries.length > 0 ? (prevIndex + 1) % explorerEntries.length : 0
     )
   }
-
+  
   const handlePrevious = () => {
     setSelectedEntryIndex((prevIndex) => 
-      (prevIndex - 1 + explorerEntries.length) % explorerEntries.length
+      explorerEntries.length > 0 ? (prevIndex - 1 + explorerEntries.length) % explorerEntries.length : 0
     )
   }
 
   const getVisibleIndices = () => {
-    const prev = (selectedEntryIndex - 1 + explorerEntries.length) % explorerEntries.length
-    const next = (selectedEntryIndex + 1) % explorerEntries.length
-    return [prev, selectedEntryIndex, next]
+    if (!Array.isArray(explorerEntries) || explorerEntries.length === 0) {
+      return [];
+    }
+  
+    const length = explorerEntries.length;
+    const safeIndex = Math.max(0, Math.min(Math.floor(selectedEntryIndex), length - 1));
+  
+    const prev = (safeIndex - 1 + length) % length;
+    const next = (safeIndex + 1) % length;
+  
+    return [prev, safeIndex, next];
   }
 
   const transitions = useTransition(getVisibleIndices(), {
@@ -223,23 +233,34 @@ const CollectionExplorerGallery = ({
     <div className={isConsideredMobile ? classes.rootMobile : classes.rootDesktop}>
       <div className={[classes.rootChild, isConsideredMobile ? classes.rootChildMobile : classes.rootChildDesktop].join(" ")}>
         <div className={[classes.carouselContainer, isConsideredMobile ? classes.carouselContainerMobile : classes.carouselContainerDesktop].join(" ")}>
-          {transitions((style, index) => (
-            <animated.img
-              key={`${uniqueId}-index`}
-              style={style}
-              className={classes.image}
-              src={getResolvableIpfsLink(explorerEntries[index]?.nftRecord?.metadata?.image ? explorerEntries[index]?.nftRecord?.metadata?.image : "")}
-              alt={`NFT ${index + 1}`}
-            />
-          ))}
-          <div className={classes.controlsOverlayContainer}>
-            <Fab onClick={handlePrevious} color="default" aria-label="previous">
-              <ArrowPrevious />
-            </Fab>
-            <Fab onClick={handleNext} color="default" aria-label="next">
-              <ArrowNext />
-            </Fab>
-          </div>
+          {!isLoading && explorerEntries.length > 0 && transitions((style, index) => {
+            if (typeof index !== 'number' || isNaN(index) || index < 0 || index >= explorerEntries.length) {
+              return null;
+            }
+            return (
+              <animated.img
+                key={`${uniqueId}-${index}`}
+                style={style}
+                className={classes.image}
+                src={getResolvableIpfsLink(explorerEntries[index]?.nftRecord?.metadata?.image ?? "")}
+                alt={`NFT ${index + 1}`}
+              />
+            );
+          })}
+          {isLoading && 
+            <div></div>
+          }
+          {
+            (explorerEntries.length > 0) && 
+              <div className={classes.controlsOverlayContainer}>
+                <Fab onClick={() => handlePrevious()} color="default" aria-label="previous">
+                  <ArrowPrevious />
+                </Fab>
+                <Fab onClick={() => handleNext()} color="default" aria-label="next">
+                  <ArrowNext />
+                </Fab>
+              </div>
+          }
         </div>
         <div className={isConsideredMobile ? classes.infoZoneMobile : classes.infoZoneDesktop}>
             <LinkWrapper link={`collection/${network_name}/${overrideSlug ? overrideSlug : slug}`}>

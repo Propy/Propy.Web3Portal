@@ -2,6 +2,8 @@ import React, { useEffect, useState, useId } from 'react'
 
 import { useSearchParams } from "react-router-dom";
 
+import { useQuery } from '@tanstack/react-query';
+
 import { Theme } from '@mui/material/styles';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -72,14 +74,7 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
 
   const uniqueId = useId();
 
-  const [nftRecords, setNftRecords] = useState<INFTRecord[]>([]);
-  const [nftAssets, setNftAssets] = useState<IRecentlyMintedTokenAssets>({});
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [perPage, setPerPage] = useState(20);
-  const [paginationTotalPages, setPaginationTotalPages] = useState(0);
-  // const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
 
   const classes = useStyles();
 
@@ -91,15 +86,19 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
     isConsideredMobile,
   } = props;
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchMixedTokens = async () => {
+  const perPage = 20;
+
+  const { 
+    data: recentlyMintedDataTanstack,
+    isLoading: isLoadingRecentlyMintedDataTanstack,
+  } = useQuery({
+    queryKey: ['recently-minted-banner', perPage, page],
+    queryFn: async () => {
       let recentlyMintedResponse = await NFTService.getRecentlyMintedPaginated(
         perPage,
         page,
       )
-      setIsLoading(false);
-      if(recentlyMintedResponse?.status && recentlyMintedResponse?.data && isMounted) {
+      if(recentlyMintedResponse?.status && recentlyMintedResponse?.data) {
         let renderResults : INFTRecord[] = [];
         let assetResults : IRecentlyMintedTokenAssets = {};
         let apiResponseData : IRecentlyMintedResult = recentlyMintedResponse.data;
@@ -110,43 +109,43 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
             }
             renderResults = [...renderResults, nftRecord];
           }
-          if(apiResponseData?.metadata?.pagination?.totalPages) {
-            setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
-          } else {
-            setPaginationTotalPages(0);
-          }
-          // if(apiResponseData?.metadata?.pagination?.total) {
-          //   setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
-          // } else {
-          //   setPaginationTotalRecords(0);
-          // }
         }
-        setNftRecords(renderResults);
-        setNftAssets(assetResults);
+        return {
+          nftRecords: renderResults,
+          nftAssets: assetResults,
+          pagination: {
+            totalPages: apiResponseData?.metadata?.pagination?.totalPages ? apiResponseData?.metadata?.pagination?.totalPages : 0,
+            totalRecords: apiResponseData?.metadata?.pagination?.total ? apiResponseData?.metadata?.pagination?.total : 0,
+          }
+        }
       } else {
-        setNftRecords([]);
-        setNftAssets({});
-        setPaginationTotalPages(0);
-        // setPaginationTotalRecords(0);
+        return {
+          nftRecords: [],
+          nftAssets: {},
+          pagination: {
+            totalPages: 0,
+            totalRecords: 0,
+          }
+        }
       }
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      } else if(searchParams.get("page")) {
-        setSearchParams((params => {
-          params.delete("page");
-          return params;
-        }));
-      }
-    }
-    fetchMixedTokens();
-    return () => {
-      isMounted = false;
-    }
-  }, [perPage, page, setSearchParams, searchParams])
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
 
+  useEffect(() => {
+    if(page > 1) {
+      setSearchParams((params => {
+        params.set("page", page.toString());
+        return params;
+      }));
+    } else if(searchParams.get("page")) {
+      setSearchParams((params => {
+        params.delete("page");
+        return params;
+      }));
+    }
+  }, [page, searchParams, setSearchParams]);
   return (
     <>
       {showTitle &&
@@ -164,17 +163,17 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
         </div>
       }
       <Grid className={classes.sectionSpacer} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
-          {!isLoading && nftRecords && nftRecords.sort((a, b) => {
-            if(nftAssets[a?.asset_address]?.standard && nftAssets[b?.asset_address]?.standard) {
-              return (nftAssets[a?.asset_address]?.standard).localeCompare(nftAssets[b?.asset_address]?.standard);
+          {!isLoadingRecentlyMintedDataTanstack && recentlyMintedDataTanstack?.nftRecords && recentlyMintedDataTanstack.nftRecords.sort((a, b) => {
+            if(recentlyMintedDataTanstack?.nftAssets[a?.asset_address]?.standard && recentlyMintedDataTanstack.nftAssets[b?.asset_address]?.standard) {
+              return (recentlyMintedDataTanstack.nftAssets[a?.asset_address]?.standard).localeCompare(recentlyMintedDataTanstack.nftAssets[b?.asset_address]?.standard);
             }
             return 0;
-          }).slice(0,(maxRecords && (nftRecords.length > maxRecords)) ? maxRecords : nftRecords.length).map((item, index) => 
+          }).slice(0,(maxRecords && (recentlyMintedDataTanstack.nftRecords.length > maxRecords)) ? maxRecords : recentlyMintedDataTanstack.nftRecords.length).map((item, index) => 
             <Grid key={`${uniqueId}-single-token-card-${index}-${item.token_id}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-              <SingleTokenCard nftRecord={item} assetRecord={nftAssets[item?.asset_address]} />
+              <SingleTokenCard nftRecord={item} assetRecord={recentlyMintedDataTanstack.nftAssets[item?.asset_address]} />
             </Grid>
           )}
-          {isLoading && maxRecords &&
+          {isLoadingRecentlyMintedDataTanstack && maxRecords &&
             Array.from({length: maxRecords}).map((entry, index) => 
               <Grid key={`${uniqueId}-single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
                 <SingleTokenCardLoading />
@@ -182,9 +181,9 @@ const RecentlyMintedTokensBanner = (props: IRecentlyMintedTokensBanner & PropsFr
             )
           }
         </Grid>
-        {paginationTotalPages > 1 && showPagination &&
+        {recentlyMintedDataTanstack?.pagination?.totalPages && (recentlyMintedDataTanstack?.pagination?.totalPages > 1) && showPagination &&
           <div className={classes.paginationContainer}>
-            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={recentlyMintedDataTanstack?.pagination.totalPages} variant="outlined" color="primary" />
           </div>
         }
     </>
