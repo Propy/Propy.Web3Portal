@@ -143,10 +143,29 @@ export interface INFTRecord {
     transfer_events_erc721?: ITransferEventERC721Record[];
 }
 
-export interface IExplorerGalleryEntry {
-    nftRecord: INFTRecord,
-    assetRecord: IAssetRecord,
+export interface INFTAsset {
+    [key: string]: IAssetRecord
 }
+
+export interface ICollectionRecord {
+    name: string;
+    collection_name: string;
+    slug: string;
+}
+
+type NFTExplorerGalleryEntry = {
+    type: 'NFT';
+    nftRecord: INFTRecord;
+    collectionRecord: ICollectionRecord;
+}
+
+type ListingExplorerGalleryEntry = {
+    type: 'LISTING';
+    listingRecord: IPropyKeysHomeListingRecord;
+    collectionRecord: ICollectionRecord;
+}
+
+export type IExplorerGalleryEntry = NFTExplorerGalleryEntry | ListingExplorerGalleryEntry;
 
 export interface ICoordinate {
     longitude: number

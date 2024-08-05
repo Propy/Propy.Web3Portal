@@ -13,12 +13,17 @@ import Button from '@mui/material/Button';
 import ArrowNext from '@mui/icons-material/ArrowForwardIos';
 import ArrowPrevious from '@mui/icons-material/ArrowBackIosNew';
 
-import { getResolvableIpfsLink } from '../utils';
+import { getResolvableIpfsLink, priceFormat } from '../utils';
 
 import LinkWrapper from '../components/LinkWrapper';
 
 import NFTLikeZoneContainer from '../containers/NFTLikeZoneContainer';
+import PropyKeysHomeListingLikeZoneContainer from '../containers/PropyKeysHomeListingLikeZoneContainer';
 import GenericTitleContainer from '../containers/GenericTitleContainer';
+
+import BathroomIcon from '../assets/svg/bathroom-icon.svg';
+import BedroomIcon from '../assets/svg/bedroom-icon.svg';
+import LotSizeIcon from '../assets/svg/lot-size-icon.svg';
 
 import { PropsFromRedux } from '../containers/CollectionExplorerGalleryContainer'
 
@@ -121,11 +126,37 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'absolute',
     },
     likeContainer: {
-      marginTop: theme.spacing(1),
+      marginTop: theme.spacing(2),
     },
     descriptionSpacerMobile: {
       marginBottom: theme.spacing(2),
-    }
+    },
+    priceZone: {
+      marginTop: theme.spacing(2),
+    },
+    quickSpecsZone: {
+      marginTop: theme.spacing(2),
+      display: 'flex',
+    },
+    quickSpecsZoneMobile: {
+      marginBottom: theme.spacing(2),
+    },
+    quickSpecEntry: {
+      display: 'flex',
+      alignItems: 'center',
+      marginRight: theme.spacing(2)
+    },
+    quickSpecEntryIcon: {
+      height: 30,
+      marginRight: theme.spacing(1),
+    },
+    quickSpecEntryText: {
+      textTransform: 'none',
+      fontSize: '1rem',
+    },
+    descriptionSpacerDesktop: {
+      marginBottom: theme.spacing(2),
+    },
   }),
 )
 
@@ -196,53 +227,117 @@ const CollectionExplorerGallery = ({
     config: { duration: 100 },
   })
 
-  // const infoTransitions = useTransition(getVisibleIndices(), {
-  //   from: (index) => ({
-  //     opacity: 0,
-  //     transform: `scale(${index === selectedEntryIndex ? 1 : 0.5})`,
-  //     top: index === selectedEntryIndex ? `0px` : `0px`
-  //   }),
-  //   enter: (index) => ({
-  //     opacity: index === selectedEntryIndex ? 1 : 0,
-  //     transform: `scale(${index === selectedEntryIndex ? 1 : 0.5})`,
-  //     top: index === selectedEntryIndex ? `0px` : `0px`,
-  //   }),
-  //   update: (index) => ({
-  //     opacity: index === selectedEntryIndex ? 1 : 0,
-  //     transform: `scale(${index === selectedEntryIndex ? 1 : 0.5})`,
-  //     top: index === selectedEntryIndex ? `0px` : `0px`,
-  //   }),
-  //   leave: { opacity: 0 },
-  //   config: { duration: 200 },
-  // })
+  const {
+    type = false,
+  } = explorerEntries[selectedEntryIndex] ? explorerEntries[selectedEntryIndex] : {};
+
+  const listingRecord = (explorerEntries[selectedEntryIndex]?.type === "LISTING" && explorerEntries[selectedEntryIndex]?.listingRecord) ? explorerEntries[selectedEntryIndex]?.listingRecord : false;
 
   const {
     token_id = false,
     asset_address = false,
     network_name = false,
     metadata = false,
-  } = explorerEntries[selectedEntryIndex]?.nftRecord ? explorerEntries[selectedEntryIndex]?.nftRecord : {};
+  } = (explorerEntries[selectedEntryIndex]?.type === "NFT" && explorerEntries[selectedEntryIndex]?.nftRecord) ? explorerEntries[selectedEntryIndex]?.nftRecord : {};
 
   const {
     name = false,
     collection_name = false,
     slug = false,
-  } = explorerEntries[selectedEntryIndex]?.assetRecord ? explorerEntries[selectedEntryIndex]?.assetRecord : {};
+  } = explorerEntries[selectedEntryIndex]?.collectionRecord ? explorerEntries[selectedEntryIndex]?.collectionRecord : {};
+
+  const renderPrimaryContentListing = () => {
+    if(listingRecord) {
+      let quickSpecs = [];
+
+      if(listingRecord?.bathrooms) {
+        quickSpecs.push({
+          icon: BathroomIcon,
+          value: `${listingRecord?.bathrooms} ba`
+        })
+      }
+
+      if(listingRecord?.bedrooms) {
+        quickSpecs.push({
+          icon: BedroomIcon,
+          value: `${listingRecord?.bedrooms} bd`
+        })
+      }
+
+      if(listingRecord?.lot_size) {
+        quickSpecs.push({
+          icon: LotSizeIcon,
+          value: `${listingRecord?.lot_size} ft²`
+        })
+      }
+
+      if(listingRecord) {
+        return (
+          <>
+            <LinkWrapper link={`listings/${listingRecord?.network_name}/${listingRecord?.asset_address}`}>
+              <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
+                {
+                  `PropyKeys Home Listings`
+                }
+              </Typography>
+            </LinkWrapper>
+            <Typography variant="h4">
+              {
+                listingRecord && listingRecord?.full_address
+              }
+            </Typography>
+            <Typography className={classes.priceZone} variant="h5" style={{fontWeight: 'bold'}}>
+              {
+                listingRecord?.price && priceFormat(listingRecord?.price, 2, "$")
+              }
+            </Typography>
+            {quickSpecs.length > 0 &&
+              <div className={[classes.quickSpecsZone, (isConsideredMobile || isConsideredMedium) ? classes.quickSpecsZoneMobile : ""].join(" ")}>
+                {quickSpecs.map((entry) => 
+                  <div className={classes.quickSpecEntry}>
+                    <img alt={entry.value} className={classes.quickSpecEntryIcon} src={entry.icon} />
+                    <Typography className={classes.quickSpecEntryText} variant="button">{entry.value}</Typography>
+                  </div>
+                )}
+              </div>
+            }
+            {listingRecord?.id && 
+              <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                <PropyKeysHomeListingLikeZoneContainer propyKeysHomeListingId={listingRecord?.id.toString()} />
+              </div>
+            }
+            {
+              listingRecord.token_id &&
+              listingRecord.asset_address && 
+              listingRecord.network_name && 
+              <div style={{marginTop: 16}}>
+                <LinkWrapper className={(isConsideredMobile || isConsideredMedium) ? "full-width" : ""} link={`listing/${listingRecord.network_name}/${listingRecord.asset_address}/${listingRecord.token_id}`}>
+                  <Button className={(isConsideredMobile || isConsideredMedium) ? "margin-top-8" : ""} variant="contained" color="secondary">
+                    View Full Details
+                  </Button>
+                </LinkWrapper>
+              </div>
+            }
+          </>
+        )
+      }
+    }
+  }
 
   return (
-    <div className={isConsideredMobile ? classes.rootMobile : classes.rootDesktop}>
-      <div className={[classes.rootChild, isConsideredMobile ? classes.rootChildMobile : classes.rootChildDesktop].join(" ")}>
-        <div className={[classes.carouselContainer, isConsideredMobile ? classes.carouselContainerMobile : classes.carouselContainerDesktop].join(" ")}>
+    <div className={(isConsideredMobile || isConsideredMedium) ? classes.rootMobile : classes.rootDesktop}>
+      <div className={[classes.rootChild, (isConsideredMobile || isConsideredMedium) ? classes.rootChildMobile : classes.rootChildDesktop].join(" ")}>
+        <div className={[classes.carouselContainer, (isConsideredMobile || isConsideredMedium) ? classes.carouselContainerMobile : classes.carouselContainerDesktop].join(" ")}>
           {!isLoading && explorerEntries.length > 0 && transitions((style, index) => {
             if (typeof index !== 'number' || isNaN(index) || index < 0 || index >= explorerEntries.length) {
               return null;
             }
             return (
               <animated.img
-                key={`${uniqueId}-${index}`}
+                key={`${uniqueId}-${type}-${index}`}
                 style={style}
                 className={classes.image}
-                src={getResolvableIpfsLink(explorerEntries[index]?.nftRecord?.metadata?.image ?? "")}
+                src={explorerEntries[index]?.type === "NFT" ? getResolvableIpfsLink(explorerEntries[index]?.nftRecord?.metadata?.image ?? "") : explorerEntries[index]?.listingRecord?.images?.[0]}
                 alt={`NFT ${index + 1}`}
               />
             );
@@ -251,7 +346,7 @@ const CollectionExplorerGallery = ({
             <div></div>
           }
           {
-            (explorerEntries.length > 0) && 
+            (explorerEntries.length > 1) && 
               <div className={classes.controlsOverlayContainer}>
                 <Fab onClick={() => handlePrevious()} color="default" aria-label="previous">
                   <ArrowPrevious />
@@ -262,48 +357,57 @@ const CollectionExplorerGallery = ({
               </div>
           }
         </div>
-        <div className={isConsideredMobile ? classes.infoZoneMobile : classes.infoZoneDesktop}>
-            <LinkWrapper link={`collection/${network_name}/${overrideSlug ? overrideSlug : slug}`}>
-              <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
-                {!overrideTitle &&
-                  `${collection_name ? collection_name : name}`
-                }
-                {overrideTitle && overrideTitle}
-              </Typography>
-            </LinkWrapper>
-            <Typography variant='h4'>
-              {metadata && metadata?.name ? metadata?.name : ""}
-            </Typography>
-            {
-              token_id && 
-              asset_address && 
-              network_name && 
-              <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                <NFTLikeZoneContainer 
-                  // compact={true}
-                  tokenId={token_id}
-                  tokenAddress={asset_address}
-                  tokenNetwork={network_name}
-                />
-              </div>
-            }
-            {metadata && metadata?.description &&
+        <div className={(isConsideredMobile || isConsideredMedium) ? classes.infoZoneMobile : classes.infoZoneDesktop}>
+            {explorerEntries[selectedEntryIndex]?.type === "NFT" &&
               <>
-                <GenericTitleContainer variant={"h5"} marginBottom={8} marginTop={16} title="Description"/>
-                <Typography variant="body1" className={isConsideredMobile ? classes.descriptionSpacerMobile : ''}>{metadata?.description}</Typography>
+                <LinkWrapper link={`collection/${network_name}/${overrideSlug ? overrideSlug : slug}`}>
+                  <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
+                    {!overrideTitle &&
+                      `${collection_name ? collection_name : name}`
+                    }
+                    {overrideTitle && overrideTitle}
+                  </Typography>
+                </LinkWrapper>
+                <Typography variant='h4'>
+                  {metadata && metadata?.name ? metadata?.name : ""}
+                </Typography>
+                {
+                  token_id && 
+                  asset_address && 
+                  network_name && 
+                  <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                    <NFTLikeZoneContainer 
+                      // compact={true}
+                      tokenId={token_id}
+                      tokenAddress={asset_address}
+                      tokenNetwork={network_name}
+                    />
+                  </div>
+                }
+                {metadata && metadata?.description &&
+                  <>
+                    <GenericTitleContainer variant={"h5"} marginBottom={8} marginTop={16} title="Description"/>
+                    <Typography variant="body1" className={(isConsideredMobile || isConsideredMedium) ? classes.descriptionSpacerMobile : ''}>{metadata?.description}</Typography>
+                  </>
+                }
+                {
+                  token_id &&
+                  asset_address && 
+                  network_name && 
+                  <div style={{marginTop: 16}}>
+                    <LinkWrapper className={(isConsideredMobile || isConsideredMedium) ? "full-width" : ""} link={`token/${network_name}/${asset_address}/${token_id}`}>
+                      <Button className={(isConsideredMobile || isConsideredMedium) ? "margin-top-8" : ""} variant="contained" color="secondary">
+                        View Full Details
+                      </Button>
+                    </LinkWrapper>
+                  </div>
+                }
               </>
             }
-            {
-              token_id &&
-              asset_address && 
-              network_name && 
-              <div style={{marginTop: 16}}>
-                <LinkWrapper className={isConsideredMobile ? "full-width" : ""} link={`token/${network_name}/${asset_address}/${token_id}`}>
-                  <Button className={isConsideredMobile ? "margin-top-8" : ""} variant="contained" color="secondary">
-                    View Full Details
-                  </Button>
-                </LinkWrapper>
-              </div>
+            {explorerEntries[selectedEntryIndex]?.type === "LISTING" &&
+              <>
+                {renderPrimaryContentListing()}
+              </>
             }
         </div>
       </div>

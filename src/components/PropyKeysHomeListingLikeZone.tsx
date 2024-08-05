@@ -11,6 +11,7 @@ import createStyles from '@mui/styles/createStyles';
 
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -61,6 +62,7 @@ interface IPropyKeysHomeListingLikeZone {
 
 const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeListingLikeZone) => {
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [likeCount, setLikeCount] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [reloadIndex, setReloadIndex] = useState<number>(0);
@@ -87,6 +89,9 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
   useEffect(() => {
     let isMounted = true;
     const getLikeStatus = async () => {
+      if(isMounted) {
+        setLoading(true);
+      }
       if(address) {
         let [likeStatusResponse, likeCountResponse] = await Promise.all([
           PropyKeysListingService.getLikedByStatus(propyKeysHomeListingId, address),
@@ -113,6 +118,9 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
           }
         }
         setIsLiked(false);
+      }
+      if(isMounted) {
+        setLoading(false);
       }
     }
     getLikeStatus();
@@ -223,10 +231,15 @@ const PropyKeysHomeListingLikeZone = (props: PropsFromRedux & IPropyKeysHomeList
             </IconButton>
           </Tooltip>
         }
-        <Typography variant={compact ? "subtitle2" : "subtitle1"}>
-          {likeCount} 
-          {!compact && <>{(likeCount && (likeCount === 1)) ? ' Like' : ' Likes'}</>}
-        </Typography>
+        {!loading &&
+          <Typography variant={compact ? "subtitle2" : "subtitle1"}>
+            {likeCount} 
+            {!compact && <>{(likeCount && (likeCount === 1)) ? ' Like' : ' Likes'}</>}
+          </Typography>
+        }
+        {loading &&
+          <CircularProgress style={{width: compact ? 8 : 20, height: compact ? 8 : 20, marginLeft: compact ? 0 : 8}} />
+        }
     </div>
   )
 }
