@@ -12,6 +12,7 @@ import {
 } from '../utils/constants';
 
 import GenericPageContainer from '../containers/GenericPageContainer';
+import MultiCollectionGalleryContainer from '../containers/MultiCollectionGalleryContainer';
 import AccountTokensBannerContainer from '../containers/AccountTokensBannerContainer';
 import RecentlyMintedTokensBannerContainer from '../containers/RecentlyMintedTokensBannerContainer';
 import CollectionBannerContainer from '../containers/CollectionBannerContainer';
@@ -58,6 +59,9 @@ const HomePage = () => {
             >
                 <div className={classes.sectionSpacer}>
                     <ReserveAnAddressHomeBannerContainer />
+                </div>
+                <div className={classes.sectionSpacer}>
+                    <MultiCollectionGalleryContainer />
                 </div>
                 {address &&
                     <div className={classes.sectionSpacer}>
