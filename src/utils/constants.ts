@@ -48,81 +48,105 @@ export const VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys", "0xa2
 
 export const VALID_HOME_LISTING_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys-base-sepolia", "propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
 
-const COLLECTIONS_ENTRIES_DEV = [
+const COLLECTIONS_ENTRIES_DEV : ICollectionEntry[] = [
   {
     network: "base-sepolia",
     address: "0x07922CDe9e58fb590ffB59BB8777cF4b737fE2a3",
-    slug: "propykeys-staking-sepolia"
+    slug: "propykeys-staking-sepolia",
+    collectionType: "NFT",
   },
   {
     network: "base-sepolia",
     address: "0x4ebCEb82B5940E10c301A33261Af13222A38d974",
     slug: "propykeys-og-staking-sepolia",
+    collectionType: "NFT",
   },
   {
     network: "base-sepolia",
     address: "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c",
     slug: "propy-home-nft-dev-base-testnet",
+    collectionType: "NFT",
   },
   {
     network: "goerli",
     address: "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95",
     slug: "propy-deed-certificates-stage-testnet",
+    collectionType: "NFT",
   },
   {
     network: "goerli",
     address: "0x73C3a1437B0307732Eb086cb2032552eBea15444",
     slug: "propy-deed-certificates-dev-testnet",
+    collectionType: "NFT",
   },
 ]
 
-const COLLECTIONS_ENTRIES_PROD = [
+const COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
     slug: "propykeys?landmark=true&sort_by=most_liked",
     overrideTitle: "PropyKeys AI Landmarks",
+    optimisticTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
-    showHeroGallery: true,
-    sortBy: "most_liked"
+    sortBy: "most_liked",
+    showInMultiCollectionGallery: true,
+    collectionType: "NFT",
   },
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+    optimisticTitle: "PropyKeys Addresses",
     slug: "propykeys",
+    collectionType: "NFT",
   },
   {
     network: "ethereum",
     address: "0x2dbC375B35c5A2B6E36A386c8006168b686b70D3",
+    optimisticTitle: "Real World Assets",
     slug: "propy-real-world-assets",
+    showInMultiCollectionGallery: true,
+    collectionType: "NFT",
   },
   {
     network: "arbitrum",
     address: "0x567c407D054A644DBBBf2d3a6643776473f82d7a",
+    optimisticTitle: "Deed Certificates",
     slug: "propy-deed-certificates",
+    showInMultiCollectionGallery: true,
+    collectionType: "NFT",
   },
   {
     network: "ethereum",
     address: "0xB5c4910335D373eb26FeBb30B8f1d7416179A4EC",
+    optimisticTitle: "MetaAgents",
     slug: "meta-agents",
+    showInMultiCollectionGallery: true,
+    collectionType: "NFT",
   },
 ]
 
-const LISTING_COLLECTIONS_ENTRIES_PROD = [
+const LISTING_COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
   {
     network: "base",
     slug: "propykeys",
     overrideTitle: "PropyKeys Home Listings",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+    showInMultiCollectionGallery: true,
+    optimisticTitle: "PropyKeys Home Listings",
+    collectionType: "LISTING",
   },
 ]
 
-const LISTING_COLLECTIONS_ENTRIES_DEV = [
+const LISTING_COLLECTIONS_ENTRIES_DEV : ICollectionEntry[] = [
   {
     network: "base-sepolia",
     slug: "propykeys-base-sepolia",
     overrideTitle: "PropyKeys Home Listings (Base Sepolia)",
     address: "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c",
+    showInMultiCollectionGallery: true,
+    optimisticTitle: "PropyKeys Home Listings",
+    collectionType: "LISTING",
   },
 ]
 
@@ -259,9 +283,12 @@ interface ICollectionEntry {
   address: string;
   slug: string;
   overrideTitle?: string;
+  optimisticTitle?: string;
   filterShims?: string[];
   showHeroGallery?: boolean;
+  collectionType: "NFT" | "LISTING",
   sortBy?: "most_liked";
+  showInMultiCollectionGallery?: boolean;
 }
 
 export const COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.env?.REACT_APP_ENV === 'prod' ? COLLECTIONS_ENTRIES_PROD : [...COLLECTIONS_ENTRIES_DEV, ...COLLECTIONS_ENTRIES_PROD];
@@ -274,4 +301,4 @@ export const LISTING_COLLECTIONS_PAGE_ENTRIES : ICollectionEntry[] = process?.en
 export const STAKING_ORIGIN_COUNTRY_BLACKLIST = ["US", "ZA", "CA"];
 
 export const HOME_LISTING_CARD_HEIGHT = 327;
-export const HOME_LISTING_CARD_MEDIA_HEIGHT = 220;
+export const HOME_LISTING_CARD_MEDIA_HEIGHT = 232;

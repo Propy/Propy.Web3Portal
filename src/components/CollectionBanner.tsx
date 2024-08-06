@@ -292,8 +292,9 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
           <CollectionExplorerGalleryContainer 
             explorerEntries={
               collectionDataTanstack?.nftRecords ? collectionDataTanstack?.nftRecords.map((item, index) => ({
+                type: "NFT",
                 nftRecord: item,
-                assetRecord: collectionDataTanstack?.nftAssets[item?.asset_address],
+                collectionRecord: collectionDataTanstack?.nftAssets[item?.asset_address],
               })) : []
             }
             fullWidth={true}
