@@ -89,7 +89,6 @@ const COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
     overrideTitle: "PropyKeys AI Landmarks",
     optimisticTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
-    showHeroGallery: true,
     sortBy: "most_liked",
     showInMultiCollectionGallery: true,
     collectionType: "NFT",
