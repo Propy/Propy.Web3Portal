@@ -9,6 +9,8 @@ import Button from '@mui/material/Button';
 
 import NetworkSelectDropdownContainer from '../containers/NetworkSelectDropdownContainer';
 
+import { CoinbaseCreateWalletButton } from './CoinbaseCreateWalletButton';
+
 import {
   centerShortenLongString,
 } from '../utils';
@@ -57,7 +59,13 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
           <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => disconnect()}>Disconnect</Button>
         </>
       ) : (
-        renderCustomConnectButton ? renderCustomConnectButton(() => open()) : <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => open()}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
+        renderCustomConnectButton ? renderCustomConnectButton(() => open()) : 
+        <>
+          <div style={{marginRight: 16}}>
+            <CoinbaseCreateWalletButton />
+          </div>
+          <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => open()}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
+        </>
       )}
     </>
   )
