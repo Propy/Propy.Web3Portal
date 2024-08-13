@@ -14,8 +14,8 @@ const buttonStyles = {
   justifyContent: 'space-between',
   color: 'white',
   backgroundColor: '#0052FF',
-  paddingLeft: 12,
-  paddingRight: 16,
+  paddingLeft: 8,
+  paddingRight: 12,
   borderRadius: 15,
   cursor: 'pointer',
 };
