@@ -23,6 +23,7 @@ interface IWeb3ModalButtonProps {
   color?: "primary" | "secondary" | "info" | "success" | "error"
   renderCustomConnectButton?: (onClickFn: () => void) => JSX.Element
   showCompactNetworkSwitch?: boolean
+  showCreateAWalletButton?: boolean
 }
 
 export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
@@ -35,6 +36,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
     color,
     renderCustomConnectButton,
     showCompactNetworkSwitch,
+    showCreateAWalletButton,
   } = props;
 
   // 4. Use modal hook
@@ -61,9 +63,11 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
       ) : (
         renderCustomConnectButton ? renderCustomConnectButton(() => open()) : 
         <>
-          <div style={{marginRight: 16}}>
-            <CoinbaseCreateWalletButton />
-          </div>
+          {showCreateAWalletButton &&
+            <div style={{marginRight: 16}}>
+              <CoinbaseCreateWalletButton />
+            </div>
+          }
           <Button variant={variant ? variant : 'text'} color={color ? color : "inherit"} onClick={() => open()}>{overrideConnectText ? overrideConnectText : "Connect"}</Button>
         </>
       )}
