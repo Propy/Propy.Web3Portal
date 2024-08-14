@@ -35,6 +35,8 @@ import {
   PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
+import PlaceholderImage from '../assets/img/placeholder.webp';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     rootDesktop: {
@@ -157,6 +159,10 @@ const useStyles = makeStyles((theme: Theme) =>
     descriptionSpacerDesktop: {
       marginBottom: theme.spacing(2),
     },
+    placeholderImage: {
+      maxWidth: '100%',
+      maxHeight: '100%',
+    }
   }),
 )
 
@@ -342,8 +348,8 @@ const CollectionExplorerGallery = ({
               />
             );
           })}
-          {isLoading && 
-            <div></div>
+          {(isLoading || explorerEntries?.length === 0) && 
+            <img className={classes.placeholderImage} src={PlaceholderImage} alt="placeholder" />
           }
           {
             (explorerEntries.length > 1) && 
@@ -358,7 +364,7 @@ const CollectionExplorerGallery = ({
           }
         </div>
         <div className={(isConsideredMobile || isConsideredMedium) ? classes.infoZoneMobile : classes.infoZoneDesktop}>
-            {explorerEntries[selectedEntryIndex]?.type === "NFT" &&
+            {(explorerEntries[selectedEntryIndex]?.type === "NFT" || isLoading) &&
               <>
                 <LinkWrapper link={`collection/${network_name}/${overrideSlug ? overrideSlug : slug}`}>
                   <Typography variant="h6" style={{color: PROPY_LIGHT_BLUE}}>
@@ -369,25 +375,28 @@ const CollectionExplorerGallery = ({
                   </Typography>
                 </LinkWrapper>
                 <Typography variant='h4'>
-                  {metadata && metadata?.name ? metadata?.name : ""}
+                  {((!isLoading && metadata) && metadata?.name) ? metadata?.name : ""}
+                  {isLoading && `Loading...`}
                 </Typography>
-                {
-                  token_id && 
-                  asset_address && 
-                  network_name && 
-                  <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
-                    <NFTLikeZoneContainer 
-                      // compact={true}
-                      tokenId={token_id}
-                      tokenAddress={asset_address}
-                      tokenNetwork={network_name}
-                    />
-                  </div>
-                }
-                {metadata && metadata?.description &&
+                <div className={[classes.likeContainer, 'secondary-text-light-mode'].join(" ")}>
+                  <NFTLikeZoneContainer 
+                    // compact={true}
+                    tokenId={token_id}
+                    tokenAddress={asset_address}
+                    tokenNetwork={network_name}
+                    isPlaceholder={isLoading}
+                  />
+                </div>
+                {(!isLoading && metadata && metadata?.description) &&
                   <>
                     <GenericTitleContainer variant={"h5"} marginBottom={8} marginTop={16} title="Description"/>
                     <Typography variant="body1" className={(isConsideredMobile || isConsideredMedium) ? classes.descriptionSpacerMobile : ''}>{metadata?.description}</Typography>
+                  </>
+                }
+                {isLoading &&
+                  <>
+                    <GenericTitleContainer variant={"h5"} marginBottom={8} marginTop={16} title="Description"/>
+                    <Typography variant="body1" className={(isConsideredMobile || isConsideredMedium) ? classes.descriptionSpacerMobile : ''}>Loading Description...</Typography>
                   </>
                 }
                 {
@@ -400,6 +409,14 @@ const CollectionExplorerGallery = ({
                         View Full Details
                       </Button>
                     </LinkWrapper>
+                  </div>
+                }
+                {
+                  isLoading &&
+                  <div style={{marginTop: 16}}>
+                    <Button className={(isConsideredMobile || isConsideredMedium) ? "margin-top-8" : ""} variant="contained" color="secondary">
+                      Loading...
+                    </Button>
                   </div>
                 }
               </>

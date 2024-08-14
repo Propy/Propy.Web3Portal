@@ -55,11 +55,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface INFTLikeZone {
   title?: string,
-  tokenAddress: string,
-  tokenId: string,
-  tokenNetwork: string,
+  tokenAddress: string | false,
+  tokenId: string | false,
+  tokenNetwork: string | false,
   onSuccess?: () => void,
   compact?: boolean,
+  isPlaceholder?: boolean,
 }
 
 const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
@@ -88,6 +89,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     tokenNetwork,
     onSuccess,
     compact = false,
+    isPlaceholder = false,
   } = props;
 
   useEffect(() => {
@@ -96,31 +98,38 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
       if(isMounted) {
         setLoading(true);
       }
-      if(address) {
-        let [likeStatusResponse, likeCountResponse] = await Promise.all([
-          NFTService.getLikedByStatus(tokenNetwork, tokenAddress, tokenId, address),
-          NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
-        ]);
+      if(isPlaceholder) {
         if(isMounted) {
-          if(likeStatusResponse?.data?.like_status) {
-            setIsLiked(true);
-          } else {
-            setIsLiked(false);
-          }
-          if(!isNaN(likeCountResponse?.data?.like_count)) {
-            setLikeCount(likeCountResponse?.data?.like_count);
-          }
+          setLikeCount(0);
+          setIsLiked(false);
         }
-      } else {
-        let [likeCountResponse] = await Promise.all([
-          NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
-        ]);
-        if(isMounted) {
-          if(!isNaN(likeCountResponse?.data?.like_count)) {
-            setLikeCount(likeCountResponse?.data?.like_count);
+      } else if (tokenNetwork && tokenId && tokenAddress) {
+        if(address) {
+          let [likeStatusResponse, likeCountResponse] = await Promise.all([
+            NFTService.getLikedByStatus(tokenNetwork, tokenAddress, tokenId, address),
+            NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
+          ]);
+          if(isMounted) {
+            if(likeStatusResponse?.data?.like_status) {
+              setIsLiked(true);
+            } else {
+              setIsLiked(false);
+            }
+            if(!isNaN(likeCountResponse?.data?.like_count)) {
+              setLikeCount(likeCountResponse?.data?.like_count);
+            }
           }
+        } else {
+          let [likeCountResponse] = await Promise.all([
+            NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
+          ]);
+          if(isMounted) {
+            if(!isNaN(likeCountResponse?.data?.like_count)) {
+              setLikeCount(likeCountResponse?.data?.like_count);
+            }
+          }
+          setIsLiked(false);
         }
-        setIsLiked(false);
       }
       if(isMounted) {
         setLoading(false);
@@ -130,7 +139,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     return () => {
       isMounted = false;
     }
-  }, [tokenNetwork, tokenAddress, tokenId, address, reloadIndex])
+  }, [tokenNetwork, tokenAddress, tokenId, address, reloadIndex, isPlaceholder])
 
   const signLike = async (type: 'add_like_nft' | 'remove_like_nft') => {
     if(signMessageAsync && address && chainId) {
@@ -212,6 +221,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                   e.preventDefault();
                   onClickFn();
                 }}
+                disabled={isPlaceholder}
               >
                 {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </IconButton>
@@ -229,6 +239,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                 e.preventDefault();
                 signLike(isLiked ? 'remove_like_nft' : 'add_like_nft')
               }}
+              disabled={isPlaceholder}
               onTouchStart={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
