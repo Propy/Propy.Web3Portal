@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+
+import { useQuery } from '@tanstack/react-query';
 
 import {
   IRecentlyMintedResult,
@@ -23,12 +25,12 @@ let maxTimeframeMinutesSinceMinted = 60;
 
 const RecentHomeNftScrollingBanner = () => {
 
-  // const [isLoading, setIsLoading] = useState(true);
-  const [scrollingTextEntries, setScrollingTextEntries] = useState<IHorizontalScrollingTextEntry[]>([]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCollection = async () => {
+  const { 
+    data: scrollingTextEntriesTanstack,
+  } = useQuery({
+    queryKey: ['latest-propykey-mint-scroller'],
+    queryFn: async () => {
+      let entries : IHorizontalScrollingTextEntry[] = [];
       if(collectionConfigEntry) {
         let collectionResponse = await NFTService.getCollectionPaginated(
           collectionConfigEntry.network,
@@ -36,8 +38,7 @@ const RecentHomeNftScrollingBanner = () => {
           10,
           1,
         )
-        // setIsLoading(false);
-        if(collectionResponse?.status && collectionResponse?.data && isMounted) {
+        if(collectionResponse?.status && collectionResponse?.data) {
           let renderResults : IHorizontalScrollingTextEntry[] = [];
           let apiResponseData : IRecentlyMintedResult = collectionResponse.data;
           if(collectionResponse?.status && apiResponseData?.data) {
@@ -57,22 +58,19 @@ const RecentHomeNftScrollingBanner = () => {
               }
             }
           }
-          setScrollingTextEntries(renderResults);
-        } else {
-          setScrollingTextEntries([]);
+          entries = renderResults;
         }
-      } else {
-        setScrollingTextEntries([]);
       }
-    }
-    fetchCollection();
-    return () => {
-      isMounted = false;
-    }
-  }, [])
+      return {
+        entries
+      }
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
 
   return (
-    <HorizontalScrollingTextBannerContainer entries={scrollingTextEntries} />
+    <HorizontalScrollingTextBannerContainer entries={scrollingTextEntriesTanstack?.entries ? scrollingTextEntriesTanstack.entries : []} />
   )
 }
 

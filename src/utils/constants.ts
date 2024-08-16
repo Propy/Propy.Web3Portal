@@ -27,6 +27,8 @@ export const TOKEN_NAME_PREFIX : {[key: string]: string} = {
 
 export const RECAPTCHA_KEY = process.env.REACT_APP_RECAPTCHA_KEY;
 
+export const GOOGLE_ANALYTICS_ID = process?.env?.REACT_APP_ENV === 'prod' ? false : false;
+
 export const TOKEN_NAME_HIDE_ID : {[key: string]: boolean} = {
   "0x37f6091feF42eFD50d4F07a91c955606e8dE38c2": true,
   "0x8fbFe4036F13e8E42E51235C9adA6efD2ACF6A95": true,
@@ -85,11 +87,10 @@ const COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
-    slug: "propykeys?landmark=true&sort_by=most_liked",
+    slug: "propykeys?landmark=true",
     overrideTitle: "PropyKeys AI Landmarks",
     optimisticTitle: "PropyKeys AI Landmarks",
     filterShims: ["landmark"],
-    sortBy: "most_liked",
     showInMultiCollectionGallery: true,
     collectionType: "NFT",
   },
