@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query';
+
 import { useSearchParams } from "react-router-dom";
 
 import { Theme } from '@mui/material/styles';
@@ -61,10 +63,6 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
   } = props;
 
   let [searchParams, setSearchParams] = useSearchParams();
-  let [uniqueCities, setUniqueCities] = useState<string[]>([]);
-  let [uniqueCountries, setUniqueCountries] = useState<string[]>([]);
-  // let [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
-  let [uniqueStatuses, setUniqueStatuses] = useState<string[]>([]);
 
   let [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
   let [selectedCountry, setSelectedCountry] = useState<string>(searchParams.get("country") || "");
@@ -153,8 +151,12 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
     contractNameOrCollectionNameOrAddress,
   } = props;
 
-  useEffect(() => {
-    const fetchUniqueFieldValues = async () => {
+  const { 
+    data: uniqueFieldDataTanstack,
+    isLoading: isLoadingUniqueFieldDataTanstack,
+  } = useQuery({
+    queryKey: ['propykeys-unique-filter-values', network, contractNameOrCollectionNameOrAddress],
+    queryFn: async () => {
       let [
         uniqueCityRequest,
         uniqueCountryRequest,
@@ -166,21 +168,27 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
         // NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Owner"),
         NFTService.getUniqueMetadataFieldValues(network, contractNameOrCollectionNameOrAddress, "Status")
       ]);
+      let uniqueCities = [];
       if(uniqueCityRequest?.data?.length > 0) {
-        setUniqueCities(uniqueCityRequest?.data);
+        uniqueCities = uniqueCityRequest?.data;
       }
+      let uniqueCountries = [];
       if(uniqueCountryRequest?.data?.length > 0) {
-        setUniqueCountries(uniqueCountryRequest?.data);
+        uniqueCountries = uniqueCountryRequest?.data;
       }
-      // if(uniqueOwnerRequest?.data?.length > 0) {
-      //   setUniqueOwners(uniqueOwnerRequest?.data);
-      // }
+      let uniqueStatuses = [];
       if(uniqueStatusRequest?.data?.length > 0) {
-        setUniqueStatuses(uniqueStatusRequest?.data);
+        uniqueStatuses = uniqueStatusRequest?.data;
       }
-    }
-    fetchUniqueFieldValues();
-  }, [network, contractNameOrCollectionNameOrAddress]);
+      return {
+        uniqueCities,
+        uniqueCountries,
+        uniqueStatuses,
+      }
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -213,8 +221,8 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
             <div className={classes.filterContainer}>
               <Autocomplete
                 id="country-filter"
-                options={uniqueCountries}
-                disabled={uniqueCountries.length === 0}
+                options={uniqueFieldDataTanstack?.uniqueCountries}
+                disabled={(uniqueFieldDataTanstack?.uniqueCountries.length === 0) || isLoadingUniqueFieldDataTanstack}
                 sx={{ width: 420, maxWidth: '100%' }}
                 className={classes.inputSpacerSmall}
                 renderInput={(params) => <TextField {...params} label="Country" />}
@@ -229,8 +237,8 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               />
               <Autocomplete
                 id="city-filter"
-                options={uniqueCities}
-                disabled={uniqueCities.length === 0}
+                options={uniqueFieldDataTanstack?.uniqueCities}
+                disabled={(uniqueFieldDataTanstack?.uniqueCities.length === 0) || isLoadingUniqueFieldDataTanstack}
                 sx={{ width: 420, maxWidth: '100%' }}
                 className={classes.inputSpacer}
                 onChange={(event, value, reason, details) => {
@@ -245,8 +253,8 @@ const PropyKeysCollectionFilterZoneInner = (props: ICollectionFilterZone) => {
               />
               <Autocomplete
                 id="status-filter"
-                options={uniqueStatuses}
-                disabled={uniqueStatuses.length === 0}
+                options={uniqueFieldDataTanstack?.uniqueStatuses}
+                disabled={(uniqueFieldDataTanstack?.uniqueStatuses.length === 0) || isLoadingUniqueFieldDataTanstack}
                 sx={{ width: 420, maxWidth: '100%' }}
                 className={classes.inputSpacer}
                 onChange={(event, value, reason, details) => {

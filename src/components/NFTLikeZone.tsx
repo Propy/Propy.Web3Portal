@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { useAccount, useSignMessage } from 'wagmi';
+
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 
 import { toast } from 'sonner';
 
@@ -65,14 +67,11 @@ interface INFTLikeZone {
 
 const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [likeCount, setLikeCount] = useState<number>(0);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [reloadIndex, setReloadIndex] = useState<number>(0);
-
   const classes = useStyles();
 
   const { address, chainId } = useAccount();
+
+  const queryClient = useQueryClient();
 
   const { 
     // data,
@@ -92,54 +91,43 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
     isPlaceholder = false,
   } = props;
 
-  useEffect(() => {
-    let isMounted = true;
-    const getLikeStatus = async () => {
-      if(isMounted) {
-        setLoading(true);
-      }
-      if(isPlaceholder) {
-        if(isMounted) {
-          setLikeCount(0);
-          setIsLiked(false);
-        }
-      } else if (tokenNetwork && tokenId && tokenAddress) {
+  const { 
+    data: likeDataTanstack,
+    isLoading: isLoadingLikeDataTanstack,
+  } = useQuery({
+    queryKey: ['nft-like-zone', tokenNetwork, tokenAddress, tokenId, address, isPlaceholder],
+    queryFn: async () => {
+      let likeCount = 0;
+      let isLiked = false;
+      if (tokenNetwork && tokenId && tokenAddress && !isPlaceholder) {
         if(address) {
           let [likeStatusResponse, likeCountResponse] = await Promise.all([
             NFTService.getLikedByStatus(tokenNetwork, tokenAddress, tokenId, address),
             NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
           ]);
-          if(isMounted) {
-            if(likeStatusResponse?.data?.like_status) {
-              setIsLiked(true);
-            } else {
-              setIsLiked(false);
-            }
-            if(!isNaN(likeCountResponse?.data?.like_count)) {
-              setLikeCount(likeCountResponse?.data?.like_count);
-            }
+          if(likeStatusResponse?.data?.like_status) {
+            isLiked = true;
+          }
+          if(!isNaN(likeCountResponse?.data?.like_count)) {
+            likeCount = likeCountResponse?.data?.like_count;
           }
         } else {
           let [likeCountResponse] = await Promise.all([
             NFTService.getLikeCount(tokenNetwork, tokenAddress, tokenId),
           ]);
-          if(isMounted) {
-            if(!isNaN(likeCountResponse?.data?.like_count)) {
-              setLikeCount(likeCountResponse?.data?.like_count);
-            }
+          if(!isNaN(likeCountResponse?.data?.like_count)) {
+            likeCount = likeCountResponse?.data?.like_count;
           }
-          setIsLiked(false);
         }
       }
-      if(isMounted) {
-        setLoading(false);
+      return {
+        likeCount,
+        isLiked,
       }
-    }
-    getLikeStatus();
-    return () => {
-      isMounted = false;
-    }
-  }, [tokenNetwork, tokenAddress, tokenId, address, reloadIndex, isPlaceholder])
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
 
   const signLike = async (type: 'add_like_nft' | 'remove_like_nft') => {
     if(signMessageAsync && address && chainId) {
@@ -176,14 +164,7 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                 if(onSuccess) {
                   onSuccess();
                 }
-                setReloadIndex(reloadIndex + 1);
-                if(type === 'add_like_nft') {
-                  setIsLiked(true);
-                  setLikeCount(likeCount + 1);
-                } else {
-                  setIsLiked(false);
-                  setLikeCount(likeCount - 1);
-                }
+                queryClient.invalidateQueries({ queryKey: ['nft-like-zone', tokenNetwork, tokenAddress, tokenId, address, isPlaceholder] })
                 toast.success(`Like ${type === 'add_like_nft' ? "added" : "removed"} successfully!`);
               } else {
                 toast.error(`Unable to ${type === 'add_like_nft' ? "add" : "remove"} like`);
@@ -223,13 +204,13 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
                 }}
                 disabled={isPlaceholder}
               >
-                {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                {likeDataTanstack?.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </IconButton>
             </Tooltip>
           )} variant="contained" color="secondary" darkMode={darkMode} overrideConnectText="Connect wallet" hideNetworkSwitch={true} />
         }
         {address &&
-          <Tooltip title={isLiked ? "Remove like" : "Add like"}>
+          <Tooltip title={likeDataTanstack?.isLiked ? "Remove like" : "Add like"}>
             <IconButton 
               size={compact ? 'small' : 'medium'}
               className={compact ? classes.likeButtonCompact : classes.likeButton}
@@ -237,23 +218,23 @@ const NFTLikeZone = (props: PropsFromRedux & INFTLikeZone) => {
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                signLike(isLiked ? 'remove_like_nft' : 'add_like_nft')
+                signLike(likeDataTanstack?.isLiked ? 'remove_like_nft' : 'add_like_nft')
               }}
               disabled={isPlaceholder}
               onTouchStart={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              {isLiked ? <FavoriteIcon fontSize="inherit" /> : <FavoriteBorderIcon fontSize="inherit" />}
+              {likeDataTanstack?.isLiked ? <FavoriteIcon fontSize="inherit" /> : <FavoriteBorderIcon fontSize="inherit" />}
             </IconButton>
           </Tooltip>
         }
-        {!loading &&
+        {!isLoadingLikeDataTanstack &&
           <Typography variant={compact ? "subtitle2" : "subtitle1"}>
-            {likeCount} 
-            {!compact && <>{(likeCount && (likeCount === 1)) ? ' Like' : ' Likes'}</>}
+            {likeDataTanstack?.likeCount} 
+            {!compact && <>{(likeDataTanstack?.likeCount && (likeDataTanstack?.likeCount === 1)) ? ' Like' : ' Likes'}</>}
           </Typography>
         }
-        {loading &&
+        {isLoadingLikeDataTanstack &&
           <CircularProgress style={{width: compact ? 8 : 20, height: compact ? 8 : 20, marginLeft: compact ? 0 : 8}} />
         }
     </div>

@@ -80,14 +80,9 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
 
   let [searchParams, setSearchParams] = useSearchParams();
 
-  const [ownedTokenBalances, setOwnedTokenBalances] = useState<IBalanceRecord[]>([]);
-  const [ownedTokenAssets, setOwnedTokenAssets] = useState<IAllTokenAssets>({});
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [perPage, setPerPage] = useState(20);
-  const [paginationTotalPages, setPaginationTotalPages] = useState(0);
-  // const [paginationTotalRecords, setPaginationTotalRecords] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const perPage = 20;
 
   const classes = useStyles();
 
@@ -157,17 +152,18 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
     staleTime: 60, // Data is always considered fresh
   });
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchMixedTokens = async () => {
-      // let apiResponse = await fetch(`${API_ENDPOINT}/balances/${account}`).then(resp => resp.json());
+  const { 
+    data: accountTokensDataTanstack,
+    isLoading: isLoadingAccountTokensDataTanstack,
+  } = useQuery({
+    queryKey: ['account-tokens-banner', account, page, perPage],
+    queryFn: async () => {
       let apiResponse = await AccountBalanceService.getAccountBalancesPaginated(
         account,
         perPage,
         page,
       )
-      setIsLoading(false);
-      if(apiResponse?.status && apiResponse?.data?.data && isMounted) {
+      if(apiResponse?.status && apiResponse?.data?.data) {
         let renderResults: IBalanceRecord[] = [];
         let assetResults : IAllTokenAssets = {};
         let apiResponseData : IOwnedBalancesResult = apiResponse.data;
@@ -181,52 +177,41 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
             }
           }
         }
-        // commenting this out while we transition to current balances from chain
-        // if(apiResponseData?.data?.['ERC-20']) {
-        //   for(let [assetAddress, assetRecord] of Object.entries(apiResponseData?.data?.['ERC-20'])) {
-        //     if(assetRecord?.balances) {
-        //       renderResults = [...renderResults, ...assetRecord.balances];
-        //     }
-        //     if(assetRecord?.asset) {
-        //       assetResults[assetAddress] = assetRecord?.asset;
-        //     }
-        //   }
-        // }
-        if(apiResponseData?.metadata?.pagination?.totalPages) {
-          setPaginationTotalPages(apiResponseData?.metadata?.pagination?.totalPages);
-        } else {
-          setPaginationTotalPages(0);
+        return {
+          ownedTokenBalances: renderResults,
+          ownedTokenAssets: assetResults,
+          pagination: {
+            totalPages: apiResponseData?.metadata?.pagination?.totalPages ? apiResponseData?.metadata?.pagination?.totalPages : 0,
+            totalRecords: apiResponseData?.metadata?.pagination?.total ? apiResponseData?.metadata?.pagination?.total : 0,
+          }
         }
-        // if(apiResponseData?.metadata?.pagination?.total) {
-        //   setPaginationTotalRecords(apiResponseData?.metadata?.pagination?.total);
-        // } else {
-        //   setPaginationTotalRecords(0);
-        // }
-        setOwnedTokenBalances(renderResults);
-        setOwnedTokenAssets(assetResults);
-      } else {
-        setOwnedTokenBalances([]);
-        setOwnedTokenAssets({});
-        setPaginationTotalPages(0);
-        // setPaginationTotalRecords(0);
       }
-      if(page > 1) {
-        setSearchParams((params => {
-          params.set("page", page.toString());
-          return params;
-        }));
-      } else if(searchParams.get("page")) {
-        setSearchParams((params => {
-          params.delete("page");
-          return params;
-        }));
+      return {
+        ownedTokenBalances: [],
+        ownedTokenAssets: {},
+        pagination: {
+          totalPages: 0,
+          totalRecords: 0,
+        }
       }
+    },
+    gcTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+  });
+
+  useEffect(() => {
+    if(page > 1) {
+      setSearchParams((params => {
+        params.set("page", page.toString());
+        return params;
+      }));
+    } else if(searchParams.get("page")) {
+      setSearchParams((params => {
+        params.delete("page");
+        return params;
+      }));
     }
-    fetchMixedTokens();
-    return () => {
-      isMounted = false;
-    }
-  }, [account, perPage, page, setSearchParams, searchParams])
+  }, [page, searchParams, setSearchParams]);
 
   return (
     <>
@@ -275,17 +260,17 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
             />
           </Grid>
         }
-        {!isLoading && ownedTokenBalances && ownedTokenBalances.sort((a, b) => {
+        {!isLoadingAccountTokensDataTanstack && accountTokensDataTanstack?.ownedTokenBalances && accountTokensDataTanstack?.ownedTokenBalances.sort((a, b) => {
           if(a?.asset?.standard && b?.asset?.standard) {
             return (a.asset.standard).localeCompare(b.asset.standard);
           }
           return 0;
-        }).slice(0,maxRecords ? maxRecords : ownedTokenBalances.length).map((item, index) => 
+        }).slice(0,maxRecords ? maxRecords : accountTokensDataTanstack?.ownedTokenBalances.length).map((item, index) => 
           <Grid key={`single-token-card-${index}-${item.asset_address}-${item.token_id ? item.token_id : ''}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
-            <SingleTokenCard assetRecord={ownedTokenAssets[item?.asset_address]} balanceRecord={item} />
+            <SingleTokenCard assetRecord={accountTokensDataTanstack?.ownedTokenAssets[item?.asset_address]} balanceRecord={item} />
           </Grid>
         )}
-        {isLoading && maxRecords &&
+        {isLoadingAccountTokensDataTanstack && maxRecords &&
           Array.from({length: maxRecords}).map((entry, index) => 
             <Grid key={`single-token-card-loading-${index}`} item xs={4} sm={4} md={6} lg={5} xl={6}>
               <SingleTokenCardLoading />
@@ -293,10 +278,10 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
           )
         }
       </Grid>
-      {paginationTotalPages > 1 && showPagination &&
+      {accountTokensDataTanstack?.pagination?.totalPages && accountTokensDataTanstack?.pagination?.totalPages > 1 && showPagination &&
         <>
           <div className={classes.paginationContainer}>
-            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={paginationTotalPages} variant="outlined" color="primary" />
+            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={accountTokensDataTanstack?.pagination?.totalPages} variant="outlined" color="primary" />
           </div>
           {/* {
             paginationTotalRecords &&
