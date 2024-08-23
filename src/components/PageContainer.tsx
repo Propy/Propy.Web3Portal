@@ -26,6 +26,7 @@ import PropyKeysMapPage from '../pages/PropyKeysMapPage';
 import AnalyticsPage from '../pages/AnalyticsPage';
 import PropyKeyRepossessionPage from '../pages/PropyKeyRepossessionPage';
 import PropyProfilePage from '../pages/PropyProfilePage';
+import PaymasterTestUnifiedPage from '../pages/PaymasterTestUnifiedPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -91,6 +92,7 @@ const PageContainer = (props: PropsFromRedux) => {
                 {showDesktopMenu && <NavigationLeftSideBarDesktopContainer/>}
                 {isLayoutInitialized &&
                   <Routes>
+                      <Route path="/paymaster-unified" element={<PaymasterTestUnifiedPage />} />
                       <Route path="/" element={<HomePage/>} />
                       <Route path="/my-assets" element={<AccountTokensPage darkMode={darkMode}/>} />
                       <Route path="/token/:network/:tokenAddress" element={<SingleTokenPage isConsideredMobile={isConsideredMobile} />} />
