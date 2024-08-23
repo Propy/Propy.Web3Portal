@@ -3,6 +3,8 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagm
 import { useCapabilities, useWriteContracts, useCallsStatus } from "wagmi/experimental";
 import { toast } from 'sonner';
 
+import { API_ENDPOINT } from "../utils/constants";
+
 type TransactionType = 'traditional' | 'accountAbstraction';
 
 interface UseUnifiedTransactionProps {
@@ -68,7 +70,7 @@ export function useUnifiedWriteContract({
     ) {
       return {
         paymasterService: {
-          url: `https://3583aaccfd0a.ngrok.app/paymaster`,
+          url: `${API_ENDPOINT}/paymaster`,
         },
       };
     }
