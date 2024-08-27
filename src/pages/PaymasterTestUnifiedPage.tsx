@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 
-import { toast } from 'sonner';
-
 import NetworkGateContainer from '../containers/NetworkGateContainer';
 import FloatingActionButton from '../components/FloatingActionButton';
 
@@ -9,6 +7,8 @@ import { useAccount, useReadContract, useBlockNumber } from "wagmi";
 import { useCapabilities } from "wagmi/experimental";
 
 import { useUnifiedWriteContract } from '../hooks/useUnifiedWriteContract';
+
+import { API_ENDPOINT } from "../utils/constants";
 
 export const ERC20ABI = [
   {
@@ -58,6 +58,48 @@ export const ERC20ABI = [
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "failOnOddMinute",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ] as const;
 
@@ -84,14 +126,14 @@ const PaymasterTestPage = () => {
     ) {
       return {
         paymasterService: {
-          url: `https://a1caf7f4909e.ngrok.app/paymaster`,
+          url: `${API_ENDPOINT}/paymaster`,
         },
       };
     }
     return {};
   }, [availableCapabilities, account.chainId]);
 
-  // WRITE BELOW
+  // WRITE SUCCESSFUL BELOW
 
   const { 
     executeTransaction,
@@ -109,10 +151,10 @@ const PaymasterTestPage = () => {
       args: [PRO_BASE_SEPOLIA, randomAllowanceValue],
     },
     onSuccess: () => {
-      // Handle success
+
     },
-    onError: (error: any) => {
-      toast.error(`${error?.details ? error.details : "Unable to complete transaction, please try again or contact support."}`);
+    onError: () => {
+      
     },
     onSettled: () => {},
   });
@@ -131,7 +173,49 @@ const PaymasterTestPage = () => {
     return "Approve";
   }
 
-  // WRITE ABOVE
+  // WRITE SUCCESSFUL ABOVE
+
+  // WRITE INTENTIONAL FAILURE BELOW
+
+  const { 
+    executeTransaction: executeFailingTx,
+    isAwaitingWalletInteraction: isAwaitingWalletInteractionFailureTx,
+    isAwaitingTx: isAwaitingFailureTx,
+    isLoading: isLoadingFailure,
+    txHash: txHashFailure,
+    txId: txIdFailure,
+  } = useUnifiedWriteContract({
+    transactionType: capabilities?.paymasterService ? 'accountAbstraction' : 'traditional', // or 'accountAbstraction'
+    contractConfig: {
+      address: "0xf6030646B9Df26a00bAbcBef2aE91Eab00405a56",
+      abi: ERC20ABI,
+      functionName: "failOnOddMinute",
+      args: [],
+    },
+    onSuccess: () => {
+
+    },
+    onError: () => {
+
+    },
+    onSettled: () => {},
+  });
+
+  const runFailure = () => {
+    executeFailingTx();
+  };
+
+  const getFailureButtonText = (waitingForWallet: boolean, waitingForTransaction: boolean) => {
+    if(waitingForWallet) {
+      return "Please Check Wallet...";
+    }
+    if(waitingForTransaction) {
+      return "Awaiting Transaction";
+    }
+    return "Init failure tx";
+  }
+
+  // WRITE INTENTIONAL FAILURE ABOVE
 
   const { 
     data: dataL2BridgePROAllowance,
@@ -154,31 +238,50 @@ const PaymasterTestPage = () => {
       requiredNetwork={"base-sepolia"}
       requireConnected={true}
     >
-      <div>
+      <div style={{padding: 32, width: '100%'}}>
         <h2>Transact With Paymaster (Unified Transaction Builder)</h2>
         <p>{JSON.stringify(capabilities)}</p>
-        <div>
-          <FloatingActionButton
-            buttonColor="secondary"
-            disabled={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
-            onClick={() => runApproval()}
-            showLoadingIcon={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
-            text={getApproveButtonText(isAwaitingWalletInteraction, isAwaitingApproveTx)}
-          />
-          <br/>
-          {`capabilities: ${JSON.stringify(capabilities)}`}
-          <br/>
-          {`id: ${txId}`}
-          <br/>
-          {`txHash: ${txHash}`}
-          <br/>
-          {`randomAllowanceValue: ${randomAllowanceValue}`}
-          <br/>
-          {`dataL2BridgePROAllowance: ${dataL2BridgePROAllowance}`}
-          <br/>
-          {`Allowance: ${Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0)}`}
-          <br/>
-          {`isLoadingApprove: ${isLoadingApprove}`}
+        <div style={{'display': 'flex', justifyContent: 'space-around'}}>
+          <div>
+            <FloatingActionButton
+              buttonColor="secondary"
+              disabled={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
+              onClick={() => runApproval()}
+              showLoadingIcon={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
+              text={getApproveButtonText(isAwaitingWalletInteraction, isAwaitingApproveTx)}
+            />
+            <br/>
+            {`capabilities: ${JSON.stringify(capabilities)}`}
+            <br/>
+            {`id: ${txId}`}
+            <br/>
+            {`txHash: ${txHash}`}
+            <br/>
+            {`randomAllowanceValue: ${randomAllowanceValue}`}
+            <br/>
+            {`dataL2BridgePROAllowance: ${dataL2BridgePROAllowance}`}
+            <br/>
+            {`Allowance: ${Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0)}`}
+            <br/>
+            {`isLoadingApprove: ${isLoadingApprove}`}
+          </div>
+          <div>
+            <FloatingActionButton
+              buttonColor="secondary"
+              disabled={isAwaitingWalletInteractionFailureTx || isAwaitingFailureTx || isLoadingFailure}
+              onClick={() => runFailure()}
+              showLoadingIcon={isAwaitingWalletInteractionFailureTx || isAwaitingFailureTx || isLoadingFailure}
+              text={getFailureButtonText(isAwaitingWalletInteractionFailureTx, isAwaitingFailureTx)}
+            />
+            <br/>
+            {`capabilities: ${JSON.stringify(capabilities)}`}
+            <br/>
+            {`id: ${txIdFailure}`}
+            <br/>
+            {`txHash: ${txHashFailure}`}
+            <br/>
+            {`isLoadingFailureTx: ${isLoadingFailure}`}
+          </div>
         </div>
       </div>
     </NetworkGateContainer>

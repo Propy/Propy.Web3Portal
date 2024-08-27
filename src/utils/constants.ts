@@ -6,8 +6,8 @@ export const STAKING_CONTRACT = '0x00000000219ab540356cBB839Cbe05303d7705Fa'
 
 export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "local": "http://localhost:8420",
-  "dev": "https://dev.dappapi.propy.com/",
-  "prod": "https://dappapi.propy.com/",
+  "dev": "https://dev.dappapi.propy.com",
+  "prod": "https://dappapi.propy.com",
 }
 
 // export const API_ENDPOINT = "http://localhost:8420";
