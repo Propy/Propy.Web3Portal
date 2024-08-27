@@ -1,15 +1,24 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useCapabilities, useWriteContracts, useCallsStatus } from "wagmi/experimental";
-// import { utils } from 'ethers';
+import { utils } from 'ethers';
 import { toast } from 'sonner';
 
 import { API_ENDPOINT } from "../utils/constants";
 
+import EntryPointV06ABI from "../abi/EntryPointV06ABI.json";
+
+import {
+  toChecksumAddress,
+} from '../utils'
+
 type TransactionType = 'traditional' | 'accountAbstraction';
 
+const EntryPointV06Interface = new utils.Interface(EntryPointV06ABI);
+
+const EntryPointV06Addresses = ["0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"];
+
 interface UseUnifiedTransactionProps {
-  transactionType: TransactionType;
   contractConfig: any; // TODO improve type
   onSuccess?: () => void;
   onError?: (error: any) => void;
@@ -17,7 +26,6 @@ interface UseUnifiedTransactionProps {
 }
 
 export function useUnifiedWriteContract({
-  transactionType,
   contractConfig,
   onSuccess,
   onError,
@@ -78,9 +86,14 @@ export function useUnifiedWriteContract({
     return {};
   }, [availableCapabilities, account.chainId]);
 
+  const transactionType : TransactionType = useMemo(() => capabilities?.paymasterService ? 'accountAbstraction' : 'traditional', [capabilities]);
+
   // Unified status effect
   useEffect(() => {
-    console.log({transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError})
+    // console.log({transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError})
+    if(aaCallStatus?.isStale && aaData) {
+      aaCallStatus.refetch();
+    }
     if (hasHandledTransaction.current) return;
 
     const handleTransactionStatus = () => {
@@ -100,13 +113,23 @@ export function useUnifiedWriteContract({
         }
       } else if (transactionType === 'accountAbstraction' && aaData && aaCallStatus?.data?.receipts && (aaCallStatus?.data?.receipts?.length > 0)) {
         let containsErrorLog = false;
-        // let errorMessage = false;
+        let errorMessage = false;
         for(let receipt of aaCallStatus?.data?.receipts) {
           for(let log of receipt.logs) {
-            // UserOperationRevertReason (index_topic_1 bytes32 userOpHash, index_topic_2 address sender, uint256 nonce, bytes revertReason) = 0x1c4fada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a201
-            if(log.topics.indexOf("0x1c4fada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a201") > -1) {
-              containsErrorLog = true;
-              // TODO decode log.data to get revertReason value probably using ABI
+            if(EntryPointV06Addresses.indexOf(toChecksumAddress(log.address)) > -1) {
+              let parsedLog = EntryPointV06Interface.parseLog(log);
+              // UserOperationRevertReason (index_topic_1 bytes32 userOpHash, index_topic_2 address sender, uint256 nonce, bytes revertReason)
+              // 0x1c4fada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a201
+              if(parsedLog.name === "UserOperationRevertReason") {
+                const decodedReasonArray = utils.defaultAbiCoder.decode(
+                    ['string'],
+                    utils.hexDataSlice(parsedLog.args.revertReason, 4)
+                )
+                if(decodedReasonArray[0]) {
+                  errorMessage = decodedReasonArray[0];
+                }
+                containsErrorLog = true;
+              }
             }
           }
         }
@@ -114,8 +137,8 @@ export function useUnifiedWriteContract({
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          toast.error('Transaction failed');
-          onError?.(new Error('AA transaction failed'));
+          toast.error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`);
+          onError?.(new Error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`));
         } else if (aaCallStatus?.status === 'success' && !hasGivenTxClosure) {
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);

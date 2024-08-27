@@ -109,7 +109,7 @@ const PRO_BASE_SEPOLIA = "0x3660925E58444955c4812e42A572e532e69Dac7B";
 
 const randomAllowanceValue = Math.floor(Math.random() * 1000000);
 
-const PaymasterTestPage = () => {
+const PaymasterTestUnifiedPage = () => {
 
   const account = useAccount();
 
@@ -143,7 +143,6 @@ const PaymasterTestPage = () => {
     txHash,
     txId,
   } = useUnifiedWriteContract({
-    transactionType: capabilities?.paymasterService ? 'accountAbstraction' : 'traditional', // or 'accountAbstraction'
     contractConfig: {
       address: PRO_BASE_SEPOLIA,
       abi: ERC20ABI,
@@ -185,7 +184,6 @@ const PaymasterTestPage = () => {
     txHash: txHashFailure,
     txId: txIdFailure,
   } = useUnifiedWriteContract({
-    transactionType: capabilities?.paymasterService ? 'accountAbstraction' : 'traditional', // or 'accountAbstraction'
     contractConfig: {
       address: "0xf6030646B9Df26a00bAbcBef2aE91Eab00405a56",
       abi: ERC20ABI,
@@ -239,10 +237,12 @@ const PaymasterTestPage = () => {
       requireConnected={true}
     >
       <div style={{padding: 32, width: '100%'}}>
-        <h2>Transact With Paymaster (Unified Transaction Builder)</h2>
+        <h2>Unified Transaction Testing</h2>
+        <h3>Should seamlessly support EOA wallets & Coinbase Smart Wallet</h3>
+        <h4>Should support sponsored transactions with Coinbase Smart Wallet</h4>
         <p>{JSON.stringify(capabilities)}</p>
-        <div style={{'display': 'flex', justifyContent: 'space-around'}}>
-          <div>
+        <div style={{'display': 'flex', justifyContent: 'space-between'}}>
+          <div style={{width: 'calc(50% - 8px)', padding: 16, border: '1px solid black', borderRadius: 15}}>
             <FloatingActionButton
               buttonColor="secondary"
               disabled={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
@@ -250,22 +250,24 @@ const PaymasterTestPage = () => {
               showLoadingIcon={isAwaitingWalletInteraction || isAwaitingApproveTx || isLoadingApprove}
               text={getApproveButtonText(isAwaitingWalletInteraction, isAwaitingApproveTx)}
             />
-            <br/>
-            {`capabilities: ${JSON.stringify(capabilities)}`}
-            <br/>
-            {`id: ${txId}`}
-            <br/>
-            {`txHash: ${txHash}`}
-            <br/>
-            {`randomAllowanceValue: ${randomAllowanceValue}`}
-            <br/>
-            {`dataL2BridgePROAllowance: ${dataL2BridgePROAllowance}`}
-            <br/>
-            {`Allowance: ${Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0)}`}
-            <br/>
-            {`isLoadingApprove: ${isLoadingApprove}`}
+            <pre style={{ wordBreak: 'break-all', whiteSpace: 'break-spaces', fontSize: 11}}>
+              <br/>
+              {`capabilities: ${JSON.stringify(capabilities)}`}
+              <br/>
+              {`id: ${txId}`}
+              <br/>
+              {`txHash: ${txHash}`}
+              <br/>
+              {`randomAllowanceValue: ${randomAllowanceValue}`}
+              <br/>
+              {`dataL2BridgePROAllowance: ${dataL2BridgePROAllowance}`}
+              <br/>
+              {`Allowance: ${Number(dataL2BridgePROAllowance ? dataL2BridgePROAllowance : 0)}`}
+              <br/>
+              {`isLoadingApprove: ${isLoadingApprove}`}
+            </pre>
           </div>
-          <div>
+          <div style={{width: 'calc(50% - 8px)', padding: 16, border: '1px solid black', borderRadius: 15}}>
             <FloatingActionButton
               buttonColor="secondary"
               disabled={isAwaitingWalletInteractionFailureTx || isAwaitingFailureTx || isLoadingFailure}
@@ -273,14 +275,17 @@ const PaymasterTestPage = () => {
               showLoadingIcon={isAwaitingWalletInteractionFailureTx || isAwaitingFailureTx || isLoadingFailure}
               text={getFailureButtonText(isAwaitingWalletInteractionFailureTx, isAwaitingFailureTx)}
             />
-            <br/>
-            {`capabilities: ${JSON.stringify(capabilities)}`}
-            <br/>
-            {`id: ${txIdFailure}`}
-            <br/>
-            {`txHash: ${txHashFailure}`}
-            <br/>
-            {`isLoadingFailureTx: ${isLoadingFailure}`}
+            <h5>This button can be used to test failing transactions. Click this button during an even minute so that MetaMask or Coinbase smart wallet run the gas calculation and tx simulation at a time when the function will work, once the clock ticks over to an odd number, submit the transaction (transaction will succeed during even minutes and fail during odd minutes, we "trick" our wallet into thinking the transaction will pass by simulating it during the even minute and then submitting on an odd minute). If you click this button during an odd minute, it probably won't let you submit the transaction in the first place, since it will detect that the tx will fail before it lets you submit it.</h5>
+            <pre style={{ wordBreak: 'break-all', whiteSpace: 'break-spaces', fontSize: 11}}>
+              <br/>
+              {`capabilities: ${JSON.stringify(capabilities)}`}
+              <br/>
+              {`id: ${txIdFailure}`}
+              <br/>
+              {`txHash: ${txHashFailure}`}
+              <br/>
+              {`isLoadingFailureTx: ${isLoadingFailure}`}
+            </pre>
           </div>
         </div>
       </div>
@@ -288,4 +293,4 @@ const PaymasterTestPage = () => {
   );
 };
 
-export default PaymasterTestPage;
+export default PaymasterTestUnifiedPage;
