@@ -1,6 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import BridgeFinalizeWithdrawalForm from '../components/BridgeFinalizeWithdrawalForm';
+import BridgeFinalizeWithdrawalFormUnified from '../components/BridgeFinalizeWithdrawalFormUnified';
 
 import {
     SupportedNetworks,
@@ -22,4 +22,4 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(BridgeFinalizeWithdrawalForm)
+export default connector(BridgeFinalizeWithdrawalFormUnified)

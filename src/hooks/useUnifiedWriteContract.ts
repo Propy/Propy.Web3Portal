@@ -19,10 +19,12 @@ const EntryPointV06Interface = new utils.Interface(EntryPointV06ABI);
 const EntryPointV06Addresses = ["0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"];
 
 interface UseUnifiedTransactionProps {
-  contractConfig: any; // TODO improve type
+  contractConfig?: any; // TODO improve type
   onSuccess?: () => void;
   onError?: (error: any) => void;
   onSettled?: () => void;
+  successToastMessage?: string;
+  fallbackErrorMessage?: string;
 }
 
 export function useUnifiedWriteContract({
@@ -30,6 +32,8 @@ export function useUnifiedWriteContract({
   onSuccess,
   onError,
   onSettled,
+  successToastMessage,
+  fallbackErrorMessage,
 }: UseUnifiedTransactionProps) {
 
   const account = useAccount();
@@ -102,14 +106,17 @@ export function useUnifiedWriteContract({
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          toast.success('Transaction successful!');
+          toast.success(successToastMessage ? successToastMessage : 'Transaction successful!');
           onSuccess?.();
         } else if (traditionalReceipt.status === 'error' && !hasGivenTxClosure) {
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          toast.error(traditionalReceipt.error?.message || 'Transaction failed');
-          onError?.(traditionalReceipt.error);
+          if(!onError) {
+            toast.error(traditionalReceipt.error?.message || fallbackErrorMessage || 'Transaction failed');
+          } else {
+            onError?.(traditionalReceipt.error);
+          }
         }
       } else if (transactionType === 'accountAbstraction' && aaData && aaCallStatus?.data?.receipts && (aaCallStatus?.data?.receipts?.length > 0)) {
         let containsErrorLog = false;
@@ -137,13 +144,16 @@ export function useUnifiedWriteContract({
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          toast.error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`);
-          onError?.(new Error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`));
+          if(!onError) {
+            toast.error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`);
+          } else {
+            onError?.(new Error(`Transaction failed${errorMessage ? ` with reason: ${errorMessage}` : ""}`));
+          }
         } else if (aaCallStatus?.status === 'success' && !hasGivenTxClosure) {
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          toast.success('Transaction successful!');
+          toast.success(successToastMessage ? successToastMessage : 'Transaction successful!');
           onSuccess?.();
         }
       }
@@ -155,17 +165,19 @@ export function useUnifiedWriteContract({
       // Cleanup function
       hasHandledTransaction.current = false;
     };
-  }, [transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError]);
+  }, [transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError, successToastMessage, fallbackErrorMessage]);
 
-  const executeTransaction = useCallback(async () => {
+  const executeTransaction = useCallback(async (overrideContractConfig: any = false) => {
     hasHandledTransaction.current = false;
     setHasGivenTxClosure(false);
     setIsAwaitingWalletInteraction(true);
     setIsAwaitingTx(true);
 
+    let useContractConfig = overrideContractConfig || contractConfig;
+
     try {
       if (transactionType === 'traditional') {
-        await writeTraditional(contractConfig, {
+        await writeTraditional(useContractConfig, {
           onSettled: () => {
             setIsAwaitingWalletInteraction(false);
             onSettled?.();
@@ -173,7 +185,7 @@ export function useUnifiedWriteContract({
         });
       } else {
         await writeAA({
-          contracts: [contractConfig],
+          contracts: [useContractConfig],
           capabilities,
         }, {
           onSettled: () => {
@@ -186,8 +198,11 @@ export function useUnifiedWriteContract({
       setIsAwaitingTx(false);
       if(!hasGivenTxClosure) {
         setHasGivenTxClosure(true);
-        toast.error((error as Error)?.message || error?.details || 'Unable to complete transaction, please try again or contact support.');
-        onError?.(error);
+        if(!onError) {
+          toast.error((error as Error)?.message || error?.details || 'Unable to complete transaction, please try again or contact support.');
+        } else {
+          onError?.(error);
+        }
       }
     } finally {
       setIsAwaitingWalletInteraction(false);
@@ -203,3 +218,5 @@ export function useUnifiedWriteContract({
     txHash: transactionType === 'traditional' ? traditionalData : null,
   };
 }
+
+export default useUnifiedWriteContract;
