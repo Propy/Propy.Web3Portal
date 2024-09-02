@@ -1,6 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import PropyKeyRepossession from '../components/PropyKeyRepossession';
+import PropyKeyRepossessionUnified from '../components/PropyKeyRepossessionUnified';
 
 interface RootState {
   isConsideredMobile: boolean
@@ -16,4 +16,4 @@ const connector = connect(mapStateToProps, {})
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(PropyKeyRepossession)
+export default connector(PropyKeyRepossessionUnified)

@@ -1,6 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import BridgeForm from '../components/BridgeForm';
+import BridgeFormUnified from '../components/BridgeFormUnified';
 
 import {
     SupportedNetworks,
@@ -22,4 +22,4 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(BridgeForm)
+export default connector(BridgeFormUnified)

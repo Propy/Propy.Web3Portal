@@ -9,6 +9,7 @@ import useStakedPROByStaker from './useStakedPROByStaker';
 import useTotalStakingBalancePRO from './useTotalStakingBalancePRO';
 import useApproxLeaveAmountFromShareAmount from './useApproxLeaveAmountFromShareAmount';
 import useApproxStakerRewardsPending from './useApproxStakerRewardsPending';
+import useUnifiedWriteContract from './useUnifiedWriteContract';
 
 export {
   useWindowSize,
@@ -22,4 +23,5 @@ export {
   useTotalStakingBalancePRO,
   useApproxLeaveAmountFromShareAmount,
   useApproxStakerRewardsPending,
+  useUnifiedWriteContract,
 }
