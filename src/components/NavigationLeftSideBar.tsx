@@ -93,7 +93,7 @@ const navigationMenu : IMenuEntry[] = [
   {
     text: 'Bridge',
     path: '/bridge',
-    pathExtended: ['/bridge/:bridgeSelection', '/bridge/:bridgeSelection/:bridgeAction/:transactionHash'],
+    externalLink: 'https://superbridge.app/base',
     icon: <BridgeIcon />,
   },
   {
