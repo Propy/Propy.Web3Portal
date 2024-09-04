@@ -1,6 +1,6 @@
 import { connect, ConnectedProps } from 'react-redux';
 
-import StakePortal from '../components/StakePortal';
+import StakePortalUnified from '../components/StakePortalUnified';
 
 import {
     SupportedNetworks,
@@ -22,4 +22,4 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
   
 export type PropsFromRedux = ConnectedProps<typeof connector>
 
-export default connector(StakePortal)
+export default connector(StakePortalUnified)
