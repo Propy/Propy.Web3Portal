@@ -16,6 +16,7 @@ import LogoLightMode from '../assets/svg/propy-light-mode.svg'
 
 import { Web3ModalButtonWagmi } from './Web3ModalButtonWagmi';
 import { PropsFromRedux } from '../containers/NavigationTopBarContainer';
+import PushNotificationZoneContainer from '../containers/PushNotificationZoneContainer';
 
 import LinkWrapper from './LinkWrapper';
 
@@ -82,6 +83,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
             </div>
           </LinkWrapper>
           <div style={{ flexGrow: 1 }}/>
+          <PushNotificationZoneContainer />
           {!isConsideredMobile && <Web3ModalButtonWagmi darkMode={darkMode} showCreateAWalletButton={true} />}
           {process.env.REACT_ENV === 'local' && 
             <IconButton

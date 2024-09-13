@@ -11,7 +11,16 @@ module.exports = function override(config, env) {
         buffer: require.resolve('buffer'),
         stream: require.resolve('stream-browserify'),
         util: require.resolve("util/"),
+        zlib: require.resolve("browserify-zlib"),
+        crypto: require.resolve("crypto-browserify"),
+        vm: require.resolve("vm-browserify"),
     };
+    config.module.rules.push({
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        },
+    });
     config.plugins.push(
         new webpack.ProvidePlugin({
             process: 'process/browser',
