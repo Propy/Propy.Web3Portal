@@ -216,6 +216,7 @@ export function useUnifiedWriteContract({
     isLoading: transactionType === 'traditional' ? isLoadingTraditional : isLoadingAA,
     txId: transactionType === 'traditional' ? null : txId,
     txHash: transactionType === 'traditional' ? traditionalData : null,
+    capabilities,
   };
 }
 

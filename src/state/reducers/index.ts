@@ -7,6 +7,7 @@ import isConsideredMedium from './isConsideredMedium';
 import activeNetwork from './activeNetwork';
 import propyKeysMapFilterOptions from './propyKeysMapFilterOptions';
 import fullScreenGalleryConfig from './fullScreenGalleryConfig';
+import supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX from './supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX';
 
 const rootReducer = combineReducers({
     showLeftMenu,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     activeNetwork,
     propyKeysMapFilterOptions,
     fullScreenGalleryConfig,
+    supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX,
 });
 
 export default rootReducer;
