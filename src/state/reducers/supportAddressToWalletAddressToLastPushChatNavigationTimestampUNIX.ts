@@ -5,7 +5,7 @@ interface ISetWalletToTimstamp {
 
 const supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX = (state = {}, action: ISetWalletToTimstamp) => {
   switch (action.type) {
-    case 'SET_SUPPORT_ADDRESS_TO_WALLET_ADDRESS_TO_LAST_PUSH_CHAT_NAV_TIMESTAMP_UNIX':
+    case 'SET_SUPPORT_ADDRESS_TO_WALLET_ADDRESS_TO_LAST_PUSH_CHAT_DISMISSED_TIMESTAMP_UNIX':
       const freshStateFromCurrentState = JSON.parse(JSON.stringify(state));
       // Merge the new data into the fresh state
       Object.entries(action.supportAddressToWalletToTimestamp).forEach(([supportAddress, walletToTimestamp]) => {

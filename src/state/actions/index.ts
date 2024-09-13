@@ -45,6 +45,6 @@ export const setFullScreenGalleryConfig = (fullScreenGalleryConfig: IFullScreenG
 })
 
 export const setsupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX = (supportAddressToWalletToTimestamp: {[key: string]: {[key: string]: number}}) => ({
-    type: "SET_SUPPORT_ADDRESS_TO_WALLET_ADDRESS_TO_LAST_PUSH_CHAT_NAV_TIMESTAMP_UNIX",
+    type: "SET_SUPPORT_ADDRESS_TO_WALLET_ADDRESS_TO_LAST_PUSH_CHAT_DISMISSED_TIMESTAMP_UNIX",
     supportAddressToWalletToTimestamp,
 })
