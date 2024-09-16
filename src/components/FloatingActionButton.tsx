@@ -16,6 +16,7 @@ interface IFloatingActionButton {
   textColor?: string
   className?: string
   component?: "button" | "div"
+  variant?: "extended" | "circular"
   disabled?: boolean
   onClick?: () => void
   showLoadingIcon?: boolean
@@ -40,6 +41,7 @@ const FloatingActionButton = (props: IFloatingActionButton) => {
       textColor = "white",
       className = "",
       component = "button",
+      variant = "extended",
       disabled = false,
       showLoadingIcon = false,
       onClick,
@@ -49,7 +51,7 @@ const FloatingActionButton = (props: IFloatingActionButton) => {
       <Fab 
         component={component}
         disabled={disabled}
-        variant="extended"
+        variant={variant}
         className={className}
         onClick={() => onClick && onClick()}
         size={size}

@@ -1,7 +1,7 @@
 import { connect, ConnectedProps } from 'react-redux';
 
 import {
-  setsupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX,
+  setSupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX,
 } from '../state/actions';
 
 import PushNotificationZone from '../components/PushNotificationZone';
@@ -21,7 +21,7 @@ const mapStateToProps = (state: RootState) => ({
 })
 
 const mapDispatchToProps = {
-  setsupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX,
+  setSupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX,
 }
   
 const connector = connect(mapStateToProps, mapDispatchToProps)
