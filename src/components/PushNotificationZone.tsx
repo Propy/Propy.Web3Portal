@@ -24,9 +24,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import LinkWrapper from './LinkWrapper';
 
-import { ExternalLink } from './ExternalLink';
-
-import FloatingActionButton from './FloatingActionButton';
 import ActionButton from './ActionButton';
 
 import PropyLogo from '../assets/img/propy-house-only.png';
@@ -149,25 +146,11 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const getAcceptButtonText = (isAwaitingWalletInteraction: boolean, isAcceptingConnectionRequest: boolean) => {
-  if(isAcceptingConnectionRequest) {
-    return "Accepting Connection Request...";
-  }
-  
-  if(isAwaitingWalletInteraction) {
-    return "Please Check Wallet...";
-  }
-
-  return "Accept Communication Request";
-}
-
 interface IChatProfile {
   profileTag: string;
   chatLink: string;
   profilePic: string;
 }
-
-const propySupportAddress = "0x48608159077516aFE77A04ebC0448eC32E6670c1";
 
 const chatProfileConfigs : {[key: string]: IChatProfile} = {
   "0x48608159077516aFE77A04ebC0448eC32E6670c1": {
@@ -184,8 +167,6 @@ const chatProfileConfigs : {[key: string]: IChatProfile} = {
 
 let pushUser : any;
 
-const genericErrorMessage = "Something went wrong accepting the connection request, please contact support if this issue persists.";
-
 const PushNotificationZone = (props: PropsFromRedux) => {
 
   let {
@@ -198,9 +179,6 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   const [showNotificationZone, setShowNotificationZone] = useState(false);
   const [hasPendingSupportRequest, setHasPendingSupportRequest] = useState(false);
   const [hasSomeMessages, setHasSomeMessages] = useState(false);
-  const [isAwaitingWalletInteraction, setIsAwaitingWalletInteraction] = useState(false);
-  const [isAcceptingConnectionRequest, setIsAcceptingConnectionRequest] = useState(false);
-  const [hasAcceptingError, setHasAcceptingError] = useState(false);
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
@@ -214,11 +192,7 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   const openMenu = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if(hasPendingSupportRequest) {
-      setAnchorEl(event.currentTarget);
-    } else if (hasSomeMessages) {
-      setAnchorEl(event.currentTarget);
-    }
+    setAnchorEl(event.currentTarget);
   };
 
   useEffect(() => {
@@ -302,7 +276,7 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   useEffect(() => {
     const checkPendingSupportRequest = async () => {
       setIsLoading(true);
-      let shouldShowNotificationZone = false;
+      let shouldShowNotificationZone = true;
       let hasSupportMessageRequest = false;
       let lastMessageFromSupport = false;
       let supportAddressToLatestMessageTimestamp : {[key: string]: number} = {};
@@ -331,10 +305,16 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                   hasSupportMessageRequest = latestSupportMessages.some((entry: any) => entry?.listType === "REQUESTS" && entry?.fromDID.indexOf(propySupportAddress) > -1);
                   newLatestMessageTimestamp = Math.floor(latestSupportMessages[0].timestamp / 1000);
                   shouldShowNotificationZone = true;
-                  supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0];
+                  if(latestSupportMessages[0]) {
+                    supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0]
+                  } else {
+                    delete supportAddressesToLatestMessageEntries[propySupportAddress];
+                  }
                 } else {
                   if (Object.keys(latestSupportMessages).length > 0) {
                     supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages;
+                  } else {
+                    delete supportAddressesToLatestMessageEntries[propySupportAddress];
                   }
                   newLatestMessageTimestamp = Math.floor(latestSupportMessages?.timestamp / 1000);
                   if (latestSupportMessages?.listType === "REQUESTS" && latestSupportMessages?.fromDID.indexOf(propySupportAddress) > -1) {
@@ -397,35 +377,6 @@ const PushNotificationZone = (props: PropsFromRedux) => {
     checkPendingSupportRequest();
   }, [address, forceUpdateCounter, memoizedCapabilities, signer, supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX, supportAddressToLatestMessageEntry])
 
-  const initPushInbox = async () => {
-    try {
-      if(signer && address) {
-        setHasAcceptingError(false);
-        setIsAwaitingWalletInteraction(true);
-        let pushUser = await PushAPI.initialize(signer, {
-          env: CONSTANTS.ENV.PROD,
-          progressHook: (progress) => {
-            if(progress.progressId === "PUSH-DECRYPT-02") {
-              setIsAcceptingConnectionRequest(true);
-            }
-          }
-        })
-        setIsAcceptingConnectionRequest(true);
-        await pushUser.chat.accept(propySupportAddress);
-        toast.success("Successfully accepted push.org connection request!");
-        setHasPendingSupportRequest(false);
-        handleClose();
-      }
-    } catch (e) {
-      toast.error(genericErrorMessage);
-      setHasAcceptingError(true);
-      setForceUpdateCounter(forceUpdateCounter + 1);
-    } finally {
-      setIsAwaitingWalletInteraction(false);
-      setIsAcceptingConnectionRequest(false);
-    }
-  }
-
   return (
     <>
       {address && showNotificationZone &&
@@ -456,33 +407,17 @@ const PushNotificationZone = (props: PropsFromRedux) => {
               }
             }}
           >
-            {hasPendingSupportRequest &&
-              <div>
-                <Typography>Propy Support would like to establish a <ExternalLink href="https://push.org" style={{color: PROPY_LIGHT_BLUE}}>push.org</ExternalLink> communication channel with your wallet, please accept this request so you can be notified if anything requires your attention.</Typography>
-                <FloatingActionButton
-                  className={classes.acceptButton}
-                  buttonColor="primary"
-                  disabled={isAwaitingWalletInteraction || isAcceptingConnectionRequest}
-                  onClick={() => initPushInbox()}
-                  showLoadingIcon={isAwaitingWalletInteraction || isAcceptingConnectionRequest}
-                  text={getAcceptButtonText(isAwaitingWalletInteraction, isAcceptingConnectionRequest)}
-                />
-                {hasAcceptingError &&
-                  <Typography variant="subtitle2" className={classes.errorText}>{genericErrorMessage}</Typography>
-                }
-              </div>
-            }
-            {!hasPendingSupportRequest && hasSomeMessages &&
-              <div className="relative">
-                {loading && 
-                  <div className={classes.loadingOverlay}>
-                    <CircularProgress color="inherit" style={{height: '36px', width: '36px', marginRight: '8px', color: '#6e6e6e'}} />
-                  </div>
-                }
-                <div className={classes.titleRow}>
-                  <Typography variant="h6" className={classes.inboxHeading}>Web3 Wallet Inbox</Typography>
+            <div className="relative">
+              {loading && 
+                <div className={classes.loadingOverlay}>
+                  <CircularProgress color="inherit" style={{height: '36px', width: '36px', marginRight: '8px', color: '#6e6e6e'}} />
                 </div>
-                <div className={classes.actionRow}>
+              }
+              <div className={classes.titleRow}>
+                <Typography variant="h6" className={classes.inboxHeading}>Web3 Wallet Inbox</Typography>
+              </div>
+              <div className={classes.actionRow}>
+                {hasSomeMessages &&
                   <ActionButton 
                     onClick={() => unlockPushProfile()}
                     className={classes.actionButtonSpacer}
@@ -493,44 +428,21 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                     disabled={unlockingProfile || unlockedProfile}
                     text={getUnlockMessagesButtonText()}
                   />
-                  {unreadMessageAccounts.length > 0 &&
-                    <ActionButton 
-                      onClick={() => handleDismissChatNotification()}
-                      size="small"
-                      variant="outlined"
-                      buttonColor="secondary"
-                      disabled={unreadMessageAccounts.length === 0}
-                      text={"Dismiss Notifications"}
-                    />
-                  }
-                </div>
-                {/* This block is for active/open chats */}
-                {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
-                  <LinkWrapper key={`push-notification-zone`} external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
-                    <div className={classes.chatProfileEntry}>
-                      {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
-                        <div className={classes.chatProfileNotificationIndicator} />
-                      }
-                      <div className={classes.chatProfilePicContainer}>
-                        <img alt={chatProfileConfigs[chatProfileAddress].profileTag} className={classes.chatProfilePic} src={chatProfileConfigs[chatProfileAddress].profilePic} />
-                      </div>
-                      <div className={classes.chatProfileEntryTypography}>
-                        <div className="flex-center space-between">
-                          <Typography variant="subtitle2" className={classes.profileTag}>{chatProfileConfigs[chatProfileAddress].profileTag}</Typography>
-                          <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(supportAddressToLatestMessageEntry[chatProfileAddress].timestamp / 1000)).format('hh:mm A MMM-D-YYYY')}</Typography>
-                        </div>
-                        <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{supportAddressToLatestMessageEntry[chatProfileAddress].messageObj?.content ? supportAddressToLatestMessageEntry[chatProfileAddress].messageObj?.content : "🔒 Locked Message"}</Typography>
-                      </div>
-                    </div>
-                  </LinkWrapper>
-                ))}
-                {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress])?.length > 0 &&
-                  <div className={classes.subtitleRow}>
-                    <Typography variant="subtitle2" className={classes.inboxHeading}>Suggested Channels</Typography>
-                  </div>
                 }
-                {/* This block is for suggested chats */}
-                {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
+                {unreadMessageAccounts.length > 0 &&
+                  <ActionButton 
+                    onClick={() => handleDismissChatNotification()}
+                    size="small"
+                    variant="outlined"
+                    buttonColor="secondary"
+                    disabled={unreadMessageAccounts.length === 0}
+                    text={"Dismiss Notifications"}
+                  />
+                }
+              </div>
+              {/* This block is for active/open chats */}
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
+                <LinkWrapper key={`push-notification-zone`} external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
                   <div className={classes.chatProfileEntry}>
                     {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
                       <div className={classes.chatProfileNotificationIndicator} />
@@ -541,20 +453,43 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                     <div className={classes.chatProfileEntryTypography}>
                       <div className="flex-center space-between">
                         <Typography variant="subtitle2" className={classes.profileTag}>{chatProfileConfigs[chatProfileAddress].profileTag}</Typography>
-                        <ActionButton 
-                          onClick={() => initiateChat(chatProfileAddress)}
-                          size="small"
-                          variant="outlined"
-                          buttonColor="primary"
-                          disabled={initiatingSupportChatAddresses.indexOf(chatProfileAddress) > -1}
-                          text={"Request Support"}
-                        />
+                        <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(supportAddressToLatestMessageEntry[chatProfileAddress].timestamp / 1000)).format('hh:mm A MMM-D-YYYY')}</Typography>
                       </div>
+                      <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{supportAddressToLatestMessageEntry[chatProfileAddress].messageObj?.content ? supportAddressToLatestMessageEntry[chatProfileAddress].messageObj?.content : "🔒 Locked Message"}</Typography>
                     </div>
                   </div>
-                ))}
-              </div>
-            }
+                </LinkWrapper>
+              ))}
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress])?.length > 0 &&
+                <div className={classes.subtitleRow}>
+                  <Typography variant="subtitle2" className={classes.inboxHeading}>Suggested Support Channels</Typography>
+                </div>
+              }
+              {/* This block is for suggested chats */}
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
+                <div className={classes.chatProfileEntry}>
+                  {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
+                    <div className={classes.chatProfileNotificationIndicator} />
+                  }
+                  <div className={classes.chatProfilePicContainer}>
+                    <img alt={chatProfileConfigs[chatProfileAddress].profileTag} className={classes.chatProfilePic} src={chatProfileConfigs[chatProfileAddress].profilePic} />
+                  </div>
+                  <div className={classes.chatProfileEntryTypography}>
+                    <div className="flex-center space-between">
+                      <Typography variant="subtitle2" className={classes.profileTag}>{chatProfileConfigs[chatProfileAddress].profileTag}</Typography>
+                      <ActionButton 
+                        onClick={() => initiateChat(chatProfileAddress)}
+                        size="small"
+                        variant="outlined"
+                        buttonColor="primary"
+                        disabled={initiatingSupportChatAddresses.indexOf(chatProfileAddress) > -1}
+                        text={"Request Support"}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Menu>
         </>
       }
