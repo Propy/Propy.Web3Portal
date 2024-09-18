@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InboxIcon from '@mui/icons-material/Inbox';
 import Menu from '@mui/material/Menu';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import LinkWrapper from './LinkWrapper';
 
@@ -74,6 +75,7 @@ const useStyles = makeStyles((theme: Theme) =>
         backgroundColor: '#f3f3f3',
       },
       position: 'relative',
+      width: '100%',
     },
     chatProfileNotificationIndicator: {
       height: '10px',
@@ -86,6 +88,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     chatProfilePicContainer: {
       width: 40,
+      minWidth: 40,
       height: 40,
       display: 'flex',
       justifyContent: 'center',
@@ -103,12 +106,20 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       marginLeft: theme.spacing(1.5),
       justifyContent: 'center',
+      width: '100%',
     },
     profileTag: {
       marginRight: theme.spacing(1.5),
     },
     titleRow: {
       marginBottom: theme.spacing(1),
+      display: 'flex',
+      justifyContent: 'start',
+      alignItems: 'center',
+    },
+    subtitleRow: {
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(0.5),
       display: 'flex',
       justifyContent: 'start',
       alignItems: 'center',
@@ -125,6 +136,16 @@ const useStyles = makeStyles((theme: Theme) =>
     actionButtonSpacer: {
       marginRight: 8
     },
+    loadingOverlay: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: '#ffffffbf',
+      zIndex: 1,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }
   }),
 );
 
@@ -152,6 +173,11 @@ const chatProfileConfigs : {[key: string]: IChatProfile} = {
   "0x48608159077516aFE77A04ebC0448eC32E6670c1": {
     profileTag: "General Propy Support",
     chatLink: `https://app.push.org/chat/0x48608159077516aFE77A04ebC0448eC32E6670c1`,
+    profilePic: PropyLogo,
+  },
+  "0x527C37417d25213868F76127021FeBa80dc85B0E": {
+    profileTag: "PropyKeys Support",
+    chatLink: `https://app.push.org/chat/0x527C37417d25213868F76127021FeBa80dc85B0E`,
     profilePic: PropyLogo,
   }
 }
@@ -182,6 +208,8 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   const [supportAddressToLatestMessageEntry, setSupportAddressToLatestMessageEntry] = useState<{[key: string]: any}>({});
   const [unlockingProfile, setUnlockingProfile] = useState(false);
   const [unlockedProfile, setUnlockedProfile] = useState(false);
+  const [initiatingSupportChatAddresses, setInitiatingSupportChatAddresses] = useState<string[]>([]);
+  const [loading, setIsLoading] = useState(false);
 
   const openMenu = Boolean(anchorEl);
 
@@ -220,8 +248,10 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   const handleDismissChatNotification = () => {
     if(address) {
       let newWalletTimestamp : {[key: string]: {[key: string]: number}} = {};
-      newWalletTimestamp[propySupportAddress] = {};
-      newWalletTimestamp[propySupportAddress][address] = Math.floor(new Date().getTime() / 1000);
+      for(let propySupportAddress of Object.keys(chatProfileConfigs)) {
+        newWalletTimestamp[propySupportAddress] = {};
+        newWalletTimestamp[propySupportAddress][address] = Math.floor(new Date().getTime() / 1000);
+      }
       setSupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX(newWalletTimestamp);
     }
   }
@@ -254,13 +284,28 @@ const PushNotificationZone = (props: PropsFromRedux) => {
     }
   }
 
+  const initiateChat = async (initChatAddress: string) => {
+    setInitiatingSupportChatAddresses((currentValues) => [initChatAddress, ...currentValues.filter((currentValue) => currentValue !== initChatAddress)]);
+    if (!pushUser || !pushUser?.signer) {
+      pushUser = await PushAPI.initialize(signer, {
+        env: CONSTANTS.ENV.PROD,
+      });
+    }
+    await pushUser.chat.send(
+      initChatAddress, 
+      {content: "Support chat successfully opened!"}
+    );
+    setInitiatingSupportChatAddresses((currentValues) => [...currentValues.filter((currentValue) => currentValue !== initChatAddress)]);
+    setForceUpdateCounter((currentValue) => currentValue + 1);
+  }
+
   useEffect(() => {
-    console.log({address, forceUpdateCounter, memoizedCapabilities, supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX, supportAddressToLatestMessageEntry})
     const checkPendingSupportRequest = async () => {
+      setIsLoading(true);
       let shouldShowNotificationZone = false;
       let hasSupportMessageRequest = false;
-      let newLatestMessageTimestamp = 0;
       let lastMessageFromSupport = false;
+      let supportAddressToLatestMessageTimestamp : {[key: string]: number} = {};
       let hasMessages = false;
       let unreadMessageStatus = false;
       let supportAddressesToLatestMessageEntries = Object.assign({}, supportAddressToLatestMessageEntry);
@@ -273,34 +318,45 @@ const PushNotificationZone = (props: PropsFromRedux) => {
               account: address,
             })
           }
-          const latestSupportMessages : any = await pushUser.chat.latest(propySupportAddress);
-          console.log({latestSupportMessages})
-          let isSmartWallet = false;
-          if (memoizedCapabilities && (Object.keys(memoizedCapabilities).length > 0)) {
-            isSmartWallet = true;
-          }
-          if(!isSmartWallet) {
-            if(latestSupportMessages?.length > 0) {
-              hasSupportMessageRequest = latestSupportMessages.some((entry: any) => entry?.listType === "REQUESTS");
-              newLatestMessageTimestamp = Math.floor(latestSupportMessages[0].timestamp / 1000);
-              shouldShowNotificationZone = true;
-              supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0];
-            } else {
-              if (Object.keys(latestSupportMessages).length > 0) {
-                supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages;
+          for(let propySupportAddress of Object.keys(chatProfileConfigs)) {
+            try {
+              let newLatestMessageTimestamp = 0;
+              const latestSupportMessages : any = await pushUser.chat.latest(propySupportAddress);
+              let isSmartWallet = false;
+              if (memoizedCapabilities && (Object.keys(memoizedCapabilities).length > 0)) {
+                isSmartWallet = true;
               }
-              newLatestMessageTimestamp = Math.floor(latestSupportMessages?.timestamp / 1000);
-              if (latestSupportMessages?.listType === "REQUESTS") {
-                hasSupportMessageRequest = true;
-                shouldShowNotificationZone = true;
-              } else if (latestSupportMessages?.listType === "CHATS") {
-                shouldShowNotificationZone = true;
+              if(!isSmartWallet) {
+                if(latestSupportMessages?.length > 0) {
+                  hasSupportMessageRequest = latestSupportMessages.some((entry: any) => entry?.listType === "REQUESTS" && entry?.fromDID.indexOf(propySupportAddress) > -1);
+                  newLatestMessageTimestamp = Math.floor(latestSupportMessages[0].timestamp / 1000);
+                  shouldShowNotificationZone = true;
+                  supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0];
+                } else {
+                  if (Object.keys(latestSupportMessages).length > 0) {
+                    supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages;
+                  }
+                  newLatestMessageTimestamp = Math.floor(latestSupportMessages?.timestamp / 1000);
+                  if (latestSupportMessages?.listType === "REQUESTS" && latestSupportMessages?.fromDID.indexOf(propySupportAddress) > -1) {
+                    hasSupportMessageRequest = true;
+                    shouldShowNotificationZone = true;
+                  } else if (latestSupportMessages?.listType === "CHATS") {
+                    shouldShowNotificationZone = true;
+                  }
+                }
+                supportAddressToLatestMessageTimestamp[propySupportAddress] = newLatestMessageTimestamp;
+                if (Object.keys(latestSupportMessages).length > 0) {
+                  supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0];
+                  shouldShowNotificationZone = true;
+                  hasMessages = true;
+                }
               }
-            }
-            if (Object.keys(latestSupportMessages).length > 0) {
-              supportAddressesToLatestMessageEntries[propySupportAddress] = latestSupportMessages[0];
-              shouldShowNotificationZone = true;
-              hasMessages = true;
+            } catch(e) {
+              console.error({
+                "Support Address": propySupportAddress,
+                "Support Account": chatProfileConfigs[propySupportAddress].profileTag,
+                "Error handling latest message state": e,
+              })
             }
           }
         } else {
@@ -313,28 +369,29 @@ const PushNotificationZone = (props: PropsFromRedux) => {
         setShowNotificationZone(shouldShowNotificationZone);
         setHasPendingSupportRequest(hasSupportMessageRequest);
         setHasSomeMessages(hasMessages);
-        if(
-          (supportAddressesToLatestMessageEntries[propySupportAddress]?.signature !== supportAddressToLatestMessageEntry[propySupportAddress]?.signature)
-          || (supportAddressesToLatestMessageEntries[propySupportAddress]?.messageObj?.content && !supportAddressToLatestMessageEntry[propySupportAddress]?.messageObj?.content)
-        ) {
-          setSupportAddressToLatestMessageEntry(supportAddressesToLatestMessageEntries);
-        }
-        console.log({'supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID.indexOf(propySupportAddress) > -1': supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID.indexOf(propySupportAddress)})
-        if(supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID && (supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID.indexOf(propySupportAddress) > -1)) {
-          lastMessageFromSupport = true;
-        }
-        if(address && supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propySupportAddress]?.[address]) {
-          if(lastMessageFromSupport && (newLatestMessageTimestamp > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX[propySupportAddress][address])) {
+        for(let propySupportAddress of Object.keys(chatProfileConfigs)) {
+          if(
+            (supportAddressesToLatestMessageEntries[propySupportAddress]?.signature !== supportAddressToLatestMessageEntry[propySupportAddress]?.signature)
+            || (supportAddressesToLatestMessageEntries[propySupportAddress]?.messageObj?.content && !supportAddressToLatestMessageEntry[propySupportAddress]?.messageObj?.content)
+          ) {
+            setSupportAddressToLatestMessageEntry(supportAddressesToLatestMessageEntries);
+          }
+          if(supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID && (supportAddressesToLatestMessageEntries[propySupportAddress]?.fromDID.indexOf(propySupportAddress) > -1)) {
+            lastMessageFromSupport = true;
+          }
+          if(address && supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propySupportAddress]?.[address]) {
+            if(lastMessageFromSupport && (supportAddressToLatestMessageTimestamp[propySupportAddress] > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX[propySupportAddress][address])) {
+              unreadMessageStatus = true;
+              latestUnreadMessageAccounts.push(propySupportAddress);
+            }
+          } else if(address && !supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propySupportAddress]?.[address] && lastMessageFromSupport) {
             unreadMessageStatus = true;
             latestUnreadMessageAccounts.push(propySupportAddress);
           }
-        } else if(address && !supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propySupportAddress]?.[address] && lastMessageFromSupport) {
-          unreadMessageStatus = true;
-          latestUnreadMessageAccounts.push(propySupportAddress);
         }
-        console.log({unreadMessageStatus, lastMessageFromSupport})
         setHasUnreadMessage(unreadMessageStatus);
         setUnreadMessageAccounts(latestUnreadMessageAccounts);
+        setIsLoading(false);
       }
     };
     checkPendingSupportRequest();
@@ -416,9 +473,14 @@ const PushNotificationZone = (props: PropsFromRedux) => {
               </div>
             }
             {!hasPendingSupportRequest && hasSomeMessages &&
-              <div>
+              <div className="relative">
+                {loading && 
+                  <div className={classes.loadingOverlay}>
+                    <CircularProgress color="inherit" style={{height: '36px', width: '36px', marginRight: '8px', color: '#6e6e6e'}} />
+                  </div>
+                }
                 <div className={classes.titleRow}>
-                  <Typography variant="h6" className={classes.inboxHeading}>Wallet Inbox</Typography>
+                  <Typography variant="h6" className={classes.inboxHeading}>Web3 Wallet Inbox</Typography>
                 </div>
                 <div className={classes.actionRow}>
                   <ActionButton 
@@ -442,8 +504,9 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                     />
                   }
                 </div>
-                {Object.keys(chatProfileConfigs).map((chatProfileAddress) => (
-                  <LinkWrapper external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
+                {/* This block is for active/open chats */}
+                {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
+                  <LinkWrapper key={`push-notification-zone`} external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
                     <div className={classes.chatProfileEntry}>
                       {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
                         <div className={classes.chatProfileNotificationIndicator} />
@@ -452,7 +515,7 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                         <img alt={chatProfileConfigs[chatProfileAddress].profileTag} className={classes.chatProfilePic} src={chatProfileConfigs[chatProfileAddress].profilePic} />
                       </div>
                       <div className={classes.chatProfileEntryTypography}>
-                        <div className="flex-center">
+                        <div className="flex-center space-between">
                           <Typography variant="subtitle2" className={classes.profileTag}>{chatProfileConfigs[chatProfileAddress].profileTag}</Typography>
                           <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(supportAddressToLatestMessageEntry[chatProfileAddress].timestamp / 1000)).format('hh:mm A MMM-D-YYYY')}</Typography>
                         </div>
@@ -460,6 +523,35 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                       </div>
                     </div>
                   </LinkWrapper>
+                ))}
+                {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress])?.length > 0 &&
+                  <div className={classes.subtitleRow}>
+                    <Typography variant="subtitle2" className={classes.inboxHeading}>Suggested Channels</Typography>
+                  </div>
+                }
+                {/* This block is for suggested chats */}
+                {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
+                  <div className={classes.chatProfileEntry}>
+                    {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
+                      <div className={classes.chatProfileNotificationIndicator} />
+                    }
+                    <div className={classes.chatProfilePicContainer}>
+                      <img alt={chatProfileConfigs[chatProfileAddress].profileTag} className={classes.chatProfilePic} src={chatProfileConfigs[chatProfileAddress].profilePic} />
+                    </div>
+                    <div className={classes.chatProfileEntryTypography}>
+                      <div className="flex-center space-between">
+                        <Typography variant="subtitle2" className={classes.profileTag}>{chatProfileConfigs[chatProfileAddress].profileTag}</Typography>
+                        <ActionButton 
+                          onClick={() => initiateChat(chatProfileAddress)}
+                          size="small"
+                          variant="outlined"
+                          buttonColor="primary"
+                          disabled={initiatingSupportChatAddresses.indexOf(chatProfileAddress) > -1}
+                          text={"Request Support"}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             }
