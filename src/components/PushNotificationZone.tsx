@@ -29,7 +29,8 @@ import ActionButton from './ActionButton';
 import PropyLogo from '../assets/img/propy-house-only.png';
 
 import {
-  PROPY_LIGHT_BLUE
+  PROPY_LIGHT_BLUE,
+  NETWORK_NAME_TO_ID,
 } from '../utils/constants';
 
 import {
@@ -118,7 +119,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(1),
       marginBottom: theme.spacing(0.5),
       display: 'flex',
-      justifyContent: 'start',
+      justifyContent: 'space-between',
       alignItems: 'center',
     },
     actionRow: {
@@ -165,6 +166,18 @@ const chatProfileConfigs : {[key: string]: IChatProfile} = {
   }
 }
 
+interface IChannelProfile {
+  channelTag: string;
+  profilePic: string;
+}
+
+const channelConfigs : {[key: string]: IChannelProfile} = {
+  "0x48608159077516aFE77A04ebC0448eC32E6670c1": {
+    channelTag: "Propy",
+    profilePic: PropyLogo,
+  }
+}
+
 let pushUser : any;
 
 const PushNotificationZone = (props: PropsFromRedux) => {
@@ -184,9 +197,12 @@ const PushNotificationZone = (props: PropsFromRedux) => {
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
   const [unreadMessageAccounts, setUnreadMessageAccounts] = useState<string[]>([]);
   const [supportAddressToLatestMessageEntry, setSupportAddressToLatestMessageEntry] = useState<{[key: string]: any}>({});
+  const [supportChannelAddressToSubscriptionStatus, setSupportChannelAddressToSubscriptionStatus] = useState<{[key: string]: boolean}>({});
+  const [supportChannelAddressToLatestNotificationEntries, setSupportChannelAddressToLatestNotificationEntries] = useState<{[key: string]: any[]}>({});
   const [unlockingProfile, setUnlockingProfile] = useState(false);
   const [unlockedProfile, setUnlockedProfile] = useState(false);
   const [initiatingSupportChatAddresses, setInitiatingSupportChatAddresses] = useState<string[]>([]);
+  const [initiatingChannelSubscriptionAddresses, setInitiatingChannelSubscriptionAddresses] = useState<string[]>([]);
   const [loading, setIsLoading] = useState(false);
 
   const openMenu = Boolean(anchorEl);
@@ -273,6 +289,20 @@ const PushNotificationZone = (props: PropsFromRedux) => {
     setForceUpdateCounter((currentValue) => currentValue + 1);
   }
 
+  const initiateChannelSubscription = async (initChannelAddress: string) => {
+    setInitiatingChannelSubscriptionAddresses((currentValues) => [initChannelAddress, ...currentValues.filter((currentValue) => currentValue !== initChannelAddress)]);
+    if (!pushUser || !pushUser?.signer) {
+      pushUser = await PushAPI.initialize(signer, {
+        env: CONSTANTS.ENV.PROD,
+      });
+    }
+    await pushUser.notification.subscribe(
+      `eip155:${NETWORK_NAME_TO_ID["base"]}:${initChannelAddress}`
+    );
+    setInitiatingChannelSubscriptionAddresses((currentValues) => [...currentValues.filter((currentValue) => currentValue !== initChannelAddress)]);
+    setForceUpdateCounter((currentValue) => currentValue + 1);
+  }
+
   useEffect(() => {
     const checkPendingSupportRequest = async () => {
       setIsLoading(true);
@@ -283,6 +313,7 @@ const PushNotificationZone = (props: PropsFromRedux) => {
       let hasMessages = false;
       let unreadMessageStatus = false;
       let supportAddressesToLatestMessageEntries = Object.assign({}, supportAddressToLatestMessageEntry);
+      let supportAddressesToLatestNotificationEntries = Object.assign({}, supportChannelAddressToLatestNotificationEntries);
       let latestUnreadMessageAccounts = [];
       try {
         if(address) {
@@ -291,6 +322,24 @@ const PushNotificationZone = (props: PropsFromRedux) => {
               env: CONSTANTS.ENV.PROD,
               account: address,
             })
+          }
+          // TODO ADD PAGINATION ON SUBSCRIPTIONS FOR HEAVY PUSH USERS
+          const connectedAddressSubscriptions = await pushUser.notification.subscriptions({
+            account: address,
+          });
+          for(let propyNotificationChannelAddress of Object.keys(channelConfigs)) {
+            const isSubscribedToPropyChannel = connectedAddressSubscriptions.find((subscription: {channel: string, user_settings: string}) => subscription.channel === propyNotificationChannelAddress) ? true : false;
+            const notificationFromPropyChannel = await pushUser.channel.notifications(propyNotificationChannelAddress);
+            setSupportChannelAddressToSubscriptionStatus((currentStatuses) => {
+              let newStatuses = Object.assign({}, currentStatuses);
+              newStatuses[propyNotificationChannelAddress] = isSubscribedToPropyChannel;
+              return newStatuses;
+            })
+            if(notificationFromPropyChannel.notifications?.length > 0) {
+              supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = notificationFromPropyChannel.notifications;
+            } else {
+              delete supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress];
+            }
           }
           for(let propySupportAddress of Object.keys(chatProfileConfigs)) {
             try {
@@ -369,13 +418,29 @@ const PushNotificationZone = (props: PropsFromRedux) => {
             latestUnreadMessageAccounts.push(propySupportAddress);
           }
         }
+        for(let propyNotificationChannelAddress of Object.keys(channelConfigs)) {
+          if(
+            ((supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress]?.length > 0 && supportChannelAddressToLatestNotificationEntries[propyNotificationChannelAddress]?.length > 0) &&
+              Math.floor(new Date(supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress][0].timestamp).getTime() / 1000) > Math.floor(new Date(supportChannelAddressToLatestNotificationEntries[propyNotificationChannelAddress][0].timestamp).getTime() / 1000))
+            || (supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress]?.length > 0 && (!supportChannelAddressToLatestNotificationEntries[propyNotificationChannelAddress] || supportChannelAddressToLatestNotificationEntries[propyNotificationChannelAddress]?.length === 0))
+          ) {
+            setSupportChannelAddressToLatestNotificationEntries(supportAddressesToLatestNotificationEntries);
+          }
+          if(address) {
+            for(let newNotification of supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress]) {
+              if(Math.floor(new Date(newNotification.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propyNotificationChannelAddress]?.[address]) {
+                unreadMessageStatus = true;
+              }
+            }
+          }
+        }
         setHasUnreadMessage(unreadMessageStatus);
         setUnreadMessageAccounts(latestUnreadMessageAccounts);
         setIsLoading(false);
       }
     };
     checkPendingSupportRequest();
-  }, [address, forceUpdateCounter, memoizedCapabilities, signer, supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX, supportAddressToLatestMessageEntry])
+  }, [address, forceUpdateCounter, memoizedCapabilities, signer, supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX, supportAddressToLatestMessageEntry, supportChannelAddressToLatestNotificationEntries])
 
   return (
     <>
@@ -402,7 +467,7 @@ const PushNotificationZone = (props: PropsFromRedux) => {
             }}
             sx={{
               '.MuiMenu-list': {
-                padding: '16px',
+                padding: '16px!important',
                 maxWidth: '500px',
               }
             }}
@@ -429,20 +494,30 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                     text={getUnlockMessagesButtonText()}
                   />
                 }
-                {unreadMessageAccounts.length > 0 &&
+                {(unreadMessageAccounts.length > 0 || hasUnreadMessage) &&
                   <ActionButton 
                     onClick={() => handleDismissChatNotification()}
                     size="small"
                     variant="outlined"
                     buttonColor="secondary"
-                    disabled={unreadMessageAccounts.length === 0}
+                    disabled={unreadMessageAccounts.length === 0 && !hasUnreadMessage}
                     text={"Dismiss Notifications"}
                   />
                 }
               </div>
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress])?.length > 0 &&
+                <div className={classes.subtitleRow}>
+                  <Typography variant="subtitle2" className={classes.inboxHeading}>Messages</Typography>
+                  <LinkWrapper external={true} link={`https://app.push.org/chat`}>
+                    <Typography variant="subtitle2" style={{color: PROPY_LIGHT_BLUE}}>
+                      View all
+                    </Typography>
+                  </LinkWrapper>
+                </div>
+              }
               {/* This block is for active/open chats */}
-              {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
-                <LinkWrapper key={`push-notification-zone`} external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress, index) => (
+                <LinkWrapper key={`push-notification-zone-active-chat-${chatProfileAddress}-${index}`} external={true} link={chatProfileConfigs[chatProfileAddress].chatLink}>
                   <div className={classes.chatProfileEntry}>
                     {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
                       <div className={classes.chatProfileNotificationIndicator} />
@@ -460,14 +535,79 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                   </div>
                 </LinkWrapper>
               ))}
+              {Object.keys(channelConfigs).filter((includeAddress) => supportChannelAddressToLatestNotificationEntries[includeAddress]?.length > 0)?.length > 0 &&
+                <div className={classes.subtitleRow}>
+                  <Typography variant="subtitle2" className={classes.inboxHeading}>Notifications</Typography>
+                  <LinkWrapper external={true} link={`https://app.push.org/inbox`}>
+                    <Typography variant="subtitle2" style={{color: PROPY_LIGHT_BLUE}}>
+                      View all
+                    </Typography>
+                  </LinkWrapper>
+                </div>
+              }
+              {/* This block is for latest notifications */}
+              {Object.keys(supportChannelAddressToLatestNotificationEntries).filter((includeAddress) => supportChannelAddressToLatestNotificationEntries[includeAddress].length > 0).slice(0, 5).map((channelAddress, index) => 
+              <>
+                {
+                  supportChannelAddressToLatestNotificationEntries[channelAddress].map((notificationEntry, notificationIndex) => (
+                    <LinkWrapper key={`notification-entry-${channelAddress}-${notificationIndex}`} external={true} link={`https://app.push.org/inbox`}>
+                      <div className={classes.chatProfileEntry} key={`push-notification-zone-notification-${index}-${channelAddress}`}>
+                        {(Math.floor(new Date(notificationEntry.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[channelAddress]?.[address]) &&
+                          <div className={classes.chatProfileNotificationIndicator} />
+                        }
+                        <div className={classes.chatProfilePicContainer}>
+                          <img alt={channelConfigs[channelAddress].channelTag} className={classes.chatProfilePic} src={chatProfileConfigs[channelAddress].profilePic} />
+                        </div>
+                        <div className={classes.chatProfileEntryTypography}>
+                          <div className="flex-center space-between">
+                            <Typography variant="subtitle2" className={classes.profileTag}>{channelConfigs[channelAddress].channelTag}</Typography>
+                            <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(new Date(notificationEntry.timestamp).getTime() / 1000)).format('hh:mm A MMM-D-YYYY')}</Typography>
+                          </div>
+                          <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{notificationEntry?.message?.notification?.body ? notificationEntry?.message?.notification?.body : "🔒 Locked Message"}</Typography>
+                        </div>
+                      </div>
+                    </LinkWrapper>
+                  ))
+                }
+              </>
+              )}
+              {Object.keys(channelConfigs).filter((includeAddress) => !supportChannelAddressToSubscriptionStatus[includeAddress])?.length > 0 &&
+                <div className={classes.subtitleRow}>
+                  <Typography variant="subtitle2" className={classes.inboxHeading}>Suggested Notification Channels</Typography>
+                </div>
+              }
+              {/* This block is for suggested channels */}
+              {Object.keys(channelConfigs).filter((includeAddress) => !supportChannelAddressToSubscriptionStatus[includeAddress]).map((channelAddress, index) => (
+                <div key={`suggested-channel-${index}-${channelAddress}`} className={classes.chatProfileEntry}>
+                  {(unreadMessageAccounts.indexOf(channelAddress) > -1) &&
+                    <div className={classes.chatProfileNotificationIndicator} />
+                  }
+                  <div className={classes.chatProfilePicContainer}>
+                    <img alt={channelConfigs[channelAddress].channelTag} className={classes.chatProfilePic} src={channelConfigs[channelAddress].profilePic} />
+                  </div>
+                  <div className={classes.chatProfileEntryTypography}>
+                    <div className="flex-center space-between">
+                      <Typography variant="subtitle2" className={classes.profileTag}>{channelConfigs[channelAddress].channelTag}</Typography>
+                      <ActionButton 
+                        onClick={() => initiateChannelSubscription(channelAddress)}
+                        size="small"
+                        variant="outlined"
+                        buttonColor="primary"
+                        disabled={initiatingChannelSubscriptionAddresses.indexOf(channelAddress) > -1}
+                        text={"Subscribe"}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
               {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress])?.length > 0 &&
                 <div className={classes.subtitleRow}>
-                  <Typography variant="subtitle2" className={classes.inboxHeading}>Suggested Support Channels</Typography>
+                  <Typography variant="subtitle2" className={classes.inboxHeading}>Available Support Chats</Typography>
                 </div>
               }
               {/* This block is for suggested chats */}
-              {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress) => (
-                <div className={classes.chatProfileEntry}>
+              {Object.keys(chatProfileConfigs).filter((includeAddress) => !supportAddressToLatestMessageEntry[includeAddress]).map((chatProfileAddress, index) => (
+                <div key={`suggested-chat-${index}-${chatProfileAddress}`} className={classes.chatProfileEntry}>
                   {(unreadMessageAccounts.indexOf(chatProfileAddress) > -1) &&
                     <div className={classes.chatProfileNotificationIndicator} />
                   }
