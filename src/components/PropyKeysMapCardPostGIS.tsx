@@ -293,7 +293,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
 
   return (
     <>
-    <Card style={{width, height, zIndex: 0, ...(disableBorderRadius && {borderRadius: 0})}}>
+    <Card style={{width, height, position: 'relative', zIndex: 0, ...(disableBorderRadius && {borderRadius: 0})}}>
       <LeafletMapContainer 
         zoom={zoom}
         zoomControl={zoomControl}
@@ -307,6 +307,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
         onMarkerSelection={onMarkerSelection}
         isLoading={isLoading || isFetching}
         setPopupOpen={setPopupOpen}
+        collectionConfigEntry={collectionConfigEntry}
         popupNode={(memoizedPopupNode && !isFetchingPopupData && !isLoadingPopup && !isFetching) ? memoizedPopupNode : 
           isFetching ? null : <div style={{width: 300, height: 300}}>
           <div className={classes.loadingIconContainer}>

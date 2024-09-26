@@ -335,10 +335,10 @@ const PushNotificationZone = (props: PropsFromRedux) => {
               newStatuses[propyNotificationChannelAddress] = isSubscribedToPropyChannel;
               return newStatuses;
             })
-            if(notificationFromPropyChannel.notifications?.length > 0) {
+            if(isSubscribedToPropyChannel && notificationFromPropyChannel.notifications?.length > 0) {
               supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = notificationFromPropyChannel.notifications;
             } else {
-              delete supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress];
+              supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = [];
             }
           }
           for(let propySupportAddress of Object.keys(chatProfileConfigs)) {
@@ -426,9 +426,9 @@ const PushNotificationZone = (props: PropsFromRedux) => {
           ) {
             setSupportChannelAddressToLatestNotificationEntries(supportAddressesToLatestNotificationEntries);
           }
-          if(address) {
+          if(address && supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress]) {
             for(let newNotification of supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress]) {
-              if(Math.floor(new Date(newNotification.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propyNotificationChannelAddress]?.[address]) {
+              if((Math.floor(new Date(newNotification.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propyNotificationChannelAddress]?.[address]) || !supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[propyNotificationChannelAddress]?.[address]) {
                 unreadMessageStatus = true;
               }
             }
@@ -546,13 +546,13 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                 </div>
               }
               {/* This block is for latest notifications */}
-              {Object.keys(supportChannelAddressToLatestNotificationEntries).filter((includeAddress) => supportChannelAddressToLatestNotificationEntries[includeAddress].length > 0).slice(0, 5).map((channelAddress, index) => 
+              {Object.keys(supportChannelAddressToLatestNotificationEntries).filter((includeAddress) => supportChannelAddressToLatestNotificationEntries[includeAddress].length > 0).map((channelAddress, index) => 
               <>
                 {
-                  supportChannelAddressToLatestNotificationEntries[channelAddress].map((notificationEntry, notificationIndex) => (
+                  supportChannelAddressToLatestNotificationEntries[channelAddress] && supportChannelAddressToLatestNotificationEntries[channelAddress].slice(0, 3).map((notificationEntry, notificationIndex) => (
                     <LinkWrapper key={`notification-entry-${channelAddress}-${notificationIndex}`} external={true} link={`https://app.push.org/inbox`}>
                       <div className={classes.chatProfileEntry} key={`push-notification-zone-notification-${index}-${channelAddress}`}>
-                        {(Math.floor(new Date(notificationEntry.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[channelAddress]?.[address]) &&
+                        {((Math.floor(new Date(notificationEntry.timestamp).getTime() / 1000) > supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[channelAddress]?.[address]) || !supportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX?.[channelAddress]?.[address]) &&
                           <div className={classes.chatProfileNotificationIndicator} />
                         }
                         <div className={classes.chatProfilePicContainer}>
