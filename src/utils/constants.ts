@@ -279,7 +279,7 @@ export const IS_GLOBAL_TOP_BANNER_ENABLED = true;
 export const GLOBAL_TOP_BANNER_HEIGHT = 28;
 export const GLOBAL_PAGE_HEIGHT = IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${64 + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 64px)';
 
-interface ICollectionEntry {
+export interface ICollectionEntry {
   network: string;
   address: string;
   slug: string;
