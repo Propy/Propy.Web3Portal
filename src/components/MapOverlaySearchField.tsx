@@ -22,8 +22,16 @@ import {
   ICollectionEntry,
 } from '../utils/constants';
 
+import {
+  ISelectedPopupConfig,
+} from '../interfaces';
+
+import { PropsFromRedux } from '../containers/MapOverlaySearchFieldContainer';
+
 interface IMapOverlaySearchField {
   collectionConfigEntry: ICollectionEntry,
+  setSelectedPopupConfig?: (popupConfig: ISelectedPopupConfig) => void
+  setPopupOpen?: (status: boolean) => void
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
       top: '16px',
       left: 'calc(50%)',
       transform: 'translateX(-50%)',
-      maxWidth: '600px',
+      maxWidth: '550px',
       width: '100%',
       display: 'flex',
       padding: '16px',
@@ -44,6 +52,22 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       backgroundColor: '#ffffffb0',
     },
+    mobileRoot: {
+      top: 'calc(100% - 16px)',
+      left: 'calc(50%)',
+      transform: 'translateX(-50%)translateY(-100%)',
+      maxWidth: '550px',
+      width: '100%',
+      display: 'flex',
+      padding: '16px',
+      zIndex: 900,
+      position: 'absolute',
+      alignItems: 'center',
+      borderRadius: '15px',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      backgroundColor: '#ffffffb0',
+    }
   }),
 );
 
@@ -52,12 +76,19 @@ interface Option {
   label: string;
   longitude: number;
   latitude: number;
+  type: "listing" | "token" | false,
+  asset_address: string | false;
+  network: string | false;
+  token_id: string | false;
 }
 
-export default function DebouncedAutocomplete(props: IMapOverlaySearchField) {
+export default function MapOverlaySearchField(props: IMapOverlaySearchField & PropsFromRedux) {
 
   const {
     collectionConfigEntry,
+    setSelectedPopupConfig,
+    setPopupOpen,
+    isConsideredMedium,
   } = props;
 
   const parentMap = useMap()
@@ -68,6 +99,7 @@ export default function DebouncedAutocomplete(props: IMapOverlaySearchField) {
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchFoundNoResults, setSearchFoundNoResults] = useState(false);
 
   const fetchOptions = useCallback(async (query: string) => {
     setLoading(true);
@@ -80,16 +112,24 @@ export default function DebouncedAutocomplete(props: IMapOverlaySearchField) {
       console.log({response})
       let newOptions : any = [];
       if(response?.data?.data?.length > 0) {
+        setSearchFoundNoResults(false);
         newOptions = response?.data?.data?.map((entry: any) => ({
           label: entry.metadata?.name,
           id: `${entry.metadata.token_id}-${entry.metadata?.name}`,
           longitude: entry.metadata.longitude,
           latitude: entry.metadata.latitude,
+          type: 'token', // todo add support for listings
+          asset_address: entry.asset_address,
+          network: entry.network_name,
+          token_id: entry.token_id,
         }))
+      } else {
+        setSearchFoundNoResults(true);
       }
       setOptions(newOptions);
     } catch (error) {
       console.error('Error fetching options:', error);
+      setSearchFoundNoResults(true);
       setOptions([]);
     } finally {
       setLoading(false);
@@ -120,8 +160,24 @@ export default function DebouncedAutocomplete(props: IMapOverlaySearchField) {
       parentMap.setView(latLngFlyTo, 18, {
         animate: true,
       })
+      if(setSelectedPopupConfig && setPopupOpen) {
+        setSelectedPopupConfig({
+          type: newValue.type,
+          asset_address: newValue.asset_address,
+          network: newValue.network,
+          token_id: newValue.token_id,
+        })
+      }
     }
   };
+
+  const getNoOptionsText = () => {
+    if(searchFoundNoResults) {
+      return 'No locations found'
+    } else {
+      return 'Type to search...'
+    }
+  }
 
   return (
     <Autocomplete
@@ -130,11 +186,13 @@ export default function DebouncedAutocomplete(props: IMapOverlaySearchField) {
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
       inputValue={inputValue}
-      className={classes.root}
+      className={isConsideredMedium ? classes.mobileRoot : classes.root}
       onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
       options={options}
       loading={loading}
       onChange={handleChange}
+      noOptionsText={getNoOptionsText()}
+      forcePopupIcon={false}
       isOptionEqualToValue={(option: any, value) => option.label === value.label}
       renderInput={(params) => (
         <TextField

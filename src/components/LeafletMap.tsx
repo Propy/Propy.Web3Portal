@@ -20,11 +20,12 @@ import {
   ICollectionEntry,
 } from '../utils/constants';
 
-import MapOverlaySearchField from './MapOverlaySearchField';
+import MapOverlaySearchFieldContainer from '../containers/MapOverlaySearchFieldContainer';
 import LeafletMapTrackBounds from './LeafletMapTrackBounds';
 
 import {
-  ILeafletMapMarker
+  ILeafletMapMarker,
+  ISelectedPopupConfig,
 } from '../interfaces';
 
 import { PropsFromRedux } from '../containers/GenericPageContainer';
@@ -45,6 +46,7 @@ interface ILeafletMap {
   onMarkerSelection?: (marker: ILeafletMapMarker) => void
   setPopupOpen?: (status: boolean) => void
   onMapMove?: (center: [number, number]) => void
+  setSelectedPopupConfig?: (popupConfig: ISelectedPopupConfig) => void
   collectionConfigEntry?: ICollectionEntry,
 }
 
@@ -91,6 +93,7 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
     popupNode,
     onMarkerSelection,
     setPopupOpen,
+    setSelectedPopupConfig,
     collectionConfigEntry,
     // onMapMove,
   } = props;
@@ -152,7 +155,7 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
       zoomDelta={2}
       zoomSnap={2}
     >
-      {collectionConfigEntry && <MapOverlaySearchField collectionConfigEntry={collectionConfigEntry} />}
+      {collectionConfigEntry && <MapOverlaySearchFieldContainer setPopupOpen={setPopupOpen} setSelectedPopupConfig={setSelectedPopupConfig} collectionConfigEntry={collectionConfigEntry} />}
       <MapEvents 
         onDragStart={(e) => {
           if(setPopupOpen) { 

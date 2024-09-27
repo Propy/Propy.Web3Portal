@@ -25,6 +25,7 @@ import {
   ILeafletMapMarker,
   INFTRecord,
   IPropyKeysHomeListingRecord,
+  ISelectedPopupConfig,
 } from '../interfaces';
 
 import {
@@ -58,13 +59,6 @@ const findCollectionConfig = (slug: string | undefined, entries: typeof COLLECTI
   const requiredSlug = slug || 'propykeys';
   return entries.find(entry => entry.slug === requiredSlug);
 };
-
-interface ISelectedPopupConfig {
-  type: "listing" | "token" | false,
-  asset_address: string | false;
-  network: string | false;
-  token_id: string | false;
-}
 
 interface IFetchedPopupData {
   type: "listing" | "token" | "unknown",
@@ -307,6 +301,7 @@ const PropyKeysMapCardPostGIS = (props: IPropyKeysMapCardProps) => {
         onMarkerSelection={onMarkerSelection}
         isLoading={isLoading || isFetching}
         setPopupOpen={setPopupOpen}
+        setSelectedPopupConfig={setSelectedPopupConfig}
         collectionConfigEntry={collectionConfigEntry}
         popupNode={(memoizedPopupNode && !isFetchingPopupData && !isLoadingPopup && !isFetching) ? memoizedPopupNode : 
           isFetching ? null : <div style={{width: 300, height: 300}}>

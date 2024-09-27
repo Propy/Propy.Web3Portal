@@ -21,6 +21,13 @@ export interface IEVMTransactionRecord {
     value: string;
 }
 
+export interface ISelectedPopupConfig {
+    type: "listing" | "token" | false,
+    asset_address: string | false;
+    network: string | false;
+    token_id: string | false;
+}
+
 export type L1Networks = 'ethereum' | 'goerli' | 'sepolia'
 export type L2Networks = 'arbitrum' | 'base' | 'base-sepolia' | 'base-goerli'
 

@@ -63,8 +63,6 @@ function LeafletMapTrackBounds(props: ILeafletMapTrackBounds) {
     mMap.on("zoomend", function () {
       let coordinates = mMap.getBounds();
       let zoom = mMap.getZoom();
-      console.log(mMap.getBounds());
-      console.log({coordinates: coordinates.toBBoxString(), zoom: mMap.getZoom()});
       let boundsRect = coordinates.toBBoxString();
       if(zoom >= 10) {
         debouncedUpdate(boundsRect, zoom);
@@ -76,8 +74,6 @@ function LeafletMapTrackBounds(props: ILeafletMapTrackBounds) {
     mMap.on("moveend", function () {
       let coordinates = mMap.getBounds();
       let zoom = mMap.getZoom();
-      console.log(mMap.getBounds());
-      console.log({coordinates: coordinates.toBBoxString(), zoom: mMap.getZoom()});
       let boundsRect = coordinates.toBBoxString();
       if(zoom >= 10) {
         debouncedUpdate(boundsRect, zoom);
