@@ -280,7 +280,7 @@ export const GLOBAL_TOP_BANNER_HEIGHT = 28;
 export const GLOBAL_PAGE_HEIGHT = IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${64 + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 64px)';
 export const getGlobalPageHeight = (isConsideredMobile: boolean) => {
   if(isConsideredMobile) {
-    return IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${(64 * 2) + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 64px)';
+    return IS_GLOBAL_TOP_BANNER_ENABLED ? `calc(100vh - ${((64 * 2) - 14) + GLOBAL_TOP_BANNER_HEIGHT}px)` : 'calc(100vh - 64px)';
   }
   return GLOBAL_PAGE_HEIGHT;
 }
