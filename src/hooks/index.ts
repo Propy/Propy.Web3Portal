@@ -10,6 +10,7 @@ import useTotalStakingBalancePRO from './useTotalStakingBalancePRO';
 import useApproxLeaveAmountFromShareAmount from './useApproxLeaveAmountFromShareAmount';
 import useApproxStakerRewardsPending from './useApproxStakerRewardsPending';
 import useUnifiedWriteContract from './useUnifiedWriteContract';
+import useEthersSigner from './useEthersSigner';
 
 export {
   useWindowSize,
@@ -24,4 +25,5 @@ export {
   useApproxLeaveAmountFromShareAmount,
   useApproxStakerRewardsPending,
   useUnifiedWriteContract,
+  useEthersSigner,
 }

@@ -175,6 +175,13 @@ export const NFTService = {
     }
     return ApiService.get(`/nft/coordinates-postgis-points/${network}`, `${contractNameOrCollectionNameOrAddress}${queryString}`)
   },
+  async getSearchOptionsWithPostGISPoints(
+    network: string,
+    contractNameOrCollectionNameOrAddress: string,
+    queryString: string
+  ) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/nft/coordinates-postgis-points-via-string-query/${network}`, `${contractNameOrCollectionNameOrAddress}?query=${queryString}`)
+  },
   async getCoordinatesPostGISClusters(
     network: string,
     contractNameOrCollectionNameOrAddress: string,

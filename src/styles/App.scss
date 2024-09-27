@@ -17,6 +17,12 @@
   width: 100%;
 }
 
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
@@ -160,4 +166,12 @@ w3m-modal {
 
 .hide-body-overflow {
   overflow: hidden!important;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.relative {
+  position: relative;
 }

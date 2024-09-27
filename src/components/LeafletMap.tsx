@@ -16,10 +16,16 @@ import markerIconPropy3D from "../assets/img/map-marker-3d-compressed.png";
 import LogoDarkMode from '../assets/svg/propy-logo-house-only.svg'
 import {Icon} from 'leaflet'
 
+import {
+  ICollectionEntry,
+} from '../utils/constants';
+
+import MapOverlaySearchFieldContainer from '../containers/MapOverlaySearchFieldContainer';
 import LeafletMapTrackBounds from './LeafletMapTrackBounds';
 
 import {
-  ILeafletMapMarker
+  ILeafletMapMarker,
+  ISelectedPopupConfig,
 } from '../interfaces';
 
 import { PropsFromRedux } from '../containers/GenericPageContainer';
@@ -40,6 +46,8 @@ interface ILeafletMap {
   onMarkerSelection?: (marker: ILeafletMapMarker) => void
   setPopupOpen?: (status: boolean) => void
   onMapMove?: (center: [number, number]) => void
+  setSelectedPopupConfig?: (popupConfig: ISelectedPopupConfig) => void
+  collectionConfigEntry?: ICollectionEntry,
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -85,6 +93,8 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
     popupNode,
     onMarkerSelection,
     setPopupOpen,
+    setSelectedPopupConfig,
+    collectionConfigEntry,
     // onMapMove,
   } = props;
 
@@ -145,6 +155,7 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
       zoomDelta={2}
       zoomSnap={2}
     >
+      {collectionConfigEntry && <MapOverlaySearchFieldContainer setPopupOpen={setPopupOpen} setSelectedPopupConfig={setSelectedPopupConfig} collectionConfigEntry={collectionConfigEntry} />}
       <MapEvents 
         onDragStart={(e) => {
           if(setPopupOpen) { 
