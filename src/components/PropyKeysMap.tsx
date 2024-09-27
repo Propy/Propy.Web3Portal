@@ -6,7 +6,7 @@ import PropyKeysMapCard from './PropyKeysMapCard';
 import PropyKeysMapCardPostGIS from './PropyKeysMapCardPostGIS';
 
 import {
-  GLOBAL_PAGE_HEIGHT,
+  getGlobalPageHeight,
 } from '../utils/constants';
 
 interface IPropyKeysMap {
@@ -27,7 +27,7 @@ const PropyKeysMap = (props: PropsFromRedux & IPropyKeysMap) => {
     <>
       {mode === "normal" &&
         <PropyKeysMapCard 
-          height={GLOBAL_PAGE_HEIGHT}
+          height={getGlobalPageHeight(isConsideredMobile)}
           zoom={2}
           zoomControl={true}
           dragging={true}
@@ -42,7 +42,7 @@ const PropyKeysMap = (props: PropsFromRedux & IPropyKeysMap) => {
       }
       {mode === "gis" &&
         <PropyKeysMapCardPostGIS 
-          height={GLOBAL_PAGE_HEIGHT}
+          height={getGlobalPageHeight(isConsideredMobile)}
           zoom={2}
           zoomControl={true}
           dragging={true}

@@ -329,14 +329,23 @@ const PushNotificationZone = (props: PropsFromRedux) => {
           });
           for(let propyNotificationChannelAddress of Object.keys(channelConfigs)) {
             const isSubscribedToPropyChannel = connectedAddressSubscriptions.find((subscription: {channel: string, user_settings: string}) => subscription.channel === propyNotificationChannelAddress) ? true : false;
-            const notificationFromPropyChannel = await pushUser.channel.notifications(propyNotificationChannelAddress);
+            const notificationFromPropyChannel = await pushUser.notification.list('INBOX', {
+              channels: [`eip155:${NETWORK_NAME_TO_ID["base"]}:${propyNotificationChannelAddress}`, `eip155:${NETWORK_NAME_TO_ID["ethereum"]}:${propyNotificationChannelAddress}`],
+              raw: true,
+            });
+            const notificationFromPropyChannelSpam = await pushUser.notification.list('SPAM', {
+              channels: [`eip155:${NETWORK_NAME_TO_ID["base"]}:${propyNotificationChannelAddress}`, `eip155:${NETWORK_NAME_TO_ID["ethereum"]}:${propyNotificationChannelAddress}`],
+              raw: true,
+            });
+            console.log({notificationFromPropyChannel, notificationFromPropyChannelSpam})
+            let useNotifications = [...notificationFromPropyChannel, ...notificationFromPropyChannelSpam];
             setSupportChannelAddressToSubscriptionStatus((currentStatuses) => {
               let newStatuses = Object.assign({}, currentStatuses);
               newStatuses[propyNotificationChannelAddress] = isSubscribedToPropyChannel;
               return newStatuses;
             })
-            if(isSubscribedToPropyChannel && notificationFromPropyChannel.notifications?.length > 0) {
-              supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = notificationFromPropyChannel.notifications;
+            if(isSubscribedToPropyChannel && useNotifications?.length > 0) {
+              supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = useNotifications;
             } else {
               supportAddressesToLatestNotificationEntries[propyNotificationChannelAddress] = [];
             }
@@ -561,9 +570,9 @@ const PushNotificationZone = (props: PropsFromRedux) => {
                         <div className={classes.chatProfileEntryTypography}>
                           <div className="flex-center space-between">
                             <Typography variant="subtitle2" className={classes.profileTag}>{channelConfigs[channelAddress].channelTag}</Typography>
-                            <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(new Date(notificationEntry.timestamp).getTime() / 1000)).format('hh:mm A MMM-D-YYYY')}</Typography>
+                            <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{dayjs.unix(Math.floor(notificationEntry?.payload?.data?.epoch)).format('hh:mm A MMM-D-YYYY')}</Typography>
                           </div>
-                          <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{notificationEntry?.message?.notification?.body ? notificationEntry?.message?.notification?.body : "🔒 Locked Message"}</Typography>
+                          <Typography variant="overline" style={{lineHeight: 1, textTransform: 'none'}}>{notificationEntry?.payload?.data?.amsg ? notificationEntry?.payload?.data?.amsg : "🔒 Locked Message"}</Typography>
                         </div>
                       </div>
                     </LinkWrapper>
