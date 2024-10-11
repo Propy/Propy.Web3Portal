@@ -138,15 +138,15 @@ const COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
 ]
 
 const LISTING_COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
-  {
-    network: "base",
-    slug: "propykeys",
-    overrideTitle: "PropyKeys Home Listings",
-    address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
-    showInMultiCollectionGallery: true,
-    optimisticTitle: "PropyKeys Home Listings",
-    collectionType: "LISTING",
-  },
+  // {
+  //   network: "base",
+  //   slug: "propykeys",
+  //   overrideTitle: "PropyKeys Home Listings",
+  //   address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
+  //   showInMultiCollectionGallery: true,
+  //   optimisticTitle: "PropyKeys Home Listings",
+  //   collectionType: "LISTING",
+  // },
 ]
 
 const LISTING_COLLECTIONS_ENTRIES_DEV : ICollectionEntry[] = [
