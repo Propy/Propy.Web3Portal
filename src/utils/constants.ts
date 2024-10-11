@@ -97,7 +97,7 @@ const COLLECTIONS_ENTRIES_PROD : ICollectionEntry[] = [
   {
     network: "base",
     address: "0xa239b9b3E00637F29f6c7C416ac95127290b950E",
-    optimisticTitle: "PropyKeys Addresses",
+    optimisticTitle: "Onchain Addresses",
     slug: "propykeys",
     collectionType: "NFT",
   },

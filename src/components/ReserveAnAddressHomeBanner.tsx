@@ -130,13 +130,13 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
               <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
-                    <img src={RaTier1Icon} className={classes.tierIcon}  alt="Tier 1 NFT" />
+                    <img src={RaTier1Icon} className={classes.tierIcon}  alt="Tier 1 Address Onchain" />
                   </div>
                   <Typography variant="h4" className={classes.cardTitle}>
                     Tier 1
                   </Typography>
                   <Typography variant="h5" className={classes.cardSubtitle}>
-                    Mint Address
+                    Address Onchain
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Create an onchain token which symbolically represents the chosen address
@@ -153,13 +153,13 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
               <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
-                    <img src={RaTier2Icon} className={classes.tierIcon}  alt="Tier 2 NFT" />
+                    <img src={RaTier2Icon} className={classes.tierIcon}  alt="Tier 2 Deed Onchain" />
                   </div>
                   <Typography variant="h4" className={classes.cardTitle}>
                     Tier 2
                   </Typography>
                   <Typography variant="h5" className={classes.cardSubtitle}>
-                    Deed NFT
+                    Deed Onchain
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Have your deed record uploaded to IPFS and associated with your NFT
@@ -176,16 +176,16 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
               <LinkWrapper link={MINT_AN_ADDRESS_LINK} external={true}>
                 <CardActionArea className={classes.actionArea}>
                   <div className={classes.tierIconContainer}>
-                    <img src={RaTier3Icon} className={classes.tierIcon} alt="Tier 3 NFT" />
+                    <img src={RaTier3Icon} className={classes.tierIcon} alt="Tier 3 Asset Onchain" />
                   </div>
                   <Typography variant="h4" className={classes.cardTitle}>
                     Tier 3
                   </Typography>
                   <Typography variant="h5" className={classes.cardSubtitle}>
-                    RWA NFT
+                    Asset Onchain
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Speed up the buying & selling process, potentially use NFT as onchain collateral
+                    Speed up the buying & selling process, potentially use asset as onchain collateral
                   </Typography>
                   <Button variant="outlined" color="secondary">
                     2000 PRO
