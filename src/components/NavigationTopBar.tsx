@@ -78,7 +78,7 @@ const NavigationTopBar = (props: PropsFromRedux) => {
             <div style={{display: 'flex', alignItems: 'center'}}>
               <img height={'28px'} style={{marginRight: '10px', cursor: 'pointer'}} src={darkMode ? LogoDarkMode : LogoLightMode} alt="logo" />
               <Typography variant="body1" className={classes.title}>
-                dApp
+                Onchain
               </Typography>
             </div>
           </LinkWrapper>
