@@ -78,6 +78,7 @@ export function useUnifiedWriteContract({
     const capabilitiesForChain = availableCapabilities[account.chainId];
     console.log({capabilitiesForChain})
     if (
+      capabilitiesForChain &&
       capabilitiesForChain["paymasterService"] &&
       capabilitiesForChain["paymasterService"].supported
     ) {
