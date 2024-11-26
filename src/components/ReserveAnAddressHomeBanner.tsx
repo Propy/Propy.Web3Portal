@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 
 import { PropsFromRedux } from '../containers/ReserveAnAddressHomeBannerContainer';
 
@@ -141,9 +141,9 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Create an onchain token which symbolically represents the chosen address
                   </Typography>
-                  <Button variant="outlined" color="secondary">
+                  {/* <Button variant="outlined" color="secondary">
                     10 PRO
-                  </Button>
+                  </Button> */}
                 </CardActionArea>
               </LinkWrapper>
             </Card>
@@ -164,9 +164,9 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Have your deed record uploaded to IPFS and associated with your NFT
                   </Typography>
-                  <Button variant="outlined" color="secondary">
+                  {/* <Button variant="outlined" color="secondary">
                     50 PRO
-                  </Button>
+                  </Button> */}
                 </CardActionArea>
               </LinkWrapper>
             </Card>
@@ -187,9 +187,9 @@ const ReserveAnAddressHomeBanner = (props: PropsFromRedux) => {
                   <Typography variant="subtitle1" className={classes.cardDescription}>
                     Speed up the buying & selling process, potentially use asset as onchain collateral
                   </Typography>
-                  <Button variant="outlined" color="secondary">
+                  {/* <Button variant="outlined" color="secondary">
                     2000 PRO
-                  </Button>
+                  </Button> */}
                 </CardActionArea>
               </LinkWrapper>
             </Card>
