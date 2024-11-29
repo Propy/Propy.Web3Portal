@@ -278,10 +278,16 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
           )
         }
       </Grid>
-      {accountTokensDataTanstack?.pagination?.totalPages && accountTokensDataTanstack?.pagination?.totalPages > 1 && showPagination &&
+      {(accountTokensDataTanstack && accountTokensDataTanstack?.pagination?.totalPages > 1) && showPagination && (
         <>
           <div className={classes.paginationContainer}>
-            <Pagination page={page} onChange={(event: any, page: number) => setPage(page)} count={accountTokensDataTanstack?.pagination?.totalPages} variant="outlined" color="primary" />
+            <Pagination 
+              page={page} 
+              onChange={(event: any, page: number) => setPage(page)} 
+              count={accountTokensDataTanstack?.pagination?.totalPages} 
+              variant="outlined" 
+              color="primary" 
+            />
           </div>
           {/* {
             paginationTotalRecords &&
@@ -290,7 +296,7 @@ const AccountTokensBanner = (props: IAccountTokensBanner & PropsFromRedux) => {
             </Typography>
           } */}
         </>
-      }
+      )}
     </>
   )
 }
