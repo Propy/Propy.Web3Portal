@@ -18,7 +18,7 @@ const projectId = '32a05ca21db0679cb1e3e2601081e2f4'
 const metadata = {
   name: 'Propy Onchain',
   description: 'Interfacing with Propy\'s onchain systems',
-  url: 'https://dapp.propy.com',
+  url: 'https://dapp.propy.com?test=123',
   icons: [PropyHouseOnlyLogo]
 }
 
