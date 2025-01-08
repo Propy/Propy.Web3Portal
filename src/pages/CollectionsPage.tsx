@@ -28,7 +28,7 @@ const CollectionsPage = () => {
         >
           {COLLECTIONS_PAGE_ENTRIES && COLLECTIONS_PAGE_ENTRIES.map((entry) => 
             <div className={classes.spacer}>
-              <CollectionBannerContainer showCollectionLink={true} maxRecords={10} showTitle={true} network={entry.network} contractNameOrCollectionNameOrAddress={entry.address} collectionSlug={entry.slug} />
+              <CollectionBannerContainer showCollectionLink={true} maxRecords={10} showTitle={true} network={entry.network} contractNameOrCollectionNameOrAddress={entry.address} collectionSlug={entry.slug} filterShims={entry.filterShims} overrideTitle={entry.overrideTitle} />
             </div>
           )}
         </GenericPageContainer>

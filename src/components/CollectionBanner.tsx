@@ -169,7 +169,7 @@ const CollectionBanner = (props: ICollectionBanner & PropsFromRedux) => {
       if(searchParams.get("landmark") || (filterShims && filterShims.indexOf("landmark") > -1)) {
         additionalFilters.push({filter_type: "landmark", value: true});
       }
-      if(searchParams.get("attached_deed")) {
+      if(searchParams.get("attached_deed") || (filterShims && filterShims.indexOf("attached_deed") > -1)) {
         additionalFilters.push({filter_type: "attached_deed", value: true});
       }
       if(sortBy) {
