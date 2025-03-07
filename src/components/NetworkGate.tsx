@@ -5,7 +5,7 @@ import { animated, useSpring } from '@react-spring/web'
 import { toast } from 'sonner';
 
 import { useAccount, useSwitchChain } from 'wagmi'
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useAppKit } from '@reown/appkit/react'
 
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -91,7 +91,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
     }
   }, [error])
 
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
 
   const connectSpring = useSpring({
     from: {
