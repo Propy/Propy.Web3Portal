@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useAppKit } from '@reown/appkit/react'
 import { useAccount, useDisconnect } from 'wagmi'
 
 import styled from 'styled-components'
@@ -40,7 +40,7 @@ export const Web3ModalButtonWagmi = (props: IWeb3ModalButtonProps) => {
   } = props;
 
   // 4. Use modal hook
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
   const { 
     address,
     // isConnecting,

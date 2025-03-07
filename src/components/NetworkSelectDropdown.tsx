@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Button from '@mui/material/Button';
 
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAppKit } from '@reown/appkit/react'
 
 import { useAccount } from 'wagmi';
 
@@ -44,7 +44,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
 
   const { chainId, address } = useAccount();
 
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
 
   useEffect(() => {
     if(chainId) {
