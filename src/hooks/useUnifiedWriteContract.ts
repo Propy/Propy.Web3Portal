@@ -3,6 +3,8 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagm
 import { useCapabilities, useWriteContracts, useCallsStatus } from "wagmi/experimental";
 import { utils } from 'ethers';
 import { toast } from 'sonner';
+import { errorABIFull } from '../abi/StakingV3CombinedErrorsABI';
+import { getContractError, BaseError } from 'viem';
 
 import { API_ENDPOINT } from "../utils/constants";
 
@@ -25,6 +27,55 @@ interface UseUnifiedTransactionProps {
   onSettled?: () => void;
   successToastMessage?: string;
   fallbackErrorMessage?: string;
+}
+
+function parseCustomError(error: any, contractConfig: any): string {
+  console.log('Raw error:', error);
+  
+  try {
+    // Try to convert generic error to ContractFunctionExecutionError
+    const contractError = getContractError(error as BaseError, {
+      abi: errorABIFull,
+      address: contractConfig.address,
+      args: contractConfig.args,
+      functionName: contractConfig.functionName
+    });
+    
+    console.log('Contract error:', contractError);
+    
+    // Extract error information from the message
+    if (contractError.message) {
+      const customErrorPattern = /Error: ([a-zA-Z0-9_]+)(\(.*?\))?\s*(\(.*?\))?/;
+      const customErrorMatch = contractError.message.match(customErrorPattern);
+      
+      if (customErrorMatch) {
+        const errorName = customErrorMatch[1]; // Captures the error name
+        
+        // Return the error name for other custom errors
+        return errorName;
+      }
+
+      const reasonPattern = /reverted with the following reason:\s*([A-Z_]+)/;
+      const reasonMatch = contractError.message.match(reasonPattern);
+      
+      if (reasonMatch) {
+        const errorReason = reasonMatch[1]; // Captures the error reason string
+        
+        // Return the reason for other string errors
+        return errorReason;
+      }
+    }
+    
+    // Fallback to the full error message
+    if(contractError.message) {
+      return contractError.message || 'Transaction failed';
+    }
+  } catch (e) {
+    console.error('Error in getContractError:', e);
+  }
+  
+  // Fallback to original error message
+  return error?.message || 'Transaction failed';
 }
 
 export function useUnifiedWriteContract({
@@ -63,11 +114,11 @@ export function useUnifiedWriteContract({
     isPending: isLoadingAA,
     writeContractsAsync: writeAA
   } = useWriteContracts({
-    mutation: { onSuccess: (id: string) => setTxId(id) },
+    mutation: { onSuccess: (data: { id: string }) => setTxId(data.id) },
   });
 
   const aaCallStatus = useCallsStatus({
-    id: aaData ? aaData : "",
+    id: aaData ? aaData.id : "",
   });
 
   const { data: availableCapabilities } = useCapabilities({
@@ -113,10 +164,10 @@ export function useUnifiedWriteContract({
           hasHandledTransaction.current = true;
           setIsAwaitingTx(false);
           setHasGivenTxClosure(true);
-          if(!onError) {
-            toast.error(traditionalReceipt.error?.message || fallbackErrorMessage || 'Transaction failed');
+          if (!onError) {
+            toast.error(parseCustomError(traditionalReceipt.error, contractConfig) || fallbackErrorMessage || 'Transaction failed');
           } else {
-            onError?.(traditionalReceipt.error);
+            onError?.(parseCustomError(traditionalReceipt.error, contractConfig));
           }
         }
       } else if (transactionType === 'accountAbstraction' && aaData && aaCallStatus?.data?.receipts && (aaCallStatus?.data?.receipts?.length > 0)) {
@@ -199,10 +250,10 @@ export function useUnifiedWriteContract({
       setIsAwaitingTx(false);
       if(!hasGivenTxClosure) {
         setHasGivenTxClosure(true);
-        if(!onError) {
-          toast.error((error as Error)?.message || error?.details || 'Unable to complete transaction, please try again or contact support.');
+        if (!onError) {
+          toast.error(parseCustomError(error, contractConfig) || (error as Error)?.message || error?.details || 'Unable to complete transaction');
         } else {
-          onError?.(error);
+          onError?.(parseCustomError(error, contractConfig));
         }
       }
     } finally {

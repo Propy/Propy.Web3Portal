@@ -175,3 +175,14 @@ w3m-modal {
 .relative {
   position: relative;
 }
+
+.tooltip-helper-icon {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s ease-in-out;
+  margin-left: 2px;
+  height: 20px;
+  &:hover {
+    opacity: 0.8;
+  }
+}
