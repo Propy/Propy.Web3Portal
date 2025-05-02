@@ -23,8 +23,6 @@ import {
 } from '../utils';
 
 import {
-  BASE_PROPYKEYS_STAKING_CONTRACT_V1,
-  BASE_PROPYKEYS_STAKING_CONTRACT_V2,
   PRO_BASE_L2_ADDRESS,
   BASE_PROPYKEYS_STAKING_NFT,
   BASE_OG_STAKING_NFT,
@@ -152,7 +150,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               {!isLoadingStakerShares && (
                 <>
                   <Typography style={{marginBottom: '4px'}} variant="h6">Total Staking Power</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}
             </div>

@@ -16,6 +16,11 @@
     "type": "constructor"
   },
   {
+    "inputs": [],
+    "name": "InvalidLeaver",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint128",
@@ -48,7 +53,27 @@
   },
   {
     "inputs": [],
+    "name": "LockupPeriodActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "LockupPeriodNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoSharesOnTokenId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotRegistry",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnstakeAllBeforeAddingMore",
     "type": "error"
   },
   {
@@ -244,6 +269,19 @@
     "name": "leaveWithOnlyLP",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "multiplier",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

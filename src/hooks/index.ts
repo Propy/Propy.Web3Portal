@@ -7,9 +7,13 @@ import useTotalStakedPRO from './useTotalStakedPRO';
 import useStakedTokenCount from './useStakedTokenCount';
 import useStakerUnlockTime from './useStakerUnlockTime';
 import useStakerModuleUnlockTime from './useStakerModuleUnlockTime';
+import useStakerSharesByModuleV3 from './useStakerSharesByModuleV3';
 import useStakedPROByStaker from './useStakedPROByStaker';
 import useTotalStakingBalancePRO from './useTotalStakingBalancePRO';
 import useApproxLeaveAmountFromShareAmount from './useApproxLeaveAmountFromShareAmount';
+import useApproxStakerRewardsPendingByModuleV3 from './useApproxStakerRewardsPendingByModuleV3';
+import useStakerToVirtualStakedPROByModuleV3 from './useStakerToVirtualStakedPROByModuleV3';
+import useStakerToStakedPROByModuleV3 from './useStakerToStakedPROByModuleV3';
 import useApproxStakerRewardsPending from './useApproxStakerRewardsPending';
 import useUnifiedWriteContract from './useUnifiedWriteContract';
 import useEthersSigner from './useEthersSigner';
@@ -22,12 +26,16 @@ export {
   useStakerSharesV3,
   useStakerUnlockTime,
   useStakerModuleUnlockTime,
+  useStakerSharesByModuleV3,
   useTotalStakingShareSupply,
   useTotalStakedPRO,
   useStakedTokenCount,
   useStakedPROByStaker,
   useTotalStakingBalancePRO,
   useApproxLeaveAmountFromShareAmount,
+  useApproxStakerRewardsPendingByModuleV3,
+  useStakerToVirtualStakedPROByModuleV3,
+  useStakerToStakedPROByModuleV3,
   useApproxStakerRewardsPending,
   useUnifiedWriteContract,
   useEthersSigner,

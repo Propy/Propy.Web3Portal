@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import { PieChart } from '@mui/x-charts/PieChart';
 
-import { utils } from 'ethers';
-
 import BigNumber from 'bignumber.js';
 
 import { Theme } from '@mui/material/styles';
@@ -13,17 +11,10 @@ import createStyles from '@mui/styles/createStyles';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAccount } from 'wagmi';
 
 import { PropsFromRedux } from '../containers/StakeStatsV3ConnectedWalletContainer';
-
-import {
-  priceFormat,
-  countdownToTimestamp,
-} from '../utils';
 
 import {
   STAKING_V3_CORE_CONTRACT_ADDRESS,
@@ -32,11 +23,11 @@ import {
 
 import { 
   useStakerSharesV3,
-  useApproxLeaveAmountFromShareAmount,
-  useStakedPROByStaker,
-  useStakerUnlockTime,
-  useApproxStakerRewardsPending,
 } from '../hooks';
+
+import StakeV3LPModuleStakingPosition from './StakeV3LPModuleStakingPosition';
+import StakeV3PKModuleStakingPosition from './StakeV3PKModuleStakingPosition';
+import StakeV3ERC20ModuleStakingPosition from './StakeV3ERC20ModuleStakingPosition';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -65,6 +56,37 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(4),
       width: '100%',
     },
+    cardTitle: {
+      marginBottom: theme.spacing(2),
+    },
+    cardSubtitle: {
+      marginBottom: theme.spacing(2),
+    },
+    cardDescription: {
+      marginBottom: theme.spacing(2),
+      maxWidth: 350
+    },
+    actionArea: {
+      padding: theme.spacing(2),
+      textAlign: 'center',
+      alignItems: 'center',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'start',
+    },
+    moduleIconContainer: {
+      height: 100,
+      width: 100,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: theme.spacing(1),
+    },
+    tierIcon: {
+      maxWidth: '100%',
+      maxHeight: '100%',
+    },
   }),
 );
 
@@ -79,7 +101,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
   let {
     totalShares,
     isConsideredMobile,
-    version,
+    // version,
   } = props;
 
   const classes = useStyles();
@@ -95,50 +117,12 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     data: {
       stakerSharesTotal,
     },
-    isLoading: isLoadingStakerShares,
+    // isLoading: isLoadingStakerShares,
   } = useStakerSharesV3(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     address,
     chain ? chain.id : undefined
   );
-
-  const { 
-    data: stakerUnlockTime,
-    isLoading: isLoadingStakerUnlockTime,
-  } = useStakerUnlockTime(
-    STAKING_V3_CORE_CONTRACT_ADDRESS,
-    address,
-    chain ? chain.id : undefined
-  );
-
-  const { 
-    data: leaveAmountFromShares,
-    isLoading: isLoadingLeaveAmountFromShares,
-  } = useApproxLeaveAmountFromShareAmount(
-    STAKING_V3_CORE_CONTRACT_ADDRESS,
-    stakerSharesTotal,
-    chain ? chain.id : undefined
-  )
-
-  const {
-    data: approxStakerRewardsPending,
-    isLoading: isLoadingApproxStakerRewardsPending,
-  } = useApproxStakerRewardsPending(
-    STAKING_V3_CORE_CONTRACT_ADDRESS,
-    address,
-    chain ? chain.id : undefined
-  )
-
-  console.log({approxStakerRewardsPending})
-
-  const { 
-    data: stakedPROByStaker,
-    isLoading: isLoadingStakedPROByStaker,
-  } = useStakedPROByStaker(
-    STAKING_V3_CORE_CONTRACT_ADDRESS,
-    address,
-    chain ? chain.id : undefined
-  )
 
   useEffect(() => {
     let newPieChartData = [];
@@ -165,7 +149,18 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>
+        <Grid item xs={4} sm={8} md={12} lg={30} xl={10}>
+          <StakeV3LPModuleStakingPosition totalShares={totalShares} />
+        </Grid>
+        <Grid item xs={4} sm={8} md={6} lg={15} xl={10}>
+          <StakeV3ERC20ModuleStakingPosition totalShares={totalShares} />
+        </Grid>
+        <Grid item xs={4} sm={8} md={6} lg={15} xl={10}>
+          <StakeV3PKModuleStakingPosition totalShares={totalShares} />
+        </Grid>
+      </Grid>
+      {/* <Grid container spacing={2}> */}
         {/* <Grid item xs={12} lg={12}>
           <pre>
             {stakerSharesTotal && `stakerSharesTotal: ${priceFormat(Number(utils.formatUnits(JSON.stringify(Number(stakerSharesTotal)), 8)), 2, 'PRO')}`}<br/>
@@ -174,28 +169,13 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             {leaveAmountFromShares && stakedPROByStaker && `Available Reward: ${priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares.toString()).minus(stakedPROByStaker.toString()).toString(), 8)), 2, 'PRO')}`}
           </pre>
         </Grid> */}
-        {version === 1 &&
-          <Grid item xs={12} md={12} lg={12}>
-            <Card className={classes.card}>
-              <div className={classes.cardInner}>
-                <Typography style={{marginBottom: '4px'}} variant="subtitle1"><span style={{fontWeight: 'bold'}}>Please Note:</span> This staking contract will not be used for futher distributions (the last distribution received by this contract was on the 13th of April 2024). The PropyKeys team is working on <span style={{fontWeight: 'bold'}}>V2</span> of the staking protocol (undergoing audit) which will be more suitable for continuous and long-term use in comparison to V1. Any stakers who are currently staked in the V1 contract who wish to move over to the V2 contract will need to unstake from the V1 contract in order to move over to the V2 contract. Tokens staked in the V1 protocol are not at risk but there won't be any more PRO distributed to V1, therefore it is advised to unstake and await V2.</Typography>
-              </div>
-            </Card>
-          </Grid>
-        }
-        <Grid item xs={12} md={6} lg={3}>
+        {/* <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {((isLoadingLeaveAmountFromShares && (version === 1)) || isLoadingStakedPROByStaker || (isLoadingApproxStakerRewardsPending && version === 2)) && (
                 <>
                   <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
                   <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {version === 1 && !isLoadingLeaveAmountFromShares && !isLoadingStakedPROByStaker && (
-                <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Available Extra PRO</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(new BigNumber(leaveAmountFromShares ? leaveAmountFromShares.toString() : 0).minus(stakedPROByStaker ? stakedPROByStaker.toString() : 0).toString(), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
               {version === 2 && !isLoadingApproxStakerRewardsPending && !isLoadingStakedPROByStaker && (
@@ -260,7 +240,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               )}
             </div>
           </Card>
-        </Grid>
+        </Grid> */}
         {/* <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
@@ -299,7 +279,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             </div>
           </Card>
         </Grid>
-      </Grid>
+      {/* </Grid> */}
     </>
   );
 }

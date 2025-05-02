@@ -37,6 +37,11 @@
   },
   {
     "inputs": [],
+    "name": "NotRegistry",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UnapprovedTokenAddress",
     "type": "error"
   },

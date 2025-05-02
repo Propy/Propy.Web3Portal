@@ -17,7 +17,37 @@
   },
   {
     "inputs": [],
+    "name": "LockupPeriodActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockupPeriodNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NoPureStakedPro",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoZeroStakes",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotRegistry",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ProTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnstakeAllBeforeAddingMore",
     "type": "error"
   },
   {

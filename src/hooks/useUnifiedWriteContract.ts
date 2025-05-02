@@ -217,7 +217,7 @@ export function useUnifiedWriteContract({
       // Cleanup function
       hasHandledTransaction.current = false;
     };
-  }, [transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError, successToastMessage, fallbackErrorMessage]);
+  }, [transactionType, traditionalReceipt, aaData, aaCallStatus, hasGivenTxClosure, onSuccess, onError, successToastMessage, fallbackErrorMessage, contractConfig]);
 
   const executeTransaction = useCallback(async (overrideContractConfig: any = false) => {
     hasHandledTransaction.current = false;
