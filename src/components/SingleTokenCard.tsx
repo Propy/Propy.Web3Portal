@@ -26,6 +26,9 @@ interface ISingleTokenCardProps {
   onBalanceRecordSelected?: (balanceRecord: IBalanceRecord) => void,
   selected?: boolean,
   disabled?: boolean,
+  imageHeight?: string,
+  imageObjectFit?: 'contain',
+  cardHeight?: string,
 }
 
 const SingleTokenCard = (props: ISingleTokenCardProps) => {
@@ -38,6 +41,9 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
     onBalanceRecordSelected,
     selected,
     disabled,
+    imageHeight,
+    imageObjectFit,
+    cardHeight,
   } = props;
 
   const [tokenImage, setTokenImage] = useState(PlaceholderImage);
@@ -113,6 +119,9 @@ const SingleTokenCard = (props: ISingleTokenCardProps) => {
       tokenContractAddress={tokenContractAddress ? tokenContractAddress : undefined}
       tokenNetwork={tokenNetwork ? tokenNetwork : undefined}
       tokenTitle={tokenTitle}
+      imageHeight={imageHeight}
+      imageObjectFit={imageObjectFit ? imageObjectFit : undefined}
+      cardHeight={cardHeight ? cardHeight : undefined}
     />
   )
 }

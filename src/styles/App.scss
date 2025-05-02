@@ -23,6 +23,18 @@
   align-items: center;
 }
 
+.flex-center-justify-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
@@ -174,4 +186,15 @@ w3m-modal {
 
 .relative {
   position: relative;
+}
+
+.tooltip-helper-icon {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s ease-in-out;
+  margin-left: 2px;
+  height: 20px;
+  &:hover {
+    opacity: 0.8;
+  }
 }

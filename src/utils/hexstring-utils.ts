@@ -8,10 +8,14 @@ import {
   isHexPrefixed,
 } from 'ethereumjs-util';
 
+import {
+  DEAD_ADDRESS,
+} from './constants';
+
 export const BURN_ADDRESS = zeroAddress();
 
 export function isBurnAddress(address: string) {
-  return address === BURN_ADDRESS;
+  return [BURN_ADDRESS, DEAD_ADDRESS].indexOf(address) > -1;
 }
 
 export function isEmptyHexString(value: string): boolean {

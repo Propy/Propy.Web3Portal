@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,13 +14,25 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+    // "strictNullChecks": true,
+    // "noUncheckedIndexedAccess": true,
+    // "exactOptionalPropertyTypes": true,
+    // "noImplicitOverride": true,
+    // "useUnknownInCatchVariables": true,
+    // "allowImportingTsExtensions": true,
+    // "incremental": true
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
