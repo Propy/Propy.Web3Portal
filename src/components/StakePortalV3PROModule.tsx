@@ -2,6 +2,8 @@ import React, { useState, useEffect, useId, useMemo } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query'
 
+import { useNavigate } from 'react-router-dom';
+
 import { animated, useSpring } from '@react-spring/web';
 
 import { utils } from 'ethers';
@@ -345,8 +347,9 @@ const StakePortalV3 = (props: IStakeEnter) => {
     postStakeSuccess,
     version,
     selectedStakingModule,
-    setSelectedStakingModule,
   } = props;
+
+  const navigate = useNavigate();
 
   const [lastErrorMessage, setLastErrorMessage] = useState<false | string>(false);
 
@@ -745,7 +748,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
   return (
     <>
       {selectedStakingModule &&
-        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedStakingModule(false);setSelectedTokenIds([]);setSelectedTokenAddress(false)}}>
+        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedTokenIds([]);setSelectedTokenAddress(false);navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}`)}}>
           <BackIcon style={{marginRight: '8px'}} />
           <Typography variant="body1" style={{fontWeight: 'bold'}}>
             Back to staking options

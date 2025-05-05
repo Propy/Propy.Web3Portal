@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { useParams, useNavigate } from 'react-router-dom';
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -38,10 +40,39 @@ const StakePage = (props: IStakePage) => {
     version,
   } = props;
 
+  let { 
+    mode,
+    module,
+  } = useParams();
+
+  const navigate = useNavigate();
+
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTabIndex(newValue);
+  };
+
+  useEffect(() => {
+    if(Number(version) === 3) {
+      if(mode === "stake") {
+        setSelectedTabIndex(1);
+      } else if(mode === "unstake") {
+        setSelectedTabIndex(2);
+      } else {
+        setSelectedTabIndex(0);
+      }
+    }
+  }, [mode, version])
+
+  const handleChangeV3 = (event: React.SyntheticEvent, newValue: number) => {
+    if(newValue === 0) {
+      navigate(`/staking/v3`)
+    } else if (newValue === 1) {
+      navigate(`/staking/v3/stake`)
+    } else if (newValue === 2) {
+      navigate(`/staking/v3/unstake`)
+    }
   };
 
   return (
@@ -90,7 +121,7 @@ const StakePage = (props: IStakePage) => {
                 <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
                   <Tabs 
                     value={selectedTabIndex}
-                    onChange={handleChange}
+                    onChange={handleChangeV3}
                     aria-label="basic tabs example"
                     variant="scrollable"
                     scrollButtons="auto"
@@ -100,26 +131,13 @@ const StakePage = (props: IStakePage) => {
                     <Tab label="Unstake" {...a11yProps(2)} />
                   </Tabs>
                 </Box>
-                {[1,2].indexOf(Number(version)) > -1 &&
-                  <>
-                    {(selectedTabIndex === 0) &&
-                      <StakeStatsContainer version={version} />
-                    }
-                    {(selectedTabIndex === 1) &&
-                      <StakePortalContainer mode="enter" version={version} />
-                    }
-                    {(selectedTabIndex === 2) &&
-                      <StakePortalContainer mode="leave" version={version} />
-                    }
-                  </>
-                }
-                {(selectedTabIndex === 0) &&
+                {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
                   <StakeStatsV3Container version={version} />
                 }
-                {(selectedTabIndex === 1) &&
+                {(mode === "stake") &&
                   <StakePortalV3Container mode="enter" version={version} />
                 }
-                {(selectedTabIndex === 2) &&
+                {(mode === "unstake") &&
                   <StakePortalV3Container mode="leave" version={version} />
                 }
               </>
