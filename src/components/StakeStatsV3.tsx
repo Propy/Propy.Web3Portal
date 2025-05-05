@@ -23,7 +23,7 @@ import {
 } from '../utils';
 
 import {
-  PRO_BASE_L2_ADDRESS,
+  STAKING_V3_PRO_ADDRESS,
   BASE_PROPYKEYS_STAKING_NFT,
   BASE_OG_STAKING_NFT,
   STAKING_V3_CORE_CONTRACT_ADDRESS,
@@ -100,7 +100,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     isLoading: isLoadingTotalStakingBalancePRO,
   } = useTotalStakingBalancePRO(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
-    PRO_BASE_L2_ADDRESS,
+    STAKING_V3_PRO_ADDRESS,
     chain ? chain.id : undefined
   )
 
