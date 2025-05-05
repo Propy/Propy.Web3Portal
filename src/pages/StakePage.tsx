@@ -42,7 +42,6 @@ const StakePage = (props: IStakePage) => {
 
   let { 
     mode,
-    module,
   } = useParams();
 
   const navigate = useNavigate();
