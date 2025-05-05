@@ -20,6 +20,7 @@ import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import Chip from '@mui/material/Chip';
 import V1Icon from '@mui/icons-material/LooksOne';
 import V2Icon from '@mui/icons-material/LooksTwo';
 import V3Icon from '@mui/icons-material/Looks3';
@@ -45,6 +46,7 @@ interface IMenuEntry {
   externalLink?: string
   onlyConnected?: boolean
   children?: IMenuEntry[]
+  new?: boolean
 }
 
 const navigationMenu : IMenuEntry[] = [
@@ -83,6 +85,7 @@ const navigationMenu : IMenuEntry[] = [
         text: 'V3',
         path: '/stake/v3',
         icon: <V3Icon />,
+        new: true,
       },
       {
         text: 'V2',
@@ -371,6 +374,9 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                               }} style={{fontWeight: 'inherit'}} primary={child.text} />
                                               {child.externalLink &&
                                                 <ExternalLinkIcon style={{opacity: 0.5}} />
+                                              }
+                                              {child?.new &&
+                                                <Chip style={{color: 'white', fontWeight: 'bold'}} label="New" color="primary" />
                                               }
                                             </ListItemButton>
                                           </LinkWrapper>

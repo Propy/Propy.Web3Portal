@@ -11,6 +11,7 @@ import useStakerSharesByModuleV3 from './useStakerSharesByModuleV3';
 import useStakedPROByStaker from './useStakedPROByStaker';
 import useTotalStakingBalancePRO from './useTotalStakingBalancePRO';
 import useApproxLeaveAmountFromShareAmount from './useApproxLeaveAmountFromShareAmount';
+import useStakerModuleLockedAtTime from './useStakerModuleLockedAtTime';
 import useApproxStakerRewardsPendingByModuleV3 from './useApproxStakerRewardsPendingByModuleV3';
 import useStakerToVirtualStakedPROByModuleV3 from './useStakerToVirtualStakedPROByModuleV3';
 import useStakerToStakedPROByModuleV3 from './useStakerToStakedPROByModuleV3';
@@ -26,6 +27,7 @@ export {
   useStakerSharesV3,
   useStakerUnlockTime,
   useStakerModuleUnlockTime,
+  useStakerModuleLockedAtTime,
   useStakerSharesByModuleV3,
   useTotalStakingShareSupply,
   useTotalStakedPRO,

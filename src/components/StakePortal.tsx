@@ -311,7 +311,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
 
   const classes = useStyles();
 
-  const latestStakingVersion = 2;
+  const latestStakingVersion = 3;
 
   const maxSelection = 100;
 
@@ -389,6 +389,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     setSelectedTokenAddress(false);
   }, [triggerUpdateIndex])
 
+  // refactor into react-query
   useEffect(() => {
     let isMounted = true;
     const getStakingTokens = async () => {
