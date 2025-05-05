@@ -15,6 +15,9 @@ import MoneyIcon from '@mui/icons-material/Paid';
 import HelpIcon from '@mui/icons-material/Help';
 import Tooltip from '@mui/material/Tooltip';
 
+import ActionButton from './ActionButton';
+import LinkWrapper from './LinkWrapper';
+
 import { useAccount } from 'wagmi';
 
 import {
@@ -111,6 +114,20 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonTitle: {
       marginBottom: theme.spacing(1),
     },
+    stakingButtonContainer: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      marginTop: theme.spacing(1),
+    },
+    stakingButtonSpacer: {
+      width: '100px',
+      marginRight: theme.spacing(2),
+    },
+    stakingButton: {
+      width: '100px',
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+    },
   }),
 );
 
@@ -195,7 +212,7 @@ const StakeV3ERC20ModuleStakingPosition = (props: IStakeV3ERC20ModuleStakingPosi
         style={{
           width: '100%',
           height: '100%',
-          opacity: Number(moduleShares) > 0 ? '1' : '0.5',
+          opacity: Number(moduleShares) > 0 ? '1' : '1',
         }}
         onClick={() => {
           // setSelectedStakingModule("lp")
@@ -308,6 +325,28 @@ const StakeV3ERC20ModuleStakingPosition = (props: IStakeV3ERC20ModuleStakingPosi
               </Tooltip>
               </span>
             </Typography>
+          </div>
+          <div className={classes.stakingButtonContainer}>
+            <LinkWrapper
+              link={"/staking/v3/stake/pro"}
+            >
+              <ActionButton
+                className={[classes.stakingButton, classes.stakingButtonSpacer].join(" ")}
+                buttonColor="secondary"
+                text={"Stake"}
+              />
+            </LinkWrapper>
+            {Number(moduleShares) > 0 &&
+              <LinkWrapper
+                link={"/staking/v3/unstake/pro"}
+              >
+                <ActionButton
+                  className={classes.stakingButton}
+                  buttonColor="secondary"
+                  text={"Unstake"}
+                />
+              </LinkWrapper>
+            }
           </div>
         </div>
       </Card>

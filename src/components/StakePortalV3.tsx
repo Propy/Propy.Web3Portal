@@ -18,6 +18,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
 import MoneyIcon from '@mui/icons-material/Paid';
 import FireIcon from '@mui/icons-material/LocalFireDepartment';
+import BackIcon from '@mui/icons-material/KeyboardBackspace';
 
 import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
 
@@ -258,6 +259,14 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                 </Typography>
               </Grid>
           </Grid>
+        }
+        {!selectedStakingModule &&
+          <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {navigate(`/staking/v3`)}}>
+            <BackIcon style={{marginRight: '8px'}} />
+            <Typography variant="body1" style={{fontWeight: 'bold'}}>
+              Back to stats
+            </Typography>
+          </div>
         }
         {(!isBlacklistedOrigin && !isDeprecatedStakingVersion && !selectedStakingModule) &&
           <Grid className={(isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>

@@ -12,6 +12,9 @@ import createStyles from '@mui/styles/createStyles';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 
+import ActionButton from './ActionButton';
+import LinkWrapper from './LinkWrapper';
+
 import HelpIcon from '@mui/icons-material/Help';
 import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
 import Tooltip from '@mui/material/Tooltip';
@@ -111,6 +114,20 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonTitle: {
       marginBottom: theme.spacing(1),
     },
+    stakingButtonContainer: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      marginTop: theme.spacing(1),
+    },
+    stakingButtonSpacer: {
+      width: '100px',
+      marginRight: theme.spacing(2),
+    },
+    stakingButton: {
+      width: '100px',
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+    },
   }),
 );
 
@@ -195,7 +212,7 @@ const StakeV3PKModuleStakingPosition = (props: IStakeV3PKModuleStakingPosition) 
         style={{
           width: '100%',
           height: '100%',
-          opacity: Number(moduleShares) > 0 ? '1' : '0.5',
+          opacity: Number(moduleShares) > 0 ? '1' : '1',
         }}
         onClick={() => {
           // setSelectedStakingModule("lp")
@@ -308,6 +325,28 @@ const StakeV3PKModuleStakingPosition = (props: IStakeV3PKModuleStakingPosition) 
               </Tooltip>
               </span>
             </Typography>
+          </div>
+          <div className={classes.stakingButtonContainer}>
+            <LinkWrapper
+              link={"/staking/v3/stake/propykeys"}
+            >
+              <ActionButton
+                className={[classes.stakingButton, classes.stakingButtonSpacer].join(" ")}
+                buttonColor="secondary"
+                text={"Stake"}
+              />
+            </LinkWrapper>
+            {Number(moduleShares) > 0 &&
+              <LinkWrapper
+                link={"/staking/v3/unstake/propykeys"}
+              >
+                <ActionButton
+                  className={classes.stakingButton}
+                  buttonColor="secondary"
+                  text={"Unstake"}
+                />
+              </LinkWrapper>
+            }
           </div>
         </div>
       </Card>
