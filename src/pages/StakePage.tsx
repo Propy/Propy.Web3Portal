@@ -19,7 +19,7 @@ import StakeStatsContainer from '../containers/StakeStatsContainer';
 import StakePortalContainer from '../containers/StakePortalContainer';
 import StakeStatsV3Container from '../containers/StakeStatsV3Container';
 import StakePortalV3Container from '../containers/StakePortalV3Container';
-import KYCWalletGateContainer from '../containers/KYCWalletGateContainer';
+// import KYCWalletGateContainer from '../containers/KYCWalletGateContainer';
 
 // import LinkWrapper from '../components/LinkWrapper';
 
@@ -114,7 +114,7 @@ const StakePage = (props: IStakePage) => {
         }
         {Number(version) === 3 &&
         <>
-          <KYCWalletGateContainer>
+          {/* <KYCWalletGateContainer> */}
             <GenericPageContainer>
               <>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
@@ -141,7 +141,7 @@ const StakePage = (props: IStakePage) => {
                 }
               </>
             </GenericPageContainer>
-          </KYCWalletGateContainer>
+          {/* </KYCWalletGateContainer> */}
           </>
         }
       </>

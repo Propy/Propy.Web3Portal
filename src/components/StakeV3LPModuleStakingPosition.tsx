@@ -34,6 +34,7 @@ import {
   useApproxStakerRewardsPendingByModuleV3,
   useStakerToVirtualStakedPROByModuleV3,
   useStakerModuleUnlockTime,
+  useStakerModuleLockedAtTime,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -140,6 +141,16 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
   );
 
   const { 
+    data: moduleLockedAtTime,
+    // isLoading: isLoadingModuleUnlockTime,
+  } = useStakerModuleLockedAtTime(
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    address,
+    chain ? chain.id : undefined,
+    STAKING_V3_LP_MODULE_ID,
+  );
+
+  const { 
     data: moduleShares,
     isLoading: isLoadingStakerShares,
   } = useStakerSharesByModuleV3(
@@ -176,6 +187,8 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
       setStakeShare(percent.toNumber());
     }
   }, [totalShares, moduleShares, isLoadingStakerShares]);
+
+  const lockupProgress = ((Math.floor(new Date().getTime() / 1000) - Number(moduleLockedAtTime)) * 100) / (Number(moduleUnlockTime) - Number(moduleLockedAtTime));
 
   return (
     <>
@@ -232,6 +245,15 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
                     </Tooltip>
                   </span>
                 </Typography>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <span>Vesting Progress:</span>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    {priceFormat(Number(moduleShares) > 0 ? 100 : 0, 2, "%", false)}
+                    <Tooltip placement="top" title={`Once vesting progress reaches 100%, you may claim any allocated rewards, provided you have an active stake!`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
               </>
             }
             {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
@@ -241,6 +263,15 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
                   <span className='flex-center' style={{marginLeft: '16px'}}>
                     {countdownToTimestamp(Number(moduleUnlockTime), "")}
                     <Tooltip placement="top" title={`Once this lockup period is over, you will be able to claim any allocated reward!`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <span>Vesting Progress:</span>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    {priceFormat(lockupProgress, 2, "%", false)}
+                    <Tooltip placement="top" title={`Once vesting progress reaches 100%, you may claim any allocated rewards! Unstaking before your vesting progress is at 100% will forfeit any rewards which you may have been granted via this staking position.`}>
                       <HelpIcon className={'tooltip-helper-icon'} />
                     </Tooltip>
                   </span>
