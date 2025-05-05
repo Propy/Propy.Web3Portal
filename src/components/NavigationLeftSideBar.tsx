@@ -83,7 +83,7 @@ const navigationMenu : IMenuEntry[] = [
     children: [
       {
         text: 'V3',
-        path: '/stake/v3',
+        path: '/staking/v3',
         icon: <V3Icon />,
         new: true,
       },

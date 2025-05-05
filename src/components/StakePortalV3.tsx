@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 
+import { useParams, useNavigate } from 'react-router-dom';
+
 import BigNumber from 'bignumber.js';
 
 import { Theme } from '@mui/material/styles';
@@ -187,7 +189,22 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
     version,
   } = props;
 
+  let {
+    module,
+  } = useParams();
+
+  const navigate = useNavigate();
+
   const [selectedStakingModule, setSelectedStakingModule] = useState<false | "pro" | "lp" | "propykeys">(false);
+
+  useEffect(() => {
+    if(module && (["pro", "lp", "propykeys"].indexOf(module) > -1)) {
+      //@ts-ignore
+      setSelectedStakingModule(module);
+    } else {
+      setSelectedStakingModule(false);
+    }
+  }, [module])
 
   const classes = useStyles();
 
@@ -256,7 +273,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  setSelectedStakingModule("lp")
+                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/lp`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
@@ -286,7 +303,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  setSelectedStakingModule("pro")
+                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/pro`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
@@ -312,7 +329,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  setSelectedStakingModule("propykeys")
+                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/propykeys`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
