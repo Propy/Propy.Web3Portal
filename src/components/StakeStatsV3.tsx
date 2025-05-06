@@ -24,8 +24,8 @@ import {
 
 import {
   STAKING_V3_PRO_ADDRESS,
-  BASE_PROPYKEYS_STAKING_NFT,
-  BASE_OG_STAKING_NFT,
+  STAKING_V3_PROPYKEYS_ADDRESS,
+  STAKING_V3_PROPYOG_ADDRESS,
   STAKING_V3_CORE_CONTRACT_ADDRESS,
 } from '../utils/constants';
 
@@ -109,7 +109,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     isLoading: isLoadingStakedPropyKeysCount,
   } = useStakedTokenCount(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
-    BASE_PROPYKEYS_STAKING_NFT,
+    STAKING_V3_PROPYKEYS_ADDRESS,
     chain ? chain.id : undefined
   )
 
@@ -118,7 +118,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     isLoading: isLoadingStakedOGCount,
   } = useStakedTokenCount(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
-    BASE_OG_STAKING_NFT,
+    STAKING_V3_PROPYOG_ADDRESS,
     chain ? chain.id : undefined
   )
 
