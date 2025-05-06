@@ -11,6 +11,11 @@ import createStyles from '@mui/styles/createStyles';
 
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
+import ActionButton from './ActionButton';
+import LinkWrapper from './LinkWrapper';
 
 import HelpIcon from '@mui/icons-material/Help';
 import RaTier2Icon from '../assets/svg/ra_tier_2.svg';
@@ -80,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'start',
+      justifyContent: 'center',
     },
     moduleIconContainer: {
       height: 100,
@@ -110,6 +115,20 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     buttonTitle: {
       marginBottom: theme.spacing(1),
+    },
+    stakingButtonContainer: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      marginTop: theme.spacing(1),
+    },
+    stakingButtonSpacer: {
+      width: '100px',
+      marginRight: theme.spacing(2),
+    },
+    stakingButton: {
+      width: '100px',
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
     },
   }),
 );
@@ -195,7 +214,7 @@ const StakeV3PKModuleStakingPosition = (props: IStakeV3PKModuleStakingPosition) 
         style={{
           width: '100%',
           height: '100%',
-          opacity: Number(moduleShares) > 0 ? '1' : '0.5',
+          opacity: Number(moduleShares) > 0 ? '1' : '1',
         }}
         onClick={() => {
           // setSelectedStakingModule("lp")
@@ -215,6 +234,54 @@ const StakeV3PKModuleStakingPosition = (props: IStakeV3PKModuleStakingPosition) 
           </Typography>
           <div style={{maxWidth: 350, minWidth: '240px', marginLeft: 'auto', marginRight: 'auto'}}>
             {/* <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2"><strong>Current Position Details:</strong></Typography> */}
+            {(Number(moduleShares)) > 0 && (Number(moduleUnlockTime) * 1000 < new Date().getTime()) &&
+              <>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <Box sx={{ width: '100%'}}>
+                    <LinearProgress variant="buffer" value={100} valueBuffer={100} />
+                  </Box>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    {priceFormat(Number(moduleShares) > 0 ? 100 : 0, 2, "%", false)}
+                    <Tooltip placement="top" title={`Once lockup progress reaches 100%, you may claim any allocated rewards, provided you have an active stake!`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <span>Lockup Status:</span>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    Unlocked
+                    <Tooltip placement="top" title={`Since your lockup period is complete, you may unstake to claim any pending rewards once you are ready to do so`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
+              </>
+            }
+            {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
+              <>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <Box sx={{ width: '100%'}}>
+                    <LinearProgress variant="buffer" value={lockupProgress} valueBuffer={lockupProgress} />
+                  </Box>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    {priceFormat(lockupProgress, 3, "%", false)}
+                    <Tooltip placement="top" title={`Once lockup progress reaches 100%, you may claim any allocated rewards! Unstaking before your lockup progress is at 100% will forfeit any rewards which you may have been granted via this staking position.`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
+                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                  <span>Lockup Remaining:</span>
+                  <span className='flex-center' style={{marginLeft: '16px'}}>
+                    {countdownToTimestamp(Number(moduleUnlockTime), "")}
+                    <Tooltip placement="top" title={`Once this lockup period is over, you will be able to claim any allocated reward!`}>
+                      <HelpIcon className={'tooltip-helper-icon'} />
+                    </Tooltip>
+                  </span>
+                </Typography>
+              </>
+            }
             <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
               <span>Staking Power:</span>
               <span className='flex-center' style={{marginLeft: '16px'}}>
@@ -233,81 +300,63 @@ const StakeV3PKModuleStakingPosition = (props: IStakeV3PKModuleStakingPosition) 
                 </Tooltip>
               </span>
             </Typography>
-            {(Number(moduleUnlockTime) * 1000 < new Date().getTime()) &&
+            {Number(moduleShares) > 0 &&
               <>
+                {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
+                  <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                    <span>Allocated Reward:</span>
+                    <span className='flex-center' style={{marginLeft: '16px'}}>
+                      {priceFormat(Number(utils.formatUnits(Number(stakerRewardOnModule ? stakerRewardOnModule : 0), 8)), 2, 'PRO', false, true)} 
+                      <Tooltip placement="top" title={`An "allocated reward" refers to a PRO reward which will only become claimable once the position's lockup timer reaches maturity, so this value effectively shows how much PRO can be claimed against this staking position once the position's lockup timer ends.`}>
+                        <HelpIcon className={'tooltip-helper-icon'} />
+                      </Tooltip>
+                    </span>
+                  </Typography>
+                }
+                {(Number(moduleUnlockTime) * 1000 < new Date().getTime()) &&
+                  <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
+                    <span>Pending Reward:</span>
+                    <span className='flex-center' style={{marginLeft: '16px'}}>
+                      {priceFormat(Number(utils.formatUnits(Number(stakerRewardOnModule ? stakerRewardOnModule : 0), 8)), 2, 'PRO', false, true)} 
+                      <Tooltip placement="top" title={`Your position has reached maturity, therefore you may use your pSTAKE in order to claim your reward`}>
+                        <HelpIcon className={'tooltip-helper-icon'} />
+                      </Tooltip>
+                    </span>
+                  </Typography>
+                }
                 <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                  <span>Lockup Status:</span>
+                  <span>Position Value:</span>
                   <span className='flex-center' style={{marginLeft: '16px'}}>
-                    Unlocked
-                    <Tooltip placement="top" title={`Since your lockup period is complete, you may unstake to claim any pending rewards once you are ready to do so`}>
-                      <HelpIcon className={'tooltip-helper-icon'} />
-                    </Tooltip>
-                  </span>
-                </Typography>
-                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                  <span>Vesting Progress:</span>
-                  <span className='flex-center' style={{marginLeft: '16px'}}>
-                    {priceFormat(Number(moduleShares) > 0 ? 100 : 0, 2, "%", false)}
-                    <Tooltip placement="top" title={`Once vesting progress reaches 100%, you may claim any allocated rewards, provided you have an active stake!`}>
-                      <HelpIcon className={'tooltip-helper-icon'} />
-                    </Tooltip>
+                  {priceFormat(Number(utils.formatUnits(Number(virtualStakedPRO ? virtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}
+                  <Tooltip placement="top" title={`Represents an estimate of the PRO value of the PropyKeys staked in this module`}>
+                    <HelpIcon className={'tooltip-helper-icon'} />
+                  </Tooltip>
                   </span>
                 </Typography>
               </>
             }
-            {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
-              <>
-                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                  <span>Lockup Remaining:</span>
-                  <span className='flex-center' style={{marginLeft: '16px'}}>
-                    {countdownToTimestamp(Number(moduleUnlockTime), "")}
-                    <Tooltip placement="top" title={`Once this lockup period is over, you will be able to claim any allocated reward!`}>
-                      <HelpIcon className={'tooltip-helper-icon'} />
-                    </Tooltip>
-                  </span>
-                </Typography>
-                <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                  <span>Vesting Progress:</span>
-                  <span className='flex-center' style={{marginLeft: '16px'}}>
-                    {priceFormat(lockupProgress, 2, "%", false)}
-                    <Tooltip placement="top" title={`Once vesting progress reaches 100%, you may claim any allocated rewards! Unstaking before your vesting progress is at 100% will forfeit any rewards which you may have been granted via this staking position.`}>
-                      <HelpIcon className={'tooltip-helper-icon'} />
-                    </Tooltip>
-                  </span>
-                </Typography>
-              </>
+          </div>
+          <div className={classes.stakingButtonContainer}>
+            <LinkWrapper
+              link={"/staking/v3/stake/propykeys"}
+            >
+              <ActionButton
+                className={[classes.stakingButton, classes.stakingButtonSpacer].join(" ")}
+                buttonColor="secondary"
+                text={"Stake"}
+              />
+            </LinkWrapper>
+            {Number(moduleShares) > 0 &&
+              <LinkWrapper
+                link={"/staking/v3/unstake/propykeys"}
+              >
+                <ActionButton
+                  className={classes.stakingButton}
+                  buttonColor="secondary"
+                  text={"Unstake"}
+                />
+              </LinkWrapper>
             }
-            {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
-              <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                <span>Allocated Reward:</span>
-                <span className='flex-center' style={{marginLeft: '16px'}}>
-                  {priceFormat(Number(utils.formatUnits(Number(stakerRewardOnModule ? stakerRewardOnModule : 0), 8)), 2, 'PRO', false, true)} 
-                  <Tooltip placement="top" title={`An "allocated reward" refers to a PRO reward which will only become claimable once the position's lockup timer reaches maturity, so this value effectively shows how much PRO can be claimed against this staking position once the position's lockup timer ends.`}>
-                    <HelpIcon className={'tooltip-helper-icon'} />
-                  </Tooltip>
-                </span>
-              </Typography>
-            }
-            {(Number(moduleUnlockTime) * 1000 < new Date().getTime()) &&
-              <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                <span>Pending Reward:</span>
-                <span className='flex-center' style={{marginLeft: '16px'}}>
-                  {priceFormat(Number(utils.formatUnits(Number(stakerRewardOnModule ? stakerRewardOnModule : 0), 8)), 2, 'PRO', false, true)} 
-                  <Tooltip placement="top" title={`Your position has reached maturity, therefore you may use your pSTAKE in order to claim your reward`}>
-                    <HelpIcon className={'tooltip-helper-icon'} />
-                  </Tooltip>
-                </span>
-              </Typography>
-            }
-            <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-              <span>Position Value:</span>
-              <span className='flex-center' style={{marginLeft: '16px'}}>
-              {priceFormat(Number(utils.formatUnits(Number(virtualStakedPRO ? virtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}
-              <Tooltip placement="top" title={`Represents an estimate of the PRO value of the PropyKeys staked in this module`}>
-                <HelpIcon className={'tooltip-helper-icon'} />
-              </Tooltip>
-              </span>
-            </Typography>
           </div>
         </div>
       </Card>
