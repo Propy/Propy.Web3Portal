@@ -619,26 +619,6 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
   //   STAKING_V3_LP_MODULE_ID,
   // );
 
-  const {
-    data: stakerToModuleIdToCumulativeRewardsPerShareLP,
-    queryKey: stakerToModuleIdToCumulativeRewardsPerShareLPQueryKey,
-  } = useReadContract({
-    address: STAKING_V3_CORE_CONTRACT_ADDRESS,
-    abi: PRONFTStakingV3CoreABI,
-    functionName: 'stakerToModuleIdToCumulativeRewardsPerShare',
-    args: [address, STAKING_V3_LP_MODULE_ID],
-  });
-  
-  const {
-    data: cumulativeRewardsPerShare,
-    queryKey: cumulativeRewardsPerShareQueryKey,
-  } = useReadContract({
-    address: STAKING_V3_CORE_CONTRACT_ADDRESS,
-    abi: PRONFTStakingV3CoreABI,
-    functionName: 'cumulativeRewardsPerShare',
-    args: [],
-  });
-
   const { 
       data: stakerRewardOnModule,
       // isLoading: isLoadingStakerRewardOnModule,
@@ -655,8 +635,6 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
       stakingContractStakingPowerAllowanceQueryKey,
       dataUniswapLPsIsStakingContractApprovedQueryKey,
       balancePStakeQueryKey,
-      cumulativeRewardsPerShareQueryKey,
-      stakerToModuleIdToCumulativeRewardsPerShareLPQueryKey,
       sharesIssuedAgainstSelectionLPQueryKey,
     ];
 
@@ -671,8 +649,6 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
     stakingContractStakingPowerAllowanceQueryKey,
     dataUniswapLPsIsStakingContractApprovedQueryKey,
     balancePStakeQueryKey,
-    cumulativeRewardsPerShareQueryKey,
-    stakerToModuleIdToCumulativeRewardsPerShareLPQueryKey,
     sharesIssuedAgainstSelectionLPQueryKey,
   ]);
 
