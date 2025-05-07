@@ -76,7 +76,12 @@ import {
   GeoService,
 } from '../services/api';
 
-import { useStakerModuleUnlockTime, useUnifiedWriteContract, useApproxStakerRewardsPendingByModuleV3 } from '../hooks';
+import { 
+  useStakerModuleUnlockTime,
+  // useStakerModuleLockedAtTime,
+  useUnifiedWriteContract,
+  useApproxStakerRewardsPendingByModuleV3
+} from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -604,6 +609,16 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
     STAKING_V3_LP_MODULE_ID,
   );
 
+  // const { 
+  //   data: moduleLockedAtTime,
+  //   // isLoading: isLoadingModuleUnlockTime,
+  // } = useStakerModuleLockedAtTime(
+  //   STAKING_V3_CORE_CONTRACT_ADDRESS,
+  //   address,
+  //   chain ? chain.id : undefined,
+  //   STAKING_V3_LP_MODULE_ID,
+  // );
+
   const {
     data: stakerToModuleIdToCumulativeRewardsPerShareLP,
     queryKey: stakerToModuleIdToCumulativeRewardsPerShareLPQueryKey,
@@ -1129,7 +1144,7 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                                   {`sharesIssuedAgainstSelectionLP: ${sharesIssuedAgainstSelectionLP}`}
                                 </Typography> */}
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Estimated Reward: {priceFormat(Number(utils.formatUnits(Number((cumulativeRewardsPerShare?.toString() && stakerToModuleIdToCumulativeRewardsPerShareLP?.toString() && sharesIssuedAgainstSelectionLP?.toString()) ? (new BigNumber(cumulativeRewardsPerShare.toString()).minus(stakerToModuleIdToCumulativeRewardsPerShareLP.toString()).multipliedBy(sharesIssuedAgainstSelectionLP.toString()).toString()) : 0).toString(), 16)), 2, 'PRO', false, true)} 
+                                  Estimated Reward: {priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)}
                                   {/* <Tooltip placement="top" title={`Unstaking t.`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip> */}
@@ -1160,7 +1175,7 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                                             inputProps={{ 'aria-label': 'controlled' }}
                                           />
                                         } 
-                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule.toString(), 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
+                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
                                       />
                                     </FormGroup>
                                     <FloatingActionButton

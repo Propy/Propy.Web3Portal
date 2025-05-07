@@ -67,7 +67,11 @@ import {
   StakeService,
 } from '../services/api';
 
-import { useStakerModuleUnlockTime, useUnifiedWriteContract } from '../hooks';
+import { 
+  useStakerModuleUnlockTime,
+  // useStakerModuleLockedAtTime,
+  useUnifiedWriteContract
+} from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 interface IStakeEnter {
@@ -575,6 +579,16 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     chain ? chain.id : undefined,
     STAKING_V3_PK_MODULE_ID,
   );
+
+  // const { 
+  //   data: moduleLockedAtTime,
+  //   // isLoading: isLoadingModuleUnlockTime,
+  // } = useStakerModuleLockedAtTime(
+  //   STAKING_V3_CORE_CONTRACT_ADDRESS,
+  //   address,
+  //   chain ? chain.id : undefined,
+  //   STAKING_V3_PK_MODULE_ID,
+  // );
 
   useEffect(() => {
 
