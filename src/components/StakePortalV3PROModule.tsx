@@ -72,7 +72,12 @@ import {
   StakeService,
 } from '../services/api';
 
-import { useStakerModuleUnlockTime, useUnifiedWriteContract, useApproxStakerRewardsPendingByModuleV3 } from '../hooks';
+import { 
+  useStakerModuleUnlockTime,
+  // useStakerModuleLockedAtTime,
+  useUnifiedWriteContract,
+  useApproxStakerRewardsPendingByModuleV3
+} from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -467,6 +472,16 @@ const StakePortalV3 = (props: IStakeEnter) => {
     chain ? chain.id : undefined,
     STAKING_V3_ERC20_MODULE_ID,
   );
+
+  // const { 
+  //   data: moduleLockedAtTime,
+  //   // isLoading: isLoadingModuleUnlockTime,
+  // } = useStakerModuleLockedAtTime(
+  //   STAKING_V3_CORE_CONTRACT_ADDRESS,
+  //   address,
+  //   chain ? chain.id : undefined,
+  //   STAKING_V3_ERC20_MODULE_ID,
+  // );
 
   const {
     data: balanceDataPRO,
@@ -1084,7 +1099,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                   {`sharesIssuedAgainstSelectionLP: ${sharesIssuedAgainstSelectionLP}`}
                                 </Typography> */}
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Estimated Reward: {priceFormat(Number(utils.formatUnits(stakerRewardOnModule.toString(), 8)), 2, 'PRO', false, true)} 
+                                  Estimated Reward: {priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)} 
                                   {/* <Tooltip placement="top" title={`Unstaking t.`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip> */}
@@ -1115,7 +1130,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                             inputProps={{ 'aria-label': 'controlled' }}
                                           />
                                         } 
-                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule.toString(), 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
+                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
                                       />
                                     </FormGroup>
                                     <FloatingActionButton
