@@ -262,7 +262,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
             {(Number(moduleUnlockTime) * 1000 > new Date().getTime()) &&
               <>
                 <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-                  <Box sx={{ width: '100%' }}>
+                  <Box sx={{ width: '100%', textAlign: 'left'}}>
                     <LinearProgress variant="buffer" value={lockupProgress} valueBuffer={lockupProgress} />
                   </Box>
                   <span className='flex-center' style={{marginLeft: '16px'}}>
