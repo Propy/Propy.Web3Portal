@@ -19,7 +19,7 @@ import StakeStatsContainer from '../containers/StakeStatsContainer';
 import StakePortalContainer from '../containers/StakePortalContainer';
 import StakeStatsV3Container from '../containers/StakeStatsV3Container';
 import StakePortalV3Container from '../containers/StakePortalV3Container';
-// import KYCWalletGateContainer from '../containers/KYCWalletGateContainer';
+import KYCWalletGateContainer from '../containers/KYCWalletGateContainer';
 
 // import LinkWrapper from '../components/LinkWrapper';
 
@@ -113,35 +113,35 @@ const StakePage = (props: IStakePage) => {
           </GenericPageContainer>
         }
         {Number(version) === 3 &&
-        <>
-          {/* <KYCWalletGateContainer> */}
-            <GenericPageContainer>
-              <>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
-                  <Tabs 
-                    value={selectedTabIndex}
-                    onChange={handleChangeV3}
-                    aria-label="basic tabs example"
-                    variant="scrollable"
-                    scrollButtons="auto"
-                  >
-                    <Tab label="Stats" {...a11yProps(0)} />
-                    <Tab label="Stake" {...a11yProps(1)} />
-                    <Tab label="Unstake" {...a11yProps(2)} />
-                  </Tabs>
-                </Box>
-                {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
-                  <StakeStatsV3Container version={version} />
-                }
-                {(mode === "stake") &&
-                  <StakePortalV3Container mode="enter" version={version} />
-                }
-                {(mode === "unstake") &&
-                  <StakePortalV3Container mode="leave" version={version} />
-                }
-              </>
-            </GenericPageContainer>
-          {/* </KYCWalletGateContainer> */}
+          <>
+            <KYCWalletGateContainer>
+              <GenericPageContainer>
+                <>
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
+                    <Tabs 
+                      value={selectedTabIndex}
+                      onChange={handleChangeV3}
+                      aria-label="basic tabs example"
+                      variant="scrollable"
+                      scrollButtons="auto"
+                    >
+                      <Tab label="Stats" {...a11yProps(0)} />
+                      <Tab label="Stake" {...a11yProps(1)} />
+                      <Tab label="Unstake" {...a11yProps(2)} />
+                    </Tabs>
+                  </Box>
+                  {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
+                    <StakeStatsV3Container version={version} />
+                  }
+                  {(mode === "stake") &&
+                    <StakePortalV3Container mode="enter" version={version} />
+                  }
+                  {(mode === "unstake") &&
+                    <StakePortalV3Container mode="leave" version={version} />
+                  }
+                </>
+              </GenericPageContainer>
+            </KYCWalletGateContainer>
           </>
         }
       </>
