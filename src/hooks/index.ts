@@ -19,6 +19,7 @@ import useApproxStakerRewardsPending from './useApproxStakerRewardsPending';
 import useUnifiedWriteContract from './useUnifiedWriteContract';
 import useEthersSigner from './useEthersSigner';
 import useWalletCapabilities from './useWalletCapabilities';
+import useOpenSeasonEndTimeV3 from './useOpenSeasonEndTimeV3';
 
 export {
   useWindowSize,
@@ -42,4 +43,5 @@ export {
   useUnifiedWriteContract,
   useEthersSigner,
   useWalletCapabilities,
+  useOpenSeasonEndTimeV3,
 }
