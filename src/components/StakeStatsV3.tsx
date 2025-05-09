@@ -31,7 +31,15 @@ import {
 
 import StakeStatsV3ConnectedWalletContainer from '../containers/StakeStatsV3ConnectedWalletContainer';
 
-import { useTotalStakingShareSupply, useTotalStakedPRO, useStakedTokenCount, useTotalStakingBalancePRO } from '../hooks';
+import CountdownTimer from './CountdownTimer';
+
+import { 
+  useTotalStakingShareSupply,
+  useTotalStakedPRO,
+  useStakedTokenCount,
+  useTotalStakingBalancePRO,
+  useOpenSeasonEndTimeV3,
+} from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -71,6 +79,8 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     version,
   } = props;
 
+  let currentSeason = 1;
+
   const classes = useStyles();
 
   const { 
@@ -91,6 +101,14 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: totalStakedPRO,
     isLoading: isLoadingTotalStakedPRO,
   } = useTotalStakedPRO(
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    chain ? chain.id : undefined
+  )
+
+  const { 
+    data: openSeasonEndTime,
+    // isLoading: isLoadingOpenSeasonEndTime,
+  } = useOpenSeasonEndTimeV3(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     chain ? chain.id : undefined
   )
@@ -120,9 +138,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     STAKING_V3_PROPYOG_ADDRESS,
     chain ? chain.id : undefined
-  )
-
-  console.log({isLoadingStakerShares})
+  );
   
   return (
     <div className={classes.root}>
@@ -132,6 +148,44 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
           <StakeStatsConnectedWalletContainer totalShares={stakerShares} />
         </Grid>
       } */}
+      {openSeasonEndTime &&
+        <div className={classes.personalStatsSpacer}>
+          <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>
+            <Grid item xs={12} md={12} lg={12}>
+              <Card className={classes.card} style={{paddingTop: '24px', paddingBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                {(Number(openSeasonEndTime) > Math.floor(new Date().getTime() / 1000)) 
+                  ?
+                    <>
+                      <Typography variant='h4' style={{marginBottom: '16px'}}>
+                        🎉 Staking Season {currentSeason} Entry Open 🎉
+                      </Typography>
+                      <Typography variant='h6' style={{}}>
+                        Closing In:
+                      </Typography>
+                      <Typography variant='h6' style={{marginBottom: '16px', fontWeight: '400'}}>
+                        <CountdownTimer endTime={Number(openSeasonEndTime)} showFullTimer={true} />
+                      </Typography>
+                      <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
+                        <strong>Please Note:</strong><br/>
+                        Once the entry period closes, it will not be possible to enter the staking protocol until the next season begins. Each season lasts ~ 4 months.
+                      </Typography>
+                    </>
+                  :
+                    <>
+                      <Typography variant='h4' style={{marginBottom: '16px'}}>
+                        🔒 Staking Season {currentSeason} Entry Closed 🔒
+                      </Typography>
+                      <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
+                        <strong>Please Note:</strong><br/>
+                        Staking entry will open for 7 days once the next season starts
+                      </Typography>
+                    </>
+                }
+              </Card>
+            </Grid>
+          </Grid>
+        </div>
+      }
       {address &&
         <div className={classes.personalStatsSpacer}>
           <StakeStatsV3ConnectedWalletContainer version={version} totalShares={stakerShares} />

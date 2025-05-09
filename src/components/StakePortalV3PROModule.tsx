@@ -975,6 +975,12 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                   }
                                 </>
                               }
+                              <Typography style={{marginTop: (selectedLockupPeriodDays !== 0) ? '8px' : '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
+                                pSTAKE estimate: {priceFormat((new BigNumber(proStakeAmount).multipliedBy(1 + (lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3] / 100)).multipliedBy(100)).toString(), 2, "pSTAKE")}
+                                <Tooltip placement="top" title={`This pSTAKE estimate represents how much staking power you would receive from creating this staking position${selectedLockupPeriodDays > 3 ? `, your selected lockup period would cause you to receive ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}% more pSTAKE tokens for each unit of PRO staked (reward allocations effectively increased by ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}%), this results in a bonus of ~ ${priceFormat((new BigNumber(proStakeAmount).multipliedBy(1 + (lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3] / 100)).multipliedBy(100).minus(new BigNumber(proStakeAmount).multipliedBy(100))).toString(), 2, "pSTAKE")}` : '.'}`}>
+                                  <HelpIcon className={'tooltip-helper-icon'} />
+                                </Tooltip>
+                              </Typography>
                             </div>
                           }
                           <div className={classes.submitButtonContainer}>

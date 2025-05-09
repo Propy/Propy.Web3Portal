@@ -24,6 +24,9 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import BackIcon from '@mui/icons-material/KeyboardBackspace';
+import HelpIcon from '@mui/icons-material/Help';
+
+import Tooltip from '@mui/material/Tooltip';
 
 import { useAccount, useReadContract, useBlockNumber } from 'wagmi';
 
@@ -35,6 +38,7 @@ import FloatingActionButton from './FloatingActionButton';
 import {
   countdownToTimestamp,
   sleep,
+  priceFormat,
 } from '../utils';
 
 import {
@@ -319,6 +323,15 @@ const getActiveStep = (
   return 0;
 }
 
+const tokenTierToValuePRO = (lastSelectedTokenTier: number | undefined) => {
+  if (lastSelectedTokenTier === 2) {
+    return 10;
+  } else if (lastSelectedTokenTier === 3) {
+    return 200;
+  }
+  return 1;
+}
+
 const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
 
   const {
@@ -359,6 +372,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
   const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   // const [showRequireTenModal, setShowRequireTenModal] = useState(false);
+  const [lastSelectedPropyKeyTokenId, setLastSelectedPropyKeyTokenId] = useState(0);
   const [isSyncingStaking, setIsSyncingStaking] = useState(false);
 
   const { 
@@ -477,6 +491,11 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       }
       setSelectedTokenIds(newSelection);
     } else {
+      if(balanceRecord?.nft?.asset_address === STAKING_V3_PROPYKEYS_ADDRESS) {
+        setLastSelectedPropyKeyTokenId(Number(balanceRecord.nft.token_id));
+      } else {
+        setLastSelectedPropyKeyTokenId(0);
+      }
       let newSelection = [...useCurrentSelection, Number(balanceRecord.token_id)];
       if(newSelection?.length > 0) {
         setSelectedTokenAddress(balanceRecord.asset_address);
@@ -579,6 +598,22 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     chain ? chain.id : undefined,
     STAKING_V3_PK_MODULE_ID,
   );
+
+  const { 
+    data: lastSelectedTokenTier,
+    queryKey: lastSelectedTokenTierQueryKey
+  } = useReadContract({
+    address: STAKING_V3_PROPYKEYS_ADDRESS,
+    abi: PropyNFTABI,
+    functionName: 'tokenTier',
+    args: [lastSelectedPropyKeyTokenId],
+  })
+
+  useEffect(() => {
+    if(Number(lastSelectedPropyKeyTokenId) > 0) {
+      queryClient.invalidateQueries({ queryKey: lastSelectedTokenTierQueryKey })
+    }
+  }, [blockNumber, queryClient, lastSelectedPropyKeyTokenId, lastSelectedTokenTierQueryKey]);
 
   // const { 
   //   data: moduleLockedAtTime,
@@ -963,6 +998,12 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                               </Stepper>
                             </div>
                           </Box>
+                          <Typography style={{marginTop: '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
+                            pSTAKE estimate: {priceFormat((selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? new BigNumber(selectedTokenIds.length).multipliedBy(tokenTierToValuePRO(Number(lastSelectedTokenTier ? lastSelectedTokenTier : 0))).multipliedBy(100) : new BigNumber(selectedTokenIds.length).multipliedBy(5).multipliedBy(100)).toString(), 2, "pSTAKE")}
+                            <Tooltip placement="top" title={`This pSTAKE estimate represents how much staking power you would receive from creating this staking position.`}>
+                              <HelpIcon className={'tooltip-helper-icon'} />
+                            </Tooltip>
+                          </Typography>
                           <div className={classes.submitButtonContainer}>
                             {
                               (
