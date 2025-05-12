@@ -8,6 +8,8 @@ import { animated, useSpring } from '@react-spring/web';
 
 import BigNumber from 'bignumber.js';
 
+import { utils } from 'ethers';
+
 import { toast } from 'sonner';
 
 import { Theme } from '@mui/material/styles';
@@ -74,7 +76,8 @@ import {
 import { 
   useStakerModuleUnlockTime,
   // useStakerModuleLockedAtTime,
-  useUnifiedWriteContract
+  useUnifiedWriteContract,
+  usePropyKeyPROValueV3,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -323,15 +326,6 @@ const getActiveStep = (
   return 0;
 }
 
-const tokenTierToValuePRO = (lastSelectedTokenTier: number | undefined) => {
-  if (lastSelectedTokenTier === 2) {
-    return 10;
-  } else if (lastSelectedTokenTier === 3) {
-    return 200;
-  }
-  return 1;
-}
-
 const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
 
   const {
@@ -372,7 +366,6 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
   const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   // const [showRequireTenModal, setShowRequireTenModal] = useState(false);
-  const [lastSelectedPropyKeyTokenId, setLastSelectedPropyKeyTokenId] = useState(0);
   const [isSyncingStaking, setIsSyncingStaking] = useState(false);
 
   const { 
@@ -491,11 +484,6 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       }
       setSelectedTokenIds(newSelection);
     } else {
-      if(balanceRecord?.nft?.asset_address === STAKING_V3_PROPYKEYS_ADDRESS) {
-        setLastSelectedPropyKeyTokenId(Number(balanceRecord.nft.token_id));
-      } else {
-        setLastSelectedPropyKeyTokenId(0);
-      }
       let newSelection = [...useCurrentSelection, Number(balanceRecord.token_id)];
       if(newSelection?.length > 0) {
         setSelectedTokenAddress(balanceRecord.asset_address);
@@ -600,20 +588,14 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
   );
 
   const { 
-    data: lastSelectedTokenTier,
-    queryKey: lastSelectedTokenTierQueryKey
-  } = useReadContract({
-    address: STAKING_V3_PROPYKEYS_ADDRESS,
-    abi: PropyNFTABI,
-    functionName: 'tokenTier',
-    args: [lastSelectedPropyKeyTokenId],
-  })
-
-  useEffect(() => {
-    if(Number(lastSelectedPropyKeyTokenId) > 0) {
-      queryClient.invalidateQueries({ queryKey: lastSelectedTokenTierQueryKey })
-    }
-  }, [blockNumber, queryClient, lastSelectedPropyKeyTokenId, lastSelectedTokenTierQueryKey]);
+    data: proValueOfSelection,
+    isLoading: isLoadingProValueOfSelection,
+  } = usePropyKeyPROValueV3(
+    STAKING_V3_CONTRACT_ADDRESS,
+    selectedTokenAddress ? selectedTokenAddress : "",
+    selectedTokenIds,
+    chain ? chain.id : undefined,
+  )
 
   // const { 
   //   data: moduleLockedAtTime,
@@ -999,7 +981,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                             </div>
                           </Box>
                           <Typography style={{marginTop: '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
-                            pSTAKE estimate: {priceFormat((selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? new BigNumber(selectedTokenIds.length).multipliedBy(tokenTierToValuePRO(Number(lastSelectedTokenTier ? lastSelectedTokenTier : 0))).multipliedBy(100) : new BigNumber(selectedTokenIds.length).multipliedBy(5).multipliedBy(100)).toString(), 2, "pSTAKE")}
+                            pSTAKE estimate: {(isLoadingProValueOfSelection || !proValueOfSelection) ? "Loading..." : priceFormat((utils.formatUnits(new BigNumber(proValueOfSelection.toString()).multipliedBy(100).toString(), 8)).toString(), 2, "pSTAKE")}
                             <Tooltip placement="top" title={`This pSTAKE estimate represents how much staking power you would receive from creating this staking position.`}>
                               <HelpIcon className={'tooltip-helper-icon'} />
                             </Tooltip>

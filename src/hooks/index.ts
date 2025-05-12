@@ -20,6 +20,7 @@ import useUnifiedWriteContract from './useUnifiedWriteContract';
 import useEthersSigner from './useEthersSigner';
 import useWalletCapabilities from './useWalletCapabilities';
 import useOpenSeasonEndTimeV3 from './useOpenSeasonEndTimeV3';
+import usePropyKeyPROValueV3 from './usePropyKeyPROValueV3';
 
 export {
   useWindowSize,
@@ -44,4 +45,5 @@ export {
   useEthersSigner,
   useWalletCapabilities,
   useOpenSeasonEndTimeV3,
+  usePropyKeyPROValueV3,
 }
