@@ -78,6 +78,7 @@ import {
   // useStakerModuleLockedAtTime,
   useUnifiedWriteContract,
   usePropyKeyPROValueV3,
+  useOpenSeasonEndTimeV3,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -268,6 +269,7 @@ const getStakeButtonText = (
   isAwaitingWalletInteraction: boolean,
   isAwaitingStakeTx: boolean,
   isSyncingStaking: boolean,
+  openSeasonEndTime: number,
 ) => {
   if(isAwaitingWalletInteraction) {
     return "Please Check Wallet...";
@@ -279,6 +281,10 @@ const getStakeButtonText = (
 
   if(isSyncingStaking) {
     return "Syncing...";
+  }
+
+  if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
+    return "Staking Entry Closed"
   }
   
   return "Stake";
@@ -595,6 +601,14 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     selectedTokenAddress ? selectedTokenAddress : "",
     selectedTokenIds,
     chain ? chain.id : undefined,
+  )
+
+  const { 
+    data: openSeasonEndTime,
+    // isLoading: isLoadingOpenSeasonEndTime,
+  } = useOpenSeasonEndTimeV3(
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    chain ? chain.id : undefined
   )
 
   // const { 
@@ -1040,10 +1054,10 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                                 <FloatingActionButton
                                   className={classes.submitButton}
                                   buttonColor="secondary"
-                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking}
+                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000))}
                                   onClick={() => {executePerformStakeTx();setLastErrorMessage(false)}}
                                   showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking}
-                                  text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformStakeTx, isSyncingStaking)}
+                                  text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformStakeTx, isSyncingStaking, Number(openSeasonEndTime ? openSeasonEndTime : 0))}
                                 />
                                 <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked. <strong>The only way to unstake during an active lockup period would be to forfeit all rewards associated with your stake</strong>.</Typography>
                               </div>

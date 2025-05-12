@@ -76,7 +76,8 @@ import {
   useStakerModuleUnlockTime,
   // useStakerModuleLockedAtTime,
   useUnifiedWriteContract,
-  useApproxStakerRewardsPendingByModuleV3
+  useApproxStakerRewardsPendingByModuleV3,
+  useOpenSeasonEndTimeV3,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -299,6 +300,7 @@ const getStakeButtonTextPRO = (
   isAwaitingStakeTx: boolean,
   isSyncingStaking: boolean,
   selectedLockupPeriodDays: number,
+  openSeasonEndTime: number,
 ) => {
   if(isAwaitingWalletInteraction) {
     return "Please Check Wallet...";
@@ -314,6 +316,10 @@ const getStakeButtonTextPRO = (
 
   if(!selectedLockupPeriodDays) {
     return "Select Lockup Period"
+  }
+
+  if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
+    return "Staking Entry Closed"
   }
   
   return "Stake";
@@ -519,6 +525,14 @@ const StakePortalV3 = (props: IStakeEnter) => {
     STAKING_V3_ERC20_MODULE_ID,
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     address,
+    chain ? chain.id : undefined
+  )
+
+  const { 
+    data: openSeasonEndTime,
+    // isLoading: isLoadingOpenSeasonEndTime,
+  } = useOpenSeasonEndTimeV3(
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
     chain ? chain.id : undefined
   )
 
@@ -1049,10 +1063,10 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                 <FloatingActionButton
                                   className={classes.submitButton}
                                   buttonColor="secondary"
-                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking || !selectedLockupPeriodDays}
+                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking || !selectedLockupPeriodDays || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000))}
                                   onClick={() => {executePerformStakePROTx();setLastErrorMessage(false)}}
                                   showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking}
-                                  text={getStakeButtonTextPRO(isAwaitingWalletInteraction, isAwaitingPerformStakePROTx, isSyncingStaking, selectedLockupPeriodDays)}
+                                  text={getStakeButtonTextPRO(isAwaitingWalletInteraction, isAwaitingPerformStakePROTx, isSyncingStaking, selectedLockupPeriodDays, Number(openSeasonEndTime ? openSeasonEndTime : 0))}
                                 />
                               </div>
                             }
