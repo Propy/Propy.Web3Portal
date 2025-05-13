@@ -18,10 +18,16 @@ import Card from '@mui/material/Card';
 import VerificationIcon from '@mui/icons-material/VerifiedUser';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { toast } from 'sonner';
+
+import { ExternalLink } from './ExternalLink';
 
 import {
   GLOBAL_PAGE_HEIGHT,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import { PropsFromRedux } from '../containers/KYCWalletGateContainer';
@@ -77,7 +83,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: theme.spacing(1),
     },
     statusText: {
-      marginBottom: theme.spacing(2),
+      marginBottom: theme.spacing(1.5),
     },
     formCard: {
       padding: theme.spacing(3),
@@ -104,10 +110,17 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface IKYCWalletGate {
   children: React.ReactElement,
+  termsLink?: string,
+  privacyPolicyLink?: string,
 }
 
 export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
-  const { children } = props;
+  const { 
+    children,
+    termsLink,
+    privacyPolicyLink,
+  } = props;
+
   const classes = useStyles();
   
   // References to store interval IDs
@@ -128,6 +141,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   const [screeningStatus, setScreeningStatus] = useState<CognitoStatus | null>(null);
   const [messageToSign, setMessageToSign] = useState<string | null>(null);
   const [authHeader, setAuthHeader] = useState<string | null>(null);
+  const [acceptsTerms, setAcceptsTerms] = useState(false);
   // const [showPlaid, setShowPlaid] = useState(false);
   
   // Set message to sign when address changes
@@ -770,24 +784,48 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
         KYC Verification Required
       </Typography>
       
-      <Typography style={{textAlign: 'center'}} variant="h6" className={[classes.statusText, "secondary-text-light-mode", "light-text"].join(" ")}>
+      <Typography style={{textAlign: 'center', marginBottom: termsLink ? '12px' : '16px'}} variant="h6" className={["secondary-text-light-mode", "light-text"].join(" ")}>
         {renderStatusMessage()}
       </Typography>
       
       {/* Step 1: Sign Message (only show if no auth header yet) */}
       {!authHeader && (
-        <Button 
-          variant="contained"
-          sx={{
-            color: 'white',
-          }}
-          color="primary"
-          disabled={!address || isSignatureLoading}
-          onClick={handleSignMessage}
-        >
-          Sign Verification Message
-          {isSignatureLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-        </Button>
+        <>
+          {termsLink &&
+            <FormGroup>
+              <FormControlLabel
+                style={{marginBottom: '16px'}}
+                componentsProps={{ typography: { variant: 'body2' } }}
+                control={
+                  <Checkbox
+                    checked={acceptsTerms}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setAcceptsTerms(event.target.checked);
+                    }}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                } 
+                label={
+                  <>
+                    I agree to the <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={termsLink}>terms of service</ExternalLink>{privacyPolicyLink ? ` and ` : ``}{privacyPolicyLink && <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={privacyPolicyLink}>privacy policy</ExternalLink>}<span style={{color: 'red'}}> *</span>
+                  </>
+                }
+              />
+            </FormGroup>
+          }
+          <Button 
+            variant="contained"
+            sx={{
+              color: 'white',
+            }}
+            color="primary"
+            disabled={!address || isSignatureLoading || !acceptsTerms}
+            onClick={handleSignMessage}
+          >
+            Sign Verification Message
+            {isSignatureLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+          </Button>
+        </>
       )}
 
       {/* {`verificationStatus: ${verificationStatus}, ${verificationStatus === ApprovalStatus.PropyIsVerifying}, authHeader: ${authHeader}`} */}

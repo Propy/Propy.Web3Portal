@@ -826,7 +826,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                           }}
                         />
                       </Grid>
-                      {mode === "enter" &&
+                      {mode === "enter" && (Number(balanceDataAltPRO) > 0) &&
                         <Grid item xs={4} sm={4} md={6} lg={5} xl={6}>
                           <SingleTokenCard
                             selected={(selectedTokenAddress === STAKING_V3_ALT_PRO_ADDRESS)}

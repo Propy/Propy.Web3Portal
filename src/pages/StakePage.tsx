@@ -114,7 +114,10 @@ const StakePage = (props: IStakePage) => {
         }
         {Number(version) === 3 &&
           <>
-            <KYCWalletGateContainer>
+            <KYCWalletGateContainer
+              privacyPolicyLink='https://propy.com/browse/privacy-policy/'
+              termsLink='https://propy.com/browse/privacy-policy/'
+            >
               <GenericPageContainer>
                 <>
                   <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
