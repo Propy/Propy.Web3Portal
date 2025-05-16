@@ -79,6 +79,8 @@ import {
   useUnifiedWriteContract,
   usePropyKeyPROValueV3,
   useOpenSeasonEndTimeV3,
+  useApproxStakerRewardsPendingByModuleV3,
+  useCountdownSeconds,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -117,7 +119,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZone: {
       position: 'fixed',
-      maxWidth: '400px',
+      maxWidth: '450px',
       width: 'calc(100% - 16px)',
       transform: 'translateY(0%)',
       textAlign: 'center',
@@ -125,6 +127,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
+      maxHeight: '90vh',
+      overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
     submitButtonContainer: {
@@ -225,6 +229,79 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+interface IRealTimeCountdownZone {
+  mode: 'countdowns' | 'tips',
+  classes: any
+  stakerRewardOnModule: any
+  stakerUnlockTime: number
+  openSeasonEndTime: number
+}
+
+const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
+
+  const {
+    mode,
+    classes,
+    stakerRewardOnModule,
+    stakerUnlockTime,
+    openSeasonEndTime,
+  } = props;
+
+  const { 
+    secondsRemaining: secondsRemainingUnlockTime,
+    formattedCountdown: formattedCountdownUnlockTime,
+  } = useCountdownSeconds(stakerUnlockTime);
+
+  const {
+    secondsRemaining: secondsRemainingOpenSeason,
+    formattedCountdown: formattedCountdownRemainingOpenSeason, 
+  } = useCountdownSeconds(openSeasonEndTime);
+
+  return (
+    <>
+      {mode === 'tips' &&
+        <>
+          {(secondsRemainingOpenSeason > 0)
+            ?
+              <>
+                {(Number(stakerRewardOnModule ? stakerRewardOnModule : 0) > 0) 
+                ? 
+                  <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with unclaimed rewards on this staking module, if you would like to stake more PropyKeys, please first claim your current rewards by unstaking, or alternatively stake the additional PropyKeys from a different wallet address.</Typography>
+                :
+                  <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked.</Typography>
+                }
+              </>
+            : 
+              <>
+                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for staking has ended, the next staking entry period will begin at the start of the next season.</Typography>
+              </>
+          }
+        </>
+      }
+      {mode === 'countdowns' &&
+        <>
+          {(secondsRemainingUnlockTime > 0) &&
+            <Typography style={{marginTop: '8px'}} className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
+              Active Lockup Remaining: {formattedCountdownUnlockTime} 
+              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PropyKeys staking module.`}>
+                <HelpIcon className={'tooltip-helper-icon'} />
+              </Tooltip>
+            </Typography>
+          }
+          {(secondsRemainingOpenSeason > 0) &&
+            <Typography style={{marginTop: (secondsRemainingUnlockTime <= 0) ? '8px' : '0px'}} className={['flex-center'].join(" ")} variant="subtitle2">
+              Entry Time Remaining: {formattedCountdownRemainingOpenSeason} 
+              <Tooltip placement="top" title={`This is how much time is left to create a staking position in the latest season`}>
+                <HelpIcon className={'tooltip-helper-icon'} />
+              </Tooltip>
+            </Typography>
+          }
+        </>
+      }
+    </>
+  )
+}
+
 interface INftAssets {
   [key: string]: IAssetRecord
 }
@@ -270,6 +347,7 @@ const getStakeButtonText = (
   isAwaitingStakeTx: boolean,
   isSyncingStaking: boolean,
   openSeasonEndTime: number,
+  stakerRewardOnModule: number
 ) => {
   if(isAwaitingWalletInteraction) {
     return "Please Check Wallet...";
@@ -285,6 +363,10 @@ const getStakeButtonText = (
 
   if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
     return "Staking Entry Closed"
+  }
+
+  if(stakerRewardOnModule > 0) {
+    return "Pending Unclaimed Rewards"
   }
   
   return "Stake";
@@ -611,6 +693,16 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     chain ? chain.id : undefined
   )
 
+  const { 
+    data: stakerRewardOnModule,
+    // isLoading: isLoadingStakerRewardOnModule,
+  } = useApproxStakerRewardsPendingByModuleV3(
+    STAKING_V3_PK_MODULE_ID,
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    address,
+    chain ? chain.id : undefined
+  )
+
   // const { 
   //   data: moduleLockedAtTime,
   //   // isLoading: isLoadingModuleUnlockTime,
@@ -732,7 +824,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
         errorMessage = `Only full range position NFTs are eligible (-887200 to 887200)`
       } else if (error === 'StakerNotApproved') {
         errorMessage = `Your wallet address has not been approved to enter the staking protocol, please ensure you have completed the KYC process.`
-      } else if (error === 'UNSTAKE_ALL_BEFORE_ADDING_MORE') {
+      } else if (error === 'UnstakeAllBeforeAddingMore') {
         errorMessage = `You have pending rewards, please unstake all staked tokens to claim all pending rewards before staking more tokens.`
       } else {
         errorMessage = error?.details ? error.details : `Unable to complete transaction, please try again or contact support (error: ${error}).`
@@ -1000,6 +1092,13 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                               <HelpIcon className={'tooltip-helper-icon'} />
                             </Tooltip>
                           </Typography>
+                          <RealTimeCountdownZone
+                            mode="countdowns"
+                            classes={classes}
+                            stakerRewardOnModule={stakerRewardOnModule}
+                            stakerUnlockTime={stakerUnlockTimePropyKeys}
+                            openSeasonEndTime={openSeasonEndTime}
+                          />
                           <div className={classes.submitButtonContainer}>
                             {
                               (
@@ -1051,15 +1150,21 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                               <div style={{maxWidth: '100%', marginLeft: 'auto', marginRight: 'auto'}}>
                                 {/* <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">PRO Balance: {priceFormat(Number(utils.formatUnits(Number(balanceDataPRO?.value ? balanceDataPRO?.value : 0), 8)), 2, 'PRO', false, true)}</Typography>
                                 <Typography className={classes.buttonTitle} variant="subtitle2">{priceFormat(Number(utils.formatUnits(Number(minimumRequiredPROAllowance ? minimumRequiredPROAllowance : 0), 8)), 2, 'PRO', false, true)} Required</Typography> */}
+                                <RealTimeCountdownZone
+                                  mode="tips"
+                                  classes={classes}
+                                  stakerRewardOnModule={stakerRewardOnModule}
+                                  stakerUnlockTime={stakerUnlockTimePropyKeys}
+                                  openSeasonEndTime={openSeasonEndTime}
+                                />
                                 <FloatingActionButton
                                   className={classes.submitButton}
                                   buttonColor="secondary"
-                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000))}
+                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000)) || (Number(stakerRewardOnModule) > 0)}
                                   onClick={() => {executePerformStakeTx();setLastErrorMessage(false)}}
                                   showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPerformStakeTx || isSyncingStaking}
-                                  text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformStakeTx, isSyncingStaking, Number(openSeasonEndTime ? openSeasonEndTime : 0))}
+                                  text={getStakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformStakeTx, isSyncingStaking, Number(openSeasonEndTime ? openSeasonEndTime : 0), Number(stakerRewardOnModule ? stakerRewardOnModule : 0))}
                                 />
-                                <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked. <strong>The only way to unstake during an active lockup period would be to forfeit all rewards associated with your stake</strong>.</Typography>
                               </div>
                             }
                           </div>

@@ -78,6 +78,8 @@ import {
   useUnifiedWriteContract,
   useApproxStakerRewardsPendingByModuleV3,
   useOpenSeasonEndTimeV3,
+  useIsLockupBoostedV3,
+  useCountdownSeconds,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -125,7 +127,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZone: {
       position: 'fixed',
-      maxWidth: '400px',
+      maxWidth: '450px',
       width: 'calc(100% - 16px)',
       transform: 'translateY(0%)',
       textAlign: 'center',
@@ -133,6 +135,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
+      maxHeight: '90vh',
+      overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
     submitButtonContainer: {
@@ -301,6 +305,8 @@ const getStakeButtonTextPRO = (
   isSyncingStaking: boolean,
   selectedLockupPeriodDays: number,
   openSeasonEndTime: number,
+  stakerRewardOnModule: number,
+  isLockupBoosted: boolean,
 ) => {
   if(isAwaitingWalletInteraction) {
     return "Please Check Wallet...";
@@ -320,6 +326,14 @@ const getStakeButtonTextPRO = (
 
   if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
     return "Staking Entry Closed"
+  }
+
+  if(stakerRewardOnModule > 0) {
+    return "Pending Unclaimed Rewards"
+  }
+
+  if(isLockupBoosted) {
+    return "Boosted Lockup Detected"
   }
   
   return "Stake";
@@ -349,6 +363,90 @@ const getActiveStep = (
     return 0;
   }
   return 0;
+}
+
+interface IRealTimeCountdownZone {
+  mode: 'countdowns' | 'tips',
+  classes: any
+  selectedLockupPeriodDays: 0|3|60|90|180|365
+  stakerRewardOnModule: any
+  isLockupBoosted: boolean
+  stakerUnlockTimePRO: number
+  openSeasonEndTime: number
+}
+
+const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
+
+  const {
+    mode,
+    classes,
+    selectedLockupPeriodDays,
+    stakerRewardOnModule,
+    isLockupBoosted,
+    stakerUnlockTimePRO,
+    openSeasonEndTime,
+  } = props;
+
+  const { 
+    secondsRemaining: secondsRemainingUnlockTime,
+    formattedCountdown: formattedCountdownUnlockTime,
+  } = useCountdownSeconds(stakerUnlockTimePRO);
+
+  const {
+    secondsRemaining: secondsRemainingOpenSeason,
+    formattedCountdown: formattedCountdownRemainingOpenSeason, 
+  } = useCountdownSeconds(openSeasonEndTime);
+
+  return (
+    <>
+      {mode === 'tips' &&
+        <>
+          {(secondsRemainingOpenSeason > 0)
+            ?
+              <>
+                {(Number(stakerRewardOnModule ? stakerRewardOnModule : 0) > 0) 
+                  ?
+                    <>
+                      <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with unclaimed rewards on this staking module. {secondsRemainingUnlockTime > 0 ? `Since you are in an active lockup period, it is recommended to use an ` : `Since your lockup period has ended, you can either unstake to claim your unclaimed rewards (at which point you can restake with a new amount of PRO) or use an `} <strong>alternative wallet address</strong> to stake additional PRO.</Typography>
+                    </>
+                  :
+                    <>
+                      {isLockupBoosted && 
+                        <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Boosted position detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with an actively boosted position. Please use an <strong>alternative wallet address</strong> to stake additional PRO.</Typography>
+                      }
+                    </>
+                }
+                {((selectedLockupPeriodDays > 0 && Number(stakerRewardOnModule ? stakerRewardOnModule : 0) === 0) && !isLockupBoosted) && <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Lockup periods can't be modified once created.</strong> Staking now would create a <strong>{selectedLockupPeriodDays}-day lockup</strong> period on all staked PRO tokens, including PRO that is already staked on this staking module. You can remove your staked PRO at any time, but <strong>if you unstake during your lockup period, you will forfeit all rewards associated with your stake.</strong>.</Typography>}
+              </>
+            : 
+              <>
+                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for staking has ended, the next staking entry period will begin at the start of the next season.</Typography>
+              </>
+          }
+        </>
+      }
+      {mode === 'countdowns' &&
+        <>
+          {(secondsRemainingUnlockTime > 0) &&
+            <Typography style={{marginTop: '8px'}} className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
+              Active Lockup Remaining: {formattedCountdownUnlockTime} 
+              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PRO staking module.`}>
+                <HelpIcon className={'tooltip-helper-icon'} />
+              </Tooltip>
+            </Typography>
+          }
+          {(secondsRemainingOpenSeason > 0) &&
+            <Typography style={{marginTop: (secondsRemainingUnlockTime <= 0) ? '8px' : '0px'}} className={['flex-center'].join(" ")} variant="subtitle2">
+              Entry Time Remaining: {formattedCountdownRemainingOpenSeason} 
+              <Tooltip placement="top" title={`This is how much time is left to create a staking position in the latest season`}>
+                <HelpIcon className={'tooltip-helper-icon'} />
+              </Tooltip>
+            </Typography>
+          }
+        </>
+      }
+    </>
+  )
 }
 
 const StakePortalV3 = (props: IStakeEnter) => {
@@ -522,6 +620,16 @@ const StakePortalV3 = (props: IStakeEnter) => {
     data: stakerRewardOnModule,
     // isLoading: isLoadingStakerRewardOnModule,
   } = useApproxStakerRewardsPendingByModuleV3(
+    STAKING_V3_ERC20_MODULE_ID,
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    address,
+    chain ? chain.id : undefined
+  )
+
+  const {
+    data: isLockupBoosted,
+    // isLoading: isLockupBoostedLoading,
+  } = useIsLockupBoostedV3(
     STAKING_V3_ERC20_MODULE_ID,
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     address,
@@ -995,6 +1103,15 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                   <HelpIcon className={'tooltip-helper-icon'} />
                                 </Tooltip>
                               </Typography>
+                              <RealTimeCountdownZone
+                                mode="countdowns"
+                                classes={classes}
+                                selectedLockupPeriodDays={selectedLockupPeriodDays}
+                                stakerRewardOnModule={stakerRewardOnModule}
+                                isLockupBoosted={isLockupBoosted}
+                                stakerUnlockTimePRO={stakerUnlockTimePRO}
+                                openSeasonEndTime={openSeasonEndTime}
+                              />
                             </div>
                           }
                           <div className={classes.submitButtonContainer}>
@@ -1046,27 +1163,22 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                 && activeStep === 2
                               ) &&
                               <div style={{maxWidth: '100%', marginLeft: 'auto', marginRight: 'auto'}}>
-                                {/* <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">LP Token Details:</Typography>
-                                <Typography className={[classes.buttonTitleSmallSpacing, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Full Range: {(lastSelectedUniswapTokenPositionDetails && (lastSelectedUniswapTokenPositionDetails[1] === 887200 && lastSelectedUniswapTokenPositionDetails[2] === -887200)) ? "Yes" : "No"}
-                                  <Tooltip placement="top" title={`Only full range positions are supported for staking`}>
-                                    <HelpIcon className={'tooltip-helper-icon'} />
-                                  </Tooltip>
-                                </Typography>
-                                <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Position Value: {priceFormat(Number(utils.formatUnits(Number(lastSelectedUniswapTokenPositionDetails ? lastSelectedUniswapTokenPositionDetails[5] : 0), 8)), 2, 'PRO', false, true)} 
-                                  <Tooltip placement="top" title={`(${priceFormat(Number(utils.formatUnits(lastSelectedUniswapTokenPositionDetails ? lastSelectedUniswapTokenPositionDetails[3] : 0, 8)), 2, 'PRO', false, true)} + ${priceFormat(Number(utils.formatUnits(lastSelectedUniswapTokenPositionDetails ? lastSelectedUniswapTokenPositionDetails[4] : 0, 18)), 2, 'ETH', false, true)})`}>
-                                    <HelpIcon className={'tooltip-helper-icon'} />
-                                  </Tooltip>
-                                </Typography> */}
-                                {selectedLockupPeriodDays > 0 && <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Lockup periods can not be modified once created.</strong> Staking now would create a <strong>{selectedLockupPeriodDays}-day lockup</strong> period on all staked PRO tokens, including PRO that is already staked on this staking module. You can remove your staked PRO at any time, but <strong>if you unstake during your lockup period, you will forfeit all rewards associated with your stake.</strong>.</Typography>}
+                                <RealTimeCountdownZone
+                                  mode="tips"
+                                  classes={classes}
+                                  selectedLockupPeriodDays={selectedLockupPeriodDays}
+                                  stakerRewardOnModule={stakerRewardOnModule}
+                                  isLockupBoosted={isLockupBoosted}
+                                  stakerUnlockTimePRO={stakerUnlockTimePRO}
+                                  openSeasonEndTime={openSeasonEndTime}
+                                />
                                 <FloatingActionButton
                                   className={classes.submitButton}
                                   buttonColor="secondary"
-                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking || !selectedLockupPeriodDays || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000))}
+                                  disabled={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking || !selectedLockupPeriodDays || (Number(openSeasonEndTime) < Math.floor(new Date().getTime() / 1000)) || (Number(stakerRewardOnModule) > 0) || isLockupBoosted}
                                   onClick={() => {executePerformStakePROTx();setLastErrorMessage(false)}}
                                   showLoadingIcon={isAwaitingWalletInteraction || isAwaitingPerformStakePROTx || isSyncingStaking}
-                                  text={getStakeButtonTextPRO(isAwaitingWalletInteraction, isAwaitingPerformStakePROTx, isSyncingStaking, selectedLockupPeriodDays, Number(openSeasonEndTime ? openSeasonEndTime : 0))}
+                                  text={getStakeButtonTextPRO(isAwaitingWalletInteraction, isAwaitingPerformStakePROTx, isSyncingStaking, selectedLockupPeriodDays, Number(openSeasonEndTime ? openSeasonEndTime : 0), Number(stakerRewardOnModule ? stakerRewardOnModule : 0), isLockupBoosted)}
                                 />
                               </div>
                             }
