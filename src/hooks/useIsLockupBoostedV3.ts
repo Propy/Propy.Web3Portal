@@ -3,21 +3,30 @@ import { useReadContract, useBlockNumber } from 'wagmi';
 
 import PRONFTStakingV3CoreABI from '../abi/PRONFTStakingV3CoreABI.json';
 
-function useOpenSeasonEndTimeV3(
+import {
+  STAKING_V3_PK_MODULE_ID,
+  STAKING_V3_ERC20_MODULE_ID,
+  STAKING_V3_LP_MODULE_ID,
+} from '../utils/constants';
+
+function useIsLockupBoosted(
+  moduleId: typeof STAKING_V3_PK_MODULE_ID | typeof STAKING_V3_ERC20_MODULE_ID | typeof STAKING_V3_LP_MODULE_ID,
   stakingContractAddress?: `0x${string}`,
+  stakerAddress?: `0x${string}`,
   chainId?: number
 ) {
 
   const { data: blockNumber } = useBlockNumber({ watch: true })
 
   const { 
-    data: openSeasonEndTime,
+    data: isLockupBoosted,
     isLoading,
     refetch,
   } = useReadContract({
     address: stakingContractAddress ? stakingContractAddress : undefined,
     abi: PRONFTStakingV3CoreABI,
-    functionName: 'openSeasonEndTime',
+    functionName: 'isLockupBoosted',
+    args: [stakerAddress, moduleId],
     chainId: chainId ? chainId : undefined,
     //watch: true,
   });
@@ -26,7 +35,7 @@ function useOpenSeasonEndTimeV3(
     refetch()
   }, [blockNumber, refetch])
 
-  return {data: openSeasonEndTime as number, isLoading};
+  return {data: isLockupBoosted as boolean, isLoading};
 }
 
-export default useOpenSeasonEndTimeV3;
+export default useIsLockupBoosted;
