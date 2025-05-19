@@ -118,6 +118,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: '350px',
       display: 'flex',
       justifyContent: 'space-evenly',
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
     buttonSubtitle: {
       marginTop: theme.spacing(1.5),
