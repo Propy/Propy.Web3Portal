@@ -116,7 +116,7 @@ const StakePage = (props: IStakePage) => {
           <>
             <KYCWalletGateContainer
               privacyPolicyLink='https://propy.com/browse/privacy-policy/'
-              termsLink='https://propy.com/browse/privacy-policy/'
+              termsLink='https://propy.com/browse/staking-terms/'
             >
               <GenericPageContainer>
                 <>
