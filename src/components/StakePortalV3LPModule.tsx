@@ -29,6 +29,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import BackIcon from '@mui/icons-material/KeyboardBackspace';
 import HelpIcon from '@mui/icons-material/Help';
+import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormGroup from '@mui/material/FormGroup';
@@ -186,6 +187,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: '350px',
       display: 'flex',
       justifyContent: 'space-evenly',
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
     buttonSubtitle: {
       marginTop: theme.spacing(1.5),
@@ -627,6 +630,12 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
     setLastErrorMessage(false);
   };
 
+  const handleModalClose = () => {
+    setSelectedTokenAddress(false);
+    setSelectedTokenIds([]);
+    setLastErrorMessage(false);
+  }
+
   const { 
     data: clientCountry,
     isLoading: isLoadingGeoLocation,
@@ -960,11 +969,17 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
     return (
       isAwaitingWalletInteraction || 
       isAwaitingPerformStakeLPTx || 
+      isAwaitingPerformUniswapLPSetApprovalForAllTx ||
+      isAwaitingPerformEarlyUnstakeLPTx ||
+      isAwaitingPerformUnstakeLPTx ||
       isSyncingStaking
     )
   }, [
     isAwaitingWalletInteraction, 
+    isAwaitingPerformUniswapLPSetApprovalForAllTx,
+    isAwaitingPerformEarlyUnstakeLPTx,
     isAwaitingPerformStakeLPTx,
+    isAwaitingPerformUnstakeLPTx,
     isSyncingStaking
   ])
 
@@ -1069,6 +1084,29 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                 </Grid>
                 <animated.div className={classes.floatingActionZone} style={actionZoneSpring}>
                   <Card className={classes.floatingActionZoneCard} elevation={6}>
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          right: '5px',
+                          top: '5px',
+                        }}
+                      >
+                        <CloseIcon 
+                          style={{
+                            cursor: (disableSelectionAdjustments) ? 'progress' : 'pointer',
+                            width: 25,
+                            height: 25,
+                            margin: 8,
+                            opacity: (disableSelectionAdjustments) ? '0.1' : '1',
+                          }}
+                          onClick={() => {
+                            if(disableSelectionAdjustments) {
+                              return;
+                            }
+                            handleModalClose();
+                          }}
+                        />
+                      </div>
                       <Typography variant="h6">
                         {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length} Uniswap LP NFT{selectedTokenIds.length === 1 ? "" : "s"}
                       </Typography>

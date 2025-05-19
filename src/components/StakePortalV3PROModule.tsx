@@ -27,6 +27,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import BackIcon from '@mui/icons-material/KeyboardBackspace';
 import HelpIcon from '@mui/icons-material/Help';
+import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import TextField from '@mui/material/TextField';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -173,6 +174,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: '350px',
       display: 'flex',
       justifyContent: 'space-evenly',
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
     buttonSubtitle: {
       marginTop: theme.spacing(1.5),
@@ -535,6 +538,11 @@ const StakePortalV3 = (props: IStakeEnter) => {
     setLastErrorMessage(false);
   }
 
+  const handleModalClose = () => {
+    setSelectedTokenAddress(false);
+    setLastErrorMessage(false);
+  }
+
   const { 
     data: stakingContractPROAllowance,
     queryKey: stakingContractPROAllowanceQueryKey,
@@ -844,17 +852,17 @@ const StakePortalV3 = (props: IStakeEnter) => {
     return (
       isAwaitingWalletInteraction || 
       isAwaitingPerformPROAllowanceTx || 
-      isAwaitingWalletInteractionPerformStakePROTx ||
-      isAwaitingWalletInteractionPerformUnstakePROTx ||
-      isAwaitingWalletInteractionPerformEarlyUnstakePROTx ||
+      isAwaitingPerformStakePROTx ||
+      isAwaitingPerformUnstakePROTx ||
+      isAwaitingPerformEarlyUnstakePROTx ||
       isSyncingStaking
     )
   }, [
     isAwaitingWalletInteraction, 
     isAwaitingPerformPROAllowanceTx,
-    isAwaitingWalletInteractionPerformStakePROTx,
-    isAwaitingWalletInteractionPerformUnstakePROTx,
-    isAwaitingWalletInteractionPerformEarlyUnstakePROTx,
+    isAwaitingPerformStakePROTx,
+    isAwaitingPerformUnstakePROTx,
+    isAwaitingPerformEarlyUnstakePROTx,
     isSyncingStaking
   ])
 
@@ -983,6 +991,29 @@ const StakePortalV3 = (props: IStakeEnter) => {
                 </Grid>
                 <animated.div className={classes.floatingActionZone} style={actionZoneFungibleSpring}>
                   <Card className={classes.floatingActionZoneCard} elevation={6}>
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          right: '5px',
+                          top: '5px',
+                        }}
+                      >
+                        <CloseIcon 
+                          style={{
+                            cursor: (disableSelectionAdjustments) ? 'progress' : 'pointer',
+                            width: 25,
+                            height: 25,
+                            margin: 8,
+                            opacity: (disableSelectionAdjustments) ? '0.1' : '1',
+                          }}
+                          onClick={() => {
+                            if(disableSelectionAdjustments) {
+                              return;
+                            }
+                            handleModalClose();
+                          }}
+                        />
+                      </div>
                       <Typography variant="h6">
                         {mode === "enter" ? "Stake " : "Unstake "} PRO
                       </Typography>
