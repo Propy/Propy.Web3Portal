@@ -553,7 +553,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   // Render verification status message
   const renderStatusMessage = () => {
     if (isPolling || verificationStatus === ApprovalStatus.PropyIsVerifying) {
-      return "Verification in progress. Please wait while we complete your verification...";
+      return "Verification in progress. This may take a few minutes. Please wait while we complete your verification...";
     }
     
     if (screeningStatus === CognitoStatus.Failed) {
@@ -577,6 +577,34 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     }
     
     return "You need to complete KYC verification to proceed. Please click the button below to start.";
+  };
+
+  const renderTitleMessage = () => {
+    if (isPolling || verificationStatus === ApprovalStatus.PropyIsVerifying) {
+      return "Awaiting KYC Verification";
+    }
+    
+    // if (screeningStatus === CognitoStatus.Failed) {
+    //   return "Your KYC verification failed. Please try again.";
+    // }
+    
+    // if (screeningStatus === CognitoStatus.Expired) {
+    //   return "Your KYC verification has expired. Please complete the process again.";
+    // }
+    
+    // if (screeningStatus === CognitoStatus.Canceled) {
+    //   return "Your KYC verification was canceled. Please try again.";
+    // }
+    
+    // if (screeningStatus === CognitoStatus.PendingReview) {
+    //   return "Your KYC verification is pending review. Please check back later.";
+    // }
+    
+    // if (!authHeader) {
+    //   return "Please sign the message to begin the KYC verification process.";
+    // }
+    
+    return "KYC Verification Required";
   };
   
   // Render legal name form when screening is successful
@@ -781,7 +809,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
       <VerificationIcon className={classes.mainGraphic} />
       
       <Typography variant="h4" style={{textAlign: 'center'}} className={classes.title}>
-        KYC Verification Required
+        {renderTitleMessage()}
       </Typography>
       
       <Typography style={{textAlign: 'center', marginBottom: termsLink ? '12px' : '16px'}} variant="h6" className={["secondary-text-light-mode", "light-text"].join(" ")}>

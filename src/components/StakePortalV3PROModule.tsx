@@ -1267,7 +1267,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip> */}
                                 </Typography>
-                                {(Number(stakerUnlockTimePRO) * 1000 < new Date().getTime()) &&
+                                {(Number(stakerUnlockTimePRO) * 1000 < new Date().getTime() && !isAwaitingPerformEarlyUnstakePROTx) &&
                                   <FloatingActionButton
                                     className={classes.submitButton}
                                     buttonColor="secondary"
@@ -1277,7 +1277,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                     text={getUnstakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformUnstakePROTx, isSyncingStaking)}
                                   />
                                 }
-                                {(Number(stakerUnlockTimePRO) * 1000 > new Date().getTime()) &&
+                                {(Number(stakerUnlockTimePRO) * 1000 > new Date().getTime() || isAwaitingPerformEarlyUnstakePROTx) &&
                                   <>
                                     <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Locked for {countdownToTimestamp(Number(stakerUnlockTimePRO), "")}</strong></Typography>
                                     <FormGroup>
@@ -1301,7 +1301,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                       buttonColor="error"
                                       disabled={isAwaitingPerformEarlyUnstakePROTx || isAwaitingWalletInteraction || (Number(stakerUnlockTimePRO) * 1000 < new Date().getTime()) || isSyncingStaking || !acceptsEarlyUnstake}
                                       onClick={() => executePerformEarlyUnstakePROTx()}
-                                      showLoadingIcon={isAwaitingPerformUnstakePROTx || isAwaitingWalletInteraction || isSyncingStaking}
+                                      showLoadingIcon={isAwaitingPerformEarlyUnstakePROTx || isAwaitingWalletInteraction || isSyncingStaking}
                                       text={getEarlyUnstakeButtonText(isAwaitingWalletInteraction, isAwaitingPerformEarlyUnstakePROTx, isSyncingStaking)}
                                     />
                                   </>
