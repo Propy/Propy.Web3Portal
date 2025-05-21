@@ -3,7 +3,7 @@ import { useAccount, useSignMessage } from 'wagmi';
 import axios from 'axios';
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
+import { TextField, Select } from 'formik-mui';
 
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -14,6 +14,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
+import MenuItem from '@mui/material/MenuItem';
 
 import VerificationIcon from '@mui/icons-material/VerifiedUser';
 import EmailIcon from '@mui/icons-material/Email';
@@ -95,7 +96,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       display: 'flex',
       justifyContent: 'flex-start',
-      marginTop: theme.spacing(2),
+      // marginTop: theme.spacing(0),
     },
     submitButton: {
       width: '100%',
@@ -104,6 +105,14 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 40,
       marginBottom: theme.spacing(2),
       opacity: 0.7
+    },
+    helperText: {
+      marginLeft: '4px',
+      marginRight: '4px',
+      fontSize: '0.7rem',
+    },
+    selectField: {
+      width: '100%',
     }
   }),
 );
@@ -142,6 +151,8 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   const [messageToSign, setMessageToSign] = useState<string | null>(null);
   const [authHeader, setAuthHeader] = useState<string | null>(null);
   const [acceptsTerms, setAcceptsTerms] = useState(false);
+  const [confirmFullName, setConfirmFullName] = useState(false);
+  const [isUS, setIsUS] = useState(true);
   // const [showPlaid, setShowPlaid] = useState(false);
   
   // Set message to sign when address changes
@@ -303,6 +314,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     
     try {
       setIsLoading(true);
+      setIsUS(true);
       
       const response = await axios.post('https://dev.api.propy.com/api/screenings/retrieve', 
         { kycTemplateId: KYC_TEMPLATE_ID },
@@ -315,6 +327,9 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
       
       if (response.data) {
         setScreeningStatus(response.data.cognitoStatus);
+        if(response.data?.address?.countryCode !== "US") {
+          setIsUS(false);
+        }
         
         // If screening is successful, we don't immediately check verification
         // Instead, we show the legal name form
@@ -623,14 +638,14 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
             <PersonIcon className={classes.formIcon} color="primary" />
             <Typography variant="h5" className={classes.title} align="center">
-              Enter Your Legal Name
+              {`${isUS ? 'W-9' : 'W-8 BEN'} Consent & Form Generation`}
             </Typography>
             <Typography variant="body1" className={classes.sectionSpacerSmall} align="center">
-              Please provide your full legal name to complete the verification process.
+              Please provide your full legal name & country of tax residency to complete the verification process.
             </Typography>
             
             <Formik
-              initialValues={{ legalName: '' }}
+              initialValues={{ legalName: '', taxResidency: isUS ? 'US' : 'Non-US'}}
               validationSchema={nameValidationSchema}
               onSubmit={async (values, { setSubmitting }) => {
                 try {
@@ -643,9 +658,23 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
                 }
               }}
             >
-              {({ submitForm, isSubmitting, handleChange }) => (
+              {({ submitForm, isSubmitting, handleChange, values }) => (
                 <Form style={{ width: '100%' }}>
                   <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Field
+                        component={Select}
+                        fullWidth
+                        id="tax-residency"
+                        name="taxResidency"
+                        labelId="tax-residency-select"
+                        label="Country of Tax Residency"
+                        formControl={{ sx: {width: '100%'} }}
+                      >
+                        <MenuItem value={'US'}>US</MenuItem>
+                        <MenuItem value={'Non-US'}>Non-US</MenuItem>
+                      </Field>
+                    </Grid>
                     <Grid item xs={12}>
                       <Field
                         component={TextField}
@@ -654,16 +683,112 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
                         name="legalName"
                         type="text"
                         label="Full Legal Name"
+                        helperText="Signature of beneficial owner (or individual authorized to sign for beneficial owner)"
+                        FormHelperTextProps={{
+                          className: classes.helperText
+                        }}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                           handleChange(event);
                         }}
                       />
                     </Grid>
                     <Grid item xs={12}>
+                        <div style={{padding: '8px', maxHeight: '200px', overflowY: 'scroll', backgroundColor: '#ececec', borderRadius: '12px', border: '1px solid #c4c4c4'}}>
+                          {
+                            values?.taxResidency === 'US'
+                            ?
+                              <>
+                                <Typography variant="caption" style={{display: 'block', marginBottom: '12px'}}>
+                                  Request for Taxpayer Identification Number and Certification (Individuals)
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block'}}>
+                                  Part I. Certification<br/>
+                                  Under penalties of perjury, I certify that:
+                                  <ol>
+                                    <li>
+                                      The number shown on this form is my correct taxpayer identification number (or I am waiting for a number to be issued to me); and
+                                    </li>
+                                    <li>
+                                      I am not subject to backup withholding because (a) I am exempt from backup withholding, or (b) I have not been notified by the Internal Revenue Service (IRS) that I am subject to backup withholding as a result of a failure to report all interest or dividends, or (c) the IRS has notified me that I am no longer subject to backup withholding; and
+                                    </li>
+                                    <li>
+                                      I am a U.S. citizen or other U.S. person (defined below).
+                                    </li>
+                                  </ol>
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block', marginBottom: '12px'}}>
+                                  Furthermore, I authorize <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/pub/irs-pdf/fw9.pdf"}>this form</ExternalLink> to be provided to any withholding agent that has control, receipt, or custody of the income of which I am the beneficial owner or any withholding agent that can disburse or make payments of the income of which I am the beneficial owner. I agree that I will submit a new form within 30 days if any certification made on <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/pub/irs-pdf/fw9.pdf"}>this form</ExternalLink> becomes incorrect.
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block'}}>
+                                  The Internal Revenue Service does not require your consent to any provisions of this document other than the certifications required to establish your status as a U.S. person and, if applicable, obtain a reduced rate of withholding.
+                                </Typography>
+                              </>
+                            : 
+                              <>
+                                <Typography variant="caption" style={{display: 'block', marginBottom: '12px'}}>
+                                  Certificate of Foreign Status of Beneficial Owner for United States Tax Withholding and Reporting (Individuals)
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block', marginBottom: '12px'}}>
+                                  {values?.legalName ? values?.legalName : "{Name}"}<br/>
+                                  Country of residence as declared
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block'}}>
+                                  Part I. Certification<br/>
+                                  Under penalties of perjury, I declare that I have examined the information on <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> and to the best of my knowledge and belief it is true, correct, and complete. I further certify under penalties of perjury that:
+                                  <ol>
+                                    <li>
+                                      I am the individual that is the beneficial owner (or am authorized to sign for the individual that is the beneficial owner) of all the income to which <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> relates or am using <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> to document myself for chapter 4 purposes,
+                                    </li>
+                                    <li>
+                                      The person named above is not a U.S. person,
+                                    </li>
+                                    <li>
+                                      The income to which <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> relates is: (a) not effectively connected with the conduct of a trade or business in the United States, (b) effectively connected but is not subject to tax under an applicable income tax treaty, or (c) the partner's share of a partnership's effectively connected income,
+                                    </li>
+                                    <li>
+                                      The person named above is a resident of the treaty country listed above within the meaning of the income tax treaty between the United States and that country, and
+                                    </li>
+                                    <li>
+                                      For broker transactions or barter exchanges, the beneficial owner is an exempt foreign person as defined in the instructions.
+                                    </li>
+                                  </ol>
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block', marginBottom: '12px'}}>
+                                  Furthermore, I authorize <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> to be provided to any withholding agent that has control, receipt, or custody of the income of which I am the beneficial owner or any withholding agent that can disburse or make payments of the income of which I am the beneficial owner. I agree that I will submit a new form within 30 days if any certification made on <ExternalLink className="no-decorate" style={{color: PROPY_LIGHT_BLUE}} href={"https://www.irs.gov/forms-pubs/about-form-w-8-ben"}>this form</ExternalLink> becomes incorrect.
+                                </Typography>
+                                <Typography variant="caption" style={{display: 'block'}}>
+                                  The Internal Revenue Service does not require your consent to any provisions of this document other than the certifications required to establish your status as a non-U.S. individual and, if applicable, obtain a reduced rate of withholding.
+                                </Typography>
+                              </>
+                          }
+                        </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormGroup>
+                        <FormControlLabel
+                          componentsProps={{ typography: { variant: 'body2' } }}
+                          control={
+                            <Checkbox
+                              checked={confirmFullName}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setConfirmFullName(event.target.checked);
+                              }}
+                              inputProps={{ 'aria-label': 'controlled' }}
+                            />
+                          } 
+                          label={
+                            <>
+                              I agree that I have provided my full legal name and correct country of tax residency<span style={{color: 'red'}}> *</span>
+                            </>
+                          }
+                        />
+                      </FormGroup>
+                    </Grid>
+                    <Grid item xs={12}>
                       <div className={classes.submitButtonContainer}>
                         <Button
                           className={classes.submitButton}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || !confirmFullName}
                           onClick={submitForm}
                           variant="contained"
                           sx={{
