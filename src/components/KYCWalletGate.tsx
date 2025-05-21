@@ -411,14 +411,17 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   }, [authHeader]);
   
   // Function to submit legal name for successful screening
-  const submitLegalName = async (legalName: string) => {
-    if (!address || !isConnected || !authHeader) return;
+  const submitLegalName = async (legalName: string, taxResidency: string) => {
+    if (!address || !isConnected || !authHeader || !taxResidency) return;
     
     try {
       setIsLoading(true);
       
       const response = await axios.post('https://dev.tp.propy.com/api/verifications/staking', 
-        { legalName },
+        { 
+          legalName,
+          selectedTaxResidency: taxResidency === "US" ? "US" : "NonUS",
+        },
         {
           headers: {
             AccountVerification: authHeader
@@ -649,7 +652,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
               validationSchema={nameValidationSchema}
               onSubmit={async (values, { setSubmitting }) => {
                 try {
-                  await submitLegalName(values.legalName);
+                  await submitLegalName(values.legalName, values.taxResidency);
                 } catch (error) {
                   console.error('Form submission error:', error);
                   toast.error('Failed to submit name');
@@ -778,7 +781,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
                           } 
                           label={
                             <>
-                              I agree that I have provided my full legal name and correct country of tax residency<span style={{color: 'red'}}> *</span>
+                              I agree to the terms above. I have provided my full legal name & correct country of tax residency.<span style={{color: 'red'}}> *</span>
                             </>
                           }
                         />
