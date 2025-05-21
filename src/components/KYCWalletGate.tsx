@@ -640,12 +640,6 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
         <Card className={classes.formCard}>
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
             <PersonIcon className={classes.formIcon} color="primary" />
-            <Typography variant="h5" className={classes.title} align="center">
-              {`${isUS ? 'W-9' : 'W-8 BEN'} Consent & Form Generation`}
-            </Typography>
-            <Typography variant="body1" className={classes.sectionSpacerSmall} align="center">
-              Please provide your full legal name & country of tax residency to complete the verification process.
-            </Typography>
             
             <Formik
               initialValues={{ legalName: '', taxResidency: isUS ? 'US' : 'Non-US'}}
@@ -663,6 +657,12 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
             >
               {({ submitForm, isSubmitting, handleChange, values }) => (
                 <Form style={{ width: '100%' }}>
+                  <Typography variant="h5" className={classes.title} align="center">
+                    {`${values?.taxResidency === 'US' ? 'W-9' : 'W-8 BEN'} Consent & Form Generation`}
+                  </Typography>
+                  <Typography variant="body1" className={classes.sectionSpacerSmall} align="center">
+                    Please provide your full legal name & country of tax residency to complete the verification process.
+                  </Typography>
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Field
