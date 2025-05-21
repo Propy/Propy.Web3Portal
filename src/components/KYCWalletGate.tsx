@@ -641,7 +641,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
               {`${isUS ? 'W-9' : 'W-8 BEN'} Consent & Form Generation`}
             </Typography>
             <Typography variant="body1" className={classes.sectionSpacerSmall} align="center">
-              Please provide your full legal name to complete the verification process.
+              Please provide your full legal name & country of tax residency to complete the verification process.
             </Typography>
             
             <Formik
