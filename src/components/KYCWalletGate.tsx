@@ -29,6 +29,7 @@ import { ExternalLink } from './ExternalLink';
 import {
   GLOBAL_PAGE_HEIGHT,
   PROPY_LIGHT_BLUE,
+  TP_API_ENDPOINT,
 } from '../utils/constants';
 
 import { PropsFromRedux } from '../containers/KYCWalletGateContainer';
@@ -204,7 +205,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     if (isPolling && authHeader) {
       pollingIntervalRef.current = setInterval(() => {
         if (authHeader) {
-          axios.get('https://dev.tp.propy.com/api/verifications/staking', {
+          axios.get(`${TP_API_ENDPOINT}/verifications/staking`, {
             headers: { AccountVerification: authHeader }
           })
             .then(response => {
@@ -260,7 +261,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     try {
       setIsLoading(true);
       
-      const response = await axios.get('https://dev.tp.propy.com/api/verifications/staking', {
+      const response = await axios.get(`${TP_API_ENDPOINT}/verifications/staking`, {
         headers: {
           AccountVerification: authHeader
         }
@@ -417,7 +418,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     try {
       setIsLoading(true);
       
-      const response = await axios.post('https://dev.tp.propy.com/api/verifications/staking', 
+      const response = await axios.post(`${TP_API_ENDPOINT}/verifications/staking`, 
         { 
           legalName,
           selectedTaxResidency: taxResidency === "US" ? "US" : "NonUS",

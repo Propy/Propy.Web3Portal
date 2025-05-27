@@ -4,6 +4,7 @@ import useStakerShares from './useStakerShares';
 import useStakerSharesV3 from './useStakerSharesV3';
 import useTotalStakingShareSupply from './useTotalStakingShareSupply';
 import useTotalStakedPRO from './useTotalStakedPRO';
+import useTotalVirtualStakedPRO from './useTotalVirtualStakedPRO';
 import useStakedTokenCount from './useStakedTokenCount';
 import useStakerUnlockTime from './useStakerUnlockTime';
 import useStakerModuleUnlockTime from './useStakerModuleUnlockTime';
@@ -50,4 +51,5 @@ export {
   useOpenSeasonEndTimeV3,
   usePropyKeyPROValueV3,
   useCountdownSeconds,
+  useTotalVirtualStakedPRO,
 }

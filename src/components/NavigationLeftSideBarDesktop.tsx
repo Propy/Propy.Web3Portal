@@ -23,7 +23,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import Chip from '@mui/material/Chip';
 import V1Icon from '@mui/icons-material/LooksOne';
 import V2Icon from '@mui/icons-material/LooksTwo';
-import V3Icon from '@mui/icons-material/Looks3';
+// import V3Icon from '@mui/icons-material/Looks3';
 
 import { PropsFromRedux } from '../containers/NavigationLeftSideBarContainer';
 
@@ -81,12 +81,12 @@ const navigationMenu : IMenuEntry[] = [
     text: 'Stake',
     icon: <StakingIcon />,
     children: [
-      {
-        text: 'V3',
-        path: '/staking/v3',
-        icon: <V3Icon />,
-        new: true,
-      },
+      // {
+      //   text: 'V3',
+      //   path: '/staking/v3',
+      //   icon: <V3Icon />,
+      //   new: true,
+      // },
       {
         text: 'V2',
         path: '/stake/v2',
