@@ -10,6 +10,12 @@ export const ENV_TO_TP_API_ENDPOINT : {[key: string]: string} = {
   "prod": "https://tp.propy.com/api",
 }
 
+export const ENV_TO_PROPY_API_ENDPOINT : {[key: string]: string} = {
+  "local": "https://dev.api.propy.com/api",
+  "dev": "https://dev.api.propy.com/api",
+  "prod": "https://api.propy.com/api",
+}
+
 export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "local": "http://localhost:8420",
   "dev": "https://dev.dappapi.propy.com",
@@ -20,8 +26,10 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 // export const API_ENDPOINT = "https://dappapi.propy.com";
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
 export const TP_API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_TP_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_TP_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.tp.propy.com/api';
+export const PROPY_API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_PROPY_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_PROPY_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.api.propy.com/api';
 
 export const PROPYKEYS_API_ENDPOINT = process?.env?.REACT_APP_ENV === 'prod' ? "https://propykeys.com/apirp/api" : "https://stage.propykeys.com/apirp/api";
+export const STAKING_V3_KYC_TEMPLATE_ID = process?.env?.REACT_APP_ENV === 'prod' ? "" : "idvtmp_e6rjsJV7xaS2js";
 
 export const DESKTOP_MENU_WIDTH = 250;
 
