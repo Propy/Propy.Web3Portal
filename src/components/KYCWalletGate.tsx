@@ -30,12 +30,12 @@ import {
   GLOBAL_PAGE_HEIGHT,
   PROPY_LIGHT_BLUE,
   TP_API_ENDPOINT,
+  STAKING_V3_KYC_TEMPLATE_ID,
+  PROPY_API_ENDPOINT,
 } from '../utils/constants';
 
 import { PropsFromRedux } from '../containers/KYCWalletGateContainer';
 
-// KYC template ID (should come from environment)
-const KYC_TEMPLATE_ID = 'idvtmp_e6rjsJV7xaS2js'; // dev environment
 const KYC_TYPE = 'Staking';
 
 // Verification status enum (matches API)
@@ -317,8 +317,8 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
       setIsLoading(true);
       setIsUS(true);
       
-      const response = await axios.post('https://dev.api.propy.com/api/screenings/retrieve', 
-        { kycTemplateId: KYC_TEMPLATE_ID },
+      const response = await axios.post(`${PROPY_API_ENDPOINT}/screenings/retrieve`, 
+        { kycTemplateId: STAKING_V3_KYC_TEMPLATE_ID },
         {
           headers: {
             AccountVerification: authHeader
@@ -368,9 +368,9 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     try {
       setIsLoading(true);
       
-      const response = await axios.post('https://dev.api.propy.com/api/screenings', 
+      const response = await axios.post(`${PROPY_API_ENDPOINT}/screenings`, 
         { 
-          kycTemplateId: KYC_TEMPLATE_ID,
+          kycTemplateId: STAKING_V3_KYC_TEMPLATE_ID,
           kycType: KYC_TYPE
         },
         {
