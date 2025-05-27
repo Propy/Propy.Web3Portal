@@ -346,8 +346,10 @@ export const BridgeService = {
 }
 
 export const StakeService = {
-  async triggerStakeOptimisticSync() : Promise<AxiosResponse["data"]> {
-    return ApiService.postNoIntercept(`/stake/sync`, {});
+  async triggerStakeOptimisticSync(stakeMeta?: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.postNoIntercept(`/stake/sync`, {
+      ...( stakeMeta ? { meta: stakeMeta } : {})
+    });
   },
 }
 

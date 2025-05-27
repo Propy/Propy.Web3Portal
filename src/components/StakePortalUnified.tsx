@@ -311,7 +311,7 @@ const StakeEnterUnified = (props: PropsFromRedux & IStakeEnter) => {
 
   const classes = useStyles();
 
-  const latestStakingVersion = 2;
+  const latestStakingVersion = 3;
 
   const maxSelection = 100;
 

@@ -294,7 +294,7 @@ export const constructSignerMessage = (
 	}
 }
 
-export const countdownToTimestamp = (unixTimestamp: number, completeText: string): string => {
+export const countdownToTimestamp = (unixTimestamp: number, completeText: string, showFullTimer?: boolean): string => {
 	// Get the current time and calculate the difference
 	const now = new Date().getTime();
 	const diff = (unixTimestamp * 1000) - now;
@@ -314,8 +314,14 @@ export const countdownToTimestamp = (unixTimestamp: number, completeText: string
 	let countdownString = "";
 	if (days > 0) {
 			countdownString += `${days} day${days > 1 ? 's' : ''} ${hours} hour${hours > 1 ? 's' : ''} `;
+			if(showFullTimer) {
+				countdownString += `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds} second${seconds > 1 ? 's' : ''}`;
+			}
 	} else if (hours > 0) {
 			countdownString += `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes > 1 ? 's' : ''} `;
+			if(showFullTimer) {
+				countdownString += `${seconds} second${seconds > 1 ? 's' : ''}`;
+			}
 	} else if (minutes > 0) {
 			countdownString += `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds} second${seconds > 1 ? 's' : ''}`;
 	} else {
@@ -324,3 +330,76 @@ export const countdownToTimestamp = (unixTimestamp: number, completeText: string
 
 	return countdownString.trim();
 }
+
+/**
+ * Interface for the NFT metadata
+ */
+interface UniswapNFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  attributes?: Array<{
+    trait_type: string;
+    value: string | number;
+  }>;
+  [key: string]: any; // For any additional properties
+}
+
+/**
+ * Decodes a Uniswap NFT tokenURI string
+ * 
+ * @param tokenURI - The tokenURI string to decode
+ * @returns The decoded NFT metadata
+ * @throws Error if the tokenURI format is invalid or decoding fails
+ */
+export const decodeUniswapNFTTokenURI = (tokenURI: string): UniswapNFTMetadata => {
+  // Check if the URI is in the data URI format
+  if (!tokenURI.startsWith('data:application/json;base64,')) {
+    throw new Error('Invalid tokenURI format: Expected data:application/json;base64,');
+  }
+
+  try {
+    // Extract the base64 part
+    const base64Part = tokenURI.split('base64,')[1];
+    
+    // Decode the base64 string
+    const decodedData = atob(base64Part);
+    
+    // Parse the JSON
+    const metadata: UniswapNFTMetadata = JSON.parse(decodedData);
+
+		console.log({metadata})
+    
+    return metadata;
+  } catch (error) {
+    throw new Error(`Failed to decode NFT metadata: ${(error as Error).message}`);
+  }
+};
+
+/**
+ * Decodes the SVG image from a Uniswap NFT metadata
+ * 
+ * @param metadata - The Uniswap NFT metadata
+ * @returns The decoded SVG as a string, or null if no valid SVG image
+ */
+export const decodeSVGImage = (metadata: UniswapNFTMetadata): string | null => {
+  if (!metadata.image) {
+    return null;
+  }
+  
+  if (!metadata.image.startsWith('data:image/svg+xml;base64,')) {
+    return null;
+  }
+  
+  try {
+    // Extract the base64 part
+    const svgBase64 = metadata.image.split('base64,')[1];
+    
+    // Decode the base64 string
+    const svgContent = atob(svgBase64);
+    
+    return svgContent;
+  } catch (error) {
+    throw new Error(`Failed to decode SVG image: ${(error as Error).message}`);
+  }
+};

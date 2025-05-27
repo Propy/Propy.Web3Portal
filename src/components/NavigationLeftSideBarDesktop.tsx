@@ -20,8 +20,10 @@ import ExternalLinkIcon from '@mui/icons-material/Launch';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import Chip from '@mui/material/Chip';
 import V1Icon from '@mui/icons-material/LooksOne';
 import V2Icon from '@mui/icons-material/LooksTwo';
+// import V3Icon from '@mui/icons-material/Looks3';
 
 import { PropsFromRedux } from '../containers/NavigationLeftSideBarContainer';
 
@@ -44,6 +46,7 @@ interface IMenuEntry {
   externalLink?: string
   onlyConnected?: boolean
   children?: IMenuEntry[]
+  new?: boolean
 }
 
 const navigationMenu : IMenuEntry[] = [
@@ -78,15 +81,21 @@ const navigationMenu : IMenuEntry[] = [
     text: 'Stake',
     icon: <StakingIcon />,
     children: [
-      {
-        text: 'V1',
-        path: '/stake/v1',
-        icon: <V1Icon />,
-      },
+      // {
+      //   text: 'V3',
+      //   path: '/staking/v3',
+      //   icon: <V3Icon />,
+      //   new: true,
+      // },
       {
         text: 'V2',
         path: '/stake/v2',
         icon: <V2Icon />,
+      },
+      {
+        text: 'V1',
+        path: '/stake/v1',
+        icon: <V1Icon />,
       },
     ]
   },
@@ -365,6 +374,9 @@ function NavigationLeftSideBarDesktop(props: PropsFromRedux) {
                                               }} style={{fontWeight: 'inherit'}} primary={child.text} />
                                               {child.externalLink &&
                                                 <ExternalLinkIcon style={{opacity: 0.5}} />
+                                              }
+                                              {child?.new &&
+                                                <Chip style={{color: 'white', fontWeight: 'bold'}} label="New" color="primary" />
                                               }
                                             </ListItemButton>
                                           </LinkWrapper>

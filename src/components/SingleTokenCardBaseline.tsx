@@ -101,6 +101,9 @@ interface ISingleTokenCardBaselineProps {
   tokenNetwork?: string,
   tokenTitle?: string,
   subtleDisableInteraction?: boolean,
+  imageHeight?: string,
+  imageObjectFit?: 'contain',
+  cardHeight?: string,
 }
 
 const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
@@ -120,6 +123,9 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
     tokenContractAddress,
     tokenNetwork,
     tokenTitle,
+    imageHeight = '200px',
+    imageObjectFit,
+    cardHeight = '298px',
   } = props;
 
   const classes = useStyles();
@@ -134,7 +140,7 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
       }
       style={{
       width: '100%',
-      height: '298px',
+      height: cardHeight,
       ...(selected && {border: `3px solid ${PROPY_LIGHT_BLUE}`}),
       ...((!selected && selectable) && {border: `3px solid white`}),
     }} onClick={() => {
@@ -146,16 +152,16 @@ const SingleTokenCardBaseline = (props: ISingleTokenCardBaselineProps) => {
         <CardActionArea className={classes.actionArea}>
           <CardMedia
             component="img"
-            height="200"
+            height={imageHeight}
             image={tokenImage ? tokenImage : PlaceholderImage}
-            style={{position: 'absolute'}}
+            style={{position: 'absolute', ...(imageObjectFit && {objectFit: imageObjectFit})}}
             alt="featured property media"
             onError={({ currentTarget }) => {
               currentTarget.onerror = null; // prevents looping
               currentTarget.src=PlaceholderImage;
             }}
           />
-          <div style={{height: 200}}></div>
+          <div style={{height: imageHeight}}></div>
           <div className={classes.chipContainer}>
             <div className={classes.leftChips}>
               {tokenStandard && <Chip className={classes.chip} color="primary" label={tokenStandard} size="small" />}
