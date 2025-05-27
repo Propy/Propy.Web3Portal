@@ -9,11 +9,13 @@ import {
 interface RootState {
     darkMode: boolean
     activeNetwork: SupportedNetworks;
+    isConsideredMobile: boolean
 }
   
 const mapStateToProps = (state: RootState) => ({
     darkMode: state.darkMode,
     activeNetwork: state.activeNetwork,
+    isConsideredMobile: state.isConsideredMobile,
 })
 
 const mapDispatchToProps = {}

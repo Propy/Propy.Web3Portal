@@ -4,6 +4,12 @@ import {
 
 export const STAKING_CONTRACT = '0x00000000219ab540356cBB839Cbe05303d7705Fa'
 
+export const ENV_TO_TP_API_ENDPOINT : {[key: string]: string} = {
+  "local": "https://dev.tp.propy.com/api",
+  "dev": "https://dev.tp.propy.com/api",
+  "prod": "https://tp.propy.com/api",
+}
+
 export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
   "local": "http://localhost:8420",
   "dev": "https://dev.dappapi.propy.com",
@@ -11,8 +17,9 @@ export const ENV_TO_API_ENDPOINT : {[key: string]: string} = {
 }
 
 // export const API_ENDPOINT = "http://localhost:8420";
-// export const API_ENDPOINT = "https://dev.dappapi.propy.com/";
+// export const API_ENDPOINT = "https://dappapi.propy.com";
 export const API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.dappapi.propy.com/' ;
+export const TP_API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_TP_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_TP_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.tp.propy.com/api';
 
 export const PROPYKEYS_API_ENDPOINT = process?.env?.REACT_APP_ENV === 'prod' ? "https://propykeys.com/apirp/api" : "https://stage.propykeys.com/apirp/api";
 
@@ -249,12 +256,12 @@ export const BASE_L2_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' :
 export const STAKING_V3_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'base' : 'sepolia';
 export const STAKING_V3_ALT_NETWORK = process?.env?.REACT_APP_ENV === 'prod' ? 'ethereum' : 'base-sepolia';
 // TODO SET PROD V3 STAKING ADDRESSES
-export const STAKING_V3_UNISWAP_LP_HELPER_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xa5e9D6f5Cda2EC0cBc6D43E992FACf902be9fAc0' : '0xa5e9D6f5Cda2EC0cBc6D43E992FACf902be9fAc0';
-export const STAKING_V3_CONTRACT_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x44EF77547B7FB49C5E2649f5a2ABc3346869Da27' : '0x44EF77547B7FB49C5E2649f5a2ABc3346869Da27';
-export const STAKING_V3_CORE_CONTRACT_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0xea6fFe0d13eca58CfF3427d65807338982BdC687" : "0xea6fFe0d13eca58CfF3427d65807338982BdC687";
-export const STAKING_V3_PROPYKEYS_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x4021bdaF50500DD718beB929769C6eD296796c63' : '0x4021bdaF50500DD718beB929769C6eD296796c63';
-export const STAKING_V3_PRO_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x5f2EFcf3e5aEc1E058038016f60e0C9cc8fBc861' : '0x5f2EFcf3e5aEc1E058038016f60e0C9cc8fBc861';
-export const STAKING_V3_LP_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x9dc3d771b5633850C5D10c86a47ADDD36a8B4487' : '0x9dc3d771b5633850C5D10c86a47ADDD36a8B4487';
+export const STAKING_V3_UNISWAP_LP_HELPER_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xd01b72f8843F2Ab2E343AC5402a8511216a720d6' : '0xa5e9D6f5Cda2EC0cBc6D43E992FACf902be9fAc0';
+export const STAKING_V3_CONTRACT_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x145D344E4E266c3Dda2Dd5808EaDB0280Cf111C2' : '0x44EF77547B7FB49C5E2649f5a2ABc3346869Da27';
+export const STAKING_V3_CORE_CONTRACT_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? "0x4e2f246042FC67d8173397c01775Fc29508c9aCe" : "0xea6fFe0d13eca58CfF3427d65807338982BdC687";
+export const STAKING_V3_PROPYKEYS_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xBd0969813733df8f506611c204EEF540770CAB72' : '0x4021bdaF50500DD718beB929769C6eD296796c63';
+export const STAKING_V3_PRO_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xF46464ad108B1CC7866DF2Cfa87688F7742BA623' : '0x5f2EFcf3e5aEc1E058038016f60e0C9cc8fBc861';
+export const STAKING_V3_LP_MODULE_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x8D020131832D8823846232031bD7EEee7A102F2F' : '0x9dc3d771b5633850C5D10c86a47ADDD36a8B4487';
 export const STAKING_V3_PROPYKEYS_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xa239b9b3E00637F29f6c7C416ac95127290b950E' : '0xDC695bE7440689D8B8BbF8bFF1323727A0EE231C';
 export const STAKING_V3_PROPYOG_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0xc84F3b80847B224684b11bF956d46c7028bC1906' : '0x2f24fFED8f7032F9032CFdBCb2CBAAB56c4fFb36';
 export const STAKING_V3_PRO_ADDRESS = process?.env?.REACT_APP_ENV === 'prod' ? '0x18dD5B087bCA9920562aFf7A0199b96B9230438b' : '0xa7423583D3b0B292E093aAC2f8900396EC110960';

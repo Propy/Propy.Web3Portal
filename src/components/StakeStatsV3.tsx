@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAccount } from 'wagmi';
 
-import { PropsFromRedux } from '../containers/StakeStatsContainer';
+import { PropsFromRedux } from '../containers/StakeStatsV3Container';
 
 import {
   priceFormat,
@@ -32,6 +32,7 @@ import {
 import StakeStatsV3ConnectedWalletContainer from '../containers/StakeStatsV3ConnectedWalletContainer';
 
 import CountdownTimer from './CountdownTimer';
+import StakeSeasonsTimelineV3 from './StakeSeasonsTimelineV3';
 
 import { 
   useTotalStakingShareSupply,
@@ -39,6 +40,7 @@ import {
   useStakedTokenCount,
   useTotalStakingBalancePRO,
   useOpenSeasonEndTimeV3,
+  useTotalVirtualStakedPRO,
 } from '../hooks';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
@@ -77,6 +79,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
 
   let {
     version,
+    isConsideredMobile,
   } = props;
 
   let currentSeason = 1;
@@ -101,6 +104,14 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     data: totalStakedPRO,
     isLoading: isLoadingTotalStakedPRO,
   } = useTotalStakedPRO(
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    chain ? chain.id : undefined
+  )
+
+  const { 
+    data: totalVirtualStakedPRO,
+    isLoading: isLoadingTotalVirtualStakedPRO,
+  } = useTotalVirtualStakedPRO(
     STAKING_V3_CORE_CONTRACT_ADDRESS,
     chain ? chain.id : undefined
   )
@@ -150,19 +161,19 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
       } */}
       {openSeasonEndTime &&
         <div className={classes.personalStatsSpacer}>
-          <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>
+          <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
             <Grid item xs={12} md={12} lg={12}>
               <Card className={classes.card} style={{paddingTop: '24px', paddingBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                 {(Number(openSeasonEndTime) > Math.floor(new Date().getTime() / 1000)) 
                   ?
                     <>
-                      <Typography variant='h4' style={{marginBottom: '16px'}}>
+                      <Typography variant='h4' style={{marginBottom: '16px', fontSize: isConsideredMobile ? '1.5rem' : 'auto', textAlign: 'center'}}>
                         🎉 Staking Season {currentSeason} Entry Open 🎉
                       </Typography>
-                      <Typography variant='h6' style={{}}>
+                      <Typography variant='h6' style={{textAlign: 'center'}}>
                         Closing In:
                       </Typography>
-                      <Typography variant='h6' style={{marginBottom: '16px', fontWeight: '400'}}>
+                      <Typography variant='h6' style={{marginBottom: '16px', fontWeight: '400', textAlign: 'center'}}>
                         <CountdownTimer endTime={Number(openSeasonEndTime)} showFullTimer={true} />
                       </Typography>
                       <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
@@ -172,7 +183,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                     </>
                   :
                     <>
-                      <Typography variant='h4' style={{marginBottom: '16px'}}>
+                      <Typography variant='h4' style={{marginBottom: '16px', fontSize: isConsideredMobile ? '1.5rem' : 'auto', textAlign: 'center'}}>
                         🔒 Staking Season {currentSeason} Entry Closed 🔒
                       </Typography>
                       <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
@@ -181,6 +192,12 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                       </Typography>
                     </>
                 }
+                <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400', marginTop: '24px'}}>
+                  <strong>Seasons Timeline:</strong>
+                </Typography>
+                <div style={{width: '100%', marginTop: '16px'}}>
+                  <StakeSeasonsTimelineV3 activeSeason={currentSeason} />
+                </div>
               </Card>
             </Grid>
           </Grid>
@@ -191,26 +208,26 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
           <StakeStatsV3ConnectedWalletContainer version={version} totalShares={stakerShares} />
         </div>
       }
-      <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 10, xl: 10 }}>
-        <Grid item xs={12} md={6} lg={2}>
+      <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 12, xl: 12 }} style={{justifyContent: 'center'}}>
+        <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakerShares && (
                 <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px', textAlign: 'center'}} />
                   <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
                 </>
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staking Power</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staking Power</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={2}>
+        <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingTotalStakedPRO && (
@@ -219,16 +236,34 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
                 </>
               )}
-              {!isLoadingStakerShares && (
+              {!isLoadingTotalStakedPRO && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staked PRO</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staked PRO</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={2}>
+        <Grid item xs={12} md={6} lg={3}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {isLoadingTotalVirtualStakedPRO && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {!isLoadingTotalVirtualStakedPRO && (
+                <>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Virtual Staked PRO</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalVirtualStakedPRO ? totalVirtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingTotalStakingBalancePRO && (
@@ -239,14 +274,32 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingTotalStakingBalancePRO && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Total PRO Balance</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total PRO Balance</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakingBalancePRO ? totalStakingBalancePRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={2}>
+        <Grid item xs={12} md={6} lg={3}>
+          <Card className={classes.card}>
+            <div className={classes.cardInner}>
+              {(isLoadingTotalStakingBalancePRO || isLoadingTotalStakedPRO) && (
+                <>
+                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                </>
+              )}
+              {(!isLoadingTotalStakingBalancePRO && !isLoadingTotalStakedPRO) && (
+                <>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Unclaimed Rewards</Typography>
+                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number((totalStakingBalancePRO && totalStakedPRO) ? new BigNumber(totalStakingBalancePRO.toString()).minus(new BigNumber(totalStakedPRO.toString())).toString() : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                </>
+              )}
+            </div>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakedPropyKeysCount && (
@@ -257,14 +310,14 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakedPropyKeysCount && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyKeys</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyKeys</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
                 </>
               )}
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={2}>
+        <Grid item xs={12} md={6} lg={3}>
           <Card className={classes.card}>
             <div className={classes.cardInner}>
               {isLoadingStakedOGCount && (
@@ -275,7 +328,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakedOGCount && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyOG</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyOG</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
                 </>
               )}
