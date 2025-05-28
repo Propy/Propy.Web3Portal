@@ -150,6 +150,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   const [flowSignature, setFlowSignature] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [screeningStatus, setScreeningStatus] = useState<CognitoStatus | null>(null);
+  const [screeningEmail, setScreeningEmail] = useState<string | false>(false);
   const [messageToSign, setMessageToSign] = useState<string | null>(null);
   const [authHeader, setAuthHeader] = useState<string | null>(null);
   const [acceptsTerms, setAcceptsTerms] = useState(false);
@@ -318,6 +319,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
       setIsLoading(true);
       setIsLoadingScreening(true);
       setIsUS(null);
+      setScreeningEmail(false);
       
       const response = await axios.post(`${PROPY_API_ENDPOINT}/screenings/retrieve`, 
         { kycTemplateId: STAKING_V3_KYC_TEMPLATE_ID },
@@ -334,6 +336,9 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
           setIsUS(false);
         } else {
           setIsUS(true);
+        }
+        if(response?.data?.email) {
+          setScreeningEmail(response?.data?.email);
         }
         
         // If screening is successful, we don't immediately check verification
@@ -469,7 +474,9 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
       if (response.data) {
         toast.success('Email submitted successfully. You will be notified when your verification is complete.');
         // Check verification to continue the flow
-        // await checkVerificationStatus();
+        if(checkScreeningStatusRef?.current) {
+          await checkScreeningStatusRef.current();
+        }
       }
     } catch (error) {
       console.error('Email submission error:', error);
@@ -851,61 +858,63 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
               KYC Verification Pending
             </Typography>
             <Typography variant="body1" className={classes.sectionSpacerSmall} align="center">
-              Your KYC verification is being reviewed. Please provide your email to receive updates about your verification status.
+              Your KYC verification is being reviewed. {!screeningEmail ? 'Please provide your email to receive updates about your verification status.' : `An email will be sent to ${screeningEmail} once an update is available.`}
             </Typography>
             
-            <Formik
-              initialValues={{ email: '' }}
-              validationSchema={emailValidationSchema}
-              onSubmit={async (values, { setSubmitting, resetForm }) => {
-                try {
-                  await submitEmail(values.email);
-                  resetForm();
-                } catch (error) {
-                  console.error('Form submission error:', error);
-                  toast.error('Failed to submit email');
-                } finally {
-                  setSubmitting(false);
-                }
-              }}
-            >
-              {({ submitForm, isSubmitting, handleChange }) => (
-                <Form style={{ width: '100%' }}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Field
-                        component={TextField}
-                        fullWidth
-                        required
-                        name="email"
-                        type="email"
-                        label="Email Address"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                          handleChange(event);
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <div className={classes.submitButtonContainer}>
-                        <Button
-                          className={classes.submitButton}
-                          disabled={isSubmitting}
-                          onClick={submitForm}
-                          variant="contained"
-                          sx={{
-                            color: 'white',
+            {!screeningEmail &&
+              <Formik
+                initialValues={{ email: '' }}
+                validationSchema={emailValidationSchema}
+                onSubmit={async (values, { setSubmitting, resetForm }) => {
+                  try {
+                    await submitEmail(values.email);
+                    resetForm();
+                  } catch (error) {
+                    console.error('Form submission error:', error);
+                    toast.error('Failed to submit email');
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+              >
+                {({ submitForm, isSubmitting, handleChange }) => (
+                  <Form style={{ width: '100%' }}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12}>
+                        <Field
+                          component={TextField}
+                          fullWidth
+                          required
+                          name="email"
+                          type="email"
+                          label="Email Address"
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            handleChange(event);
                           }}
-                          color="primary"
-                        >
-                          Submit
-                          {isSubmitting && <CircularProgress size={24} className={classes.buttonProgress} />}
-                        </Button>
-                      </div>
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <div className={classes.submitButtonContainer}>
+                          <Button
+                            className={classes.submitButton}
+                            disabled={isSubmitting}
+                            onClick={submitForm}
+                            variant="contained"
+                            sx={{
+                              color: 'white',
+                            }}
+                            color="primary"
+                          >
+                            Submit
+                            {isSubmitting && <CircularProgress size={24} className={classes.buttonProgress} />}
+                          </Button>
+                        </div>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Form>
-              )}
-            </Formik>
+                  </Form>
+                )}
+              </Formik>
+            }
           </div>
         </Card>
       </div>
