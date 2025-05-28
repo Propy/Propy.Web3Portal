@@ -450,16 +450,27 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   
   // Function to submit email for pending review screening
   const submitEmail = async (email: string) => {
-    if (!address || !isConnected || !authHeader) return;
+    if (!address || !isConnected || !authHeader || !email) return;
     
     try {
       setIsLoading(true);
       
-      // Simulate API call - replace with actual endpoint when available
-      // This endpoint doesn't exist yet, so we're just simulating success
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await axios.post(`${TP_API_ENDPOINT}/verifications/staking`, 
+        { 
+          email,
+        },
+        {
+          headers: {
+            AccountVerification: authHeader
+          }
+        }
+      );
       
-      toast.success('Email submitted successfully. You will be notified when your verification is complete.');
+      if (response.data) {
+        toast.success('Email submitted successfully. You will be notified when your verification is complete.');
+        // Check verification to continue the flow
+        // await checkVerificationStatus();
+      }
     } catch (error) {
       console.error('Email submission error:', error);
       toast.error('Failed to submit email');
