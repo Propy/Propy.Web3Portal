@@ -29,7 +29,7 @@ export const TP_API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_TP_API_END
 export const PROPY_API_ENDPOINT = (process?.env?.REACT_APP_ENV && ENV_TO_PROPY_API_ENDPOINT[process.env.REACT_APP_ENV]) ? ENV_TO_PROPY_API_ENDPOINT[process.env.REACT_APP_ENV] : 'https://dev.api.propy.com/api';
 
 export const PROPYKEYS_API_ENDPOINT = process?.env?.REACT_APP_ENV === 'prod' ? "https://propykeys.com/apirp/api" : "https://stage.propykeys.com/apirp/api";
-export const STAKING_V3_KYC_TEMPLATE_ID = process?.env?.REACT_APP_ENV === 'prod' ? "" : "idvtmp_e6rjsJV7xaS2js";
+export const STAKING_V3_KYC_TEMPLATE_ID = process?.env?.REACT_APP_ENV === 'prod' ? "idvtmp_8dUu7mpZ6CxEEY" : "idvtmp_e6rjsJV7xaS2js";
 
 export const DESKTOP_MENU_WIDTH = 250;
 
