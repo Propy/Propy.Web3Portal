@@ -460,7 +460,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     try {
       setIsLoading(true);
       
-      const response = await axios.post(`${TP_API_ENDPOINT}/screenings/email`, 
+      const response = await axios.post(`${PROPY_API_ENDPOINT}/screenings/email`, 
         { 
           email,
         },
