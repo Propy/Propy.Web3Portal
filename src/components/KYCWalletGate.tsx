@@ -348,6 +348,8 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
         } else if (response.data.cognitoStatus === CognitoStatus.Active && response.data.flowSignature) {
           setScreeningStatus(response.data.cognitoStatus);
           setFlowSignature(response.data.flowSignature);
+        } else if ([CognitoStatus.Canceled, CognitoStatus.Expired, CognitoStatus.Failed].indexOf(response.data.cognitoStatus) > -1) {
+          // Keep the "bad" status and prevent looping
         } else if (response.data.cognitoStatus !== CognitoStatus.PendingReview) {
           // For other statuses (except Success and PendingReview), check verification
           if(checkVerificationStatusRef?.current) {
@@ -607,7 +609,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
     }
     
     if (screeningStatus === CognitoStatus.Canceled) {
-      return "Your KYC verification was canceled. Please try again.";
+      return "Your KYC verification was cancelled. Please try again.";
     }
     
     if (screeningStatus === CognitoStatus.PendingReview) {
