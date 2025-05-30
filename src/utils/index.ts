@@ -7,12 +7,12 @@ import {
 	NetworkName,
 } from '../interfaces';
 
-export const centerShortenLongString = (string: string, maxLength: number) => {
+export const centerShortenLongString = (string: string, maxLength: number, leftPadding: number = 0) => {
 	if(typeof string === 'string') {
 		if(string.length > maxLength) {
 			let charCountForRemoval = string.length - maxLength;
 			let stringHalfwayPoint = Math.floor(maxLength/2);
-			string = string.slice(0, stringHalfwayPoint) + "..." + string.slice(stringHalfwayPoint + charCountForRemoval, string.length);
+			string = string.slice(0, stringHalfwayPoint + leftPadding) + "..." + string.slice(stringHalfwayPoint + charCountForRemoval, string.length);
 			return string;
 		}else{
 			return string;
