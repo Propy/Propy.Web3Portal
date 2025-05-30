@@ -23,6 +23,10 @@ import {
   getEtherscanLinkByNetworkName,
 } from '../utils';
 
+import {
+  ENV,
+} from '../utils/constants'
+
 const getTableHeading = (mode?: string) => {
   let heading = "Staking Event History";
   if(mode === "withdrawals") {
@@ -61,7 +65,7 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
   useEffect(() => {
     let isMounted = true;
     const loadStakingEventsV3 = async () => {
-      let results = await StakeService.getStakingEventsV3Paginated(page, perPage, 'testnet');
+      let results = await StakeService.getStakingEventsV3Paginated(page, perPage, ENV !== 'prod' ? 'testnet' : undefined);
       if(isMounted) {
         setTransactions(results.data?.data);
         setTotalRecords(results?.data?.metadata?.pagination?.total);
