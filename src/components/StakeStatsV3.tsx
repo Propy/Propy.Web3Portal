@@ -33,6 +33,7 @@ import StakeStatsV3ConnectedWalletContainer from '../containers/StakeStatsV3Conn
 
 import CountdownTimer from './CountdownTimer';
 import StakeSeasonsTimelineV3 from './StakeSeasonsTimelineV3';
+import StakingEventsV3 from './StakingEventsV3';
 
 import { 
   useTotalStakingShareSupply,
@@ -334,6 +335,9 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
             </div>
           </Card>
+        </Grid>
+        <Grid item xs={12} lg={12}>
+          <StakingEventsV3 />
         </Grid>
         {/* <Grid item xs={12} lg={12}>
           <pre>

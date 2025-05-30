@@ -351,6 +351,9 @@ export const StakeService = {
       ...( stakeMeta ? { meta: stakeMeta } : {})
     });
   },
+  async getStakingEventsV3Paginated(page: number, perPage: number, mode?: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/stake/v3`, `staking-events?page=${page}&perPage=${perPage}${mode ? `&mode=${mode}` : ''}`)
+  }
 }
 
 export const GeoService = {
