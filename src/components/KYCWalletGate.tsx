@@ -140,7 +140,7 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   const createScreeningRef = useRef<(() => Promise<void>) | null>(null);
   
   // Wagmi hooks
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { data: signatureData, isPending: isSignatureLoading, signMessage, reset } = useSignMessage();
   
   // Component states
@@ -190,10 +190,10 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   
   // Update auth header when signature is received
   useEffect(() => {
-    if (signatureData && messageToSign) {
-      setAuthHeader(`${messageToSign}::${signatureData}`);
+    if (signatureData && messageToSign && address && chainId) {
+      setAuthHeader(`${messageToSign}::${signatureData}::${address}::${chainId}`);
     }
-  }, [signatureData, messageToSign]);
+  }, [signatureData, messageToSign, address, chainId]);
   
   // Start polling when needed
   useEffect(() => {
