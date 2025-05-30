@@ -5,6 +5,10 @@ import dayjs from 'dayjs';
 
 import { utils } from "ethers";
 
+import StakeIcon from '@mui/icons-material/MoveToInbox';
+import UnstakeIcon from '@mui/icons-material/Outbox';
+import EarlyUnstakeIcon from '@mui/icons-material/HighlightOff';
+
 import LinkWrapper from './LinkWrapper';
 
 import {
@@ -90,27 +94,44 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
         valueKey: 'type',
         numeric: true,
         disablePadding: false,
-        valueFormatter: (value: string) => {
+        tCellStyle: {display: 'flex', alignItems: 'center'},
+        valueFormatterAsElement: (value: string) => {
           let result;
+          let icon;
           if (value === 'EnteredStakingERC20') {
+            icon = <StakeIcon style={{marginRight: '8px'}} />
             result = 'Stake (PRO)';
           } else if(value === 'EarlyLeftStakingERC20') {
+            icon = <EarlyUnstakeIcon style={{marginRight: '8px'}} />
             result = 'Early Unstake (PRO)';
           } else if (value === 'LeftStakingERC20') {
+            icon = <UnstakeIcon style={{marginRight: '8px'}} />
             result = 'Unstake (PRO)';
           } else if (value === 'EnteredStakingLP') {
+            icon = <StakeIcon style={{marginRight: '8px'}} />
             result = 'Stake (LP NFT)'
           } else if (value === 'LeftStakingLP') {
+            icon = <UnstakeIcon style={{marginRight: '8px'}} />
             result = 'Unstake (LP NFT)'
           } else if (value === 'EarlyLeftStakingLP') {
+            icon = <EarlyUnstakeIcon style={{marginRight: '8px'}} />
             result = 'Early Unstake (LP NFT)'
           } else if (value === 'EnteredStakingPropyKeys') {
+            icon = <StakeIcon style={{marginRight: '8px'}} />
             result = 'Stake (PropyKey)';
           } else if (value === 'LeftStakingPropyKeys') {
+            icon = <UnstakeIcon style={{marginRight: '8px'}} />
             result = 'Unstake (PropyKey)';
           }
           if(result) {
-            return <span style={{fontWeight: 'bold'}}>{result}</span>
+            return (
+              <>
+                {icon}
+                <span style={{fontWeight: 'bold'}}>
+                  {result}
+                </span>
+              </>
+            )
           }
           return result;
         },
