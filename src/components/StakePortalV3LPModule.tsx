@@ -82,6 +82,7 @@ import {
   // useStakerModuleLockedAtTime,
   useUnifiedWriteContract,
   useApproxStakerRewardsPendingByModuleV3,
+  useStakerSharesByModuleV3,
   useOpenSeasonEndTimeV3,
   useIsLockupBoostedV3,
   useCountdownSeconds,
@@ -751,6 +752,16 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
   )
 
   const {
+    data: stakerTotalSharesOnModule,
+    //isLoading: isLoadingStakerTotalSharesOnModule,
+  } = useStakerSharesByModuleV3(
+    STAKING_V3_LP_MODULE_ID,
+    STAKING_V3_CORE_CONTRACT_ADDRESS,
+    address,
+    chain ? chain.id : undefined
+  )
+
+  const {
     data: isLockupBoosted,
     // isLoading: isLockupBoostedLoading,
   } = useIsLockupBoostedV3(
@@ -994,6 +1005,22 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
       </>
     )
   }
+
+  const pendingRewardEstimate = useMemo(() => {
+    if(stakerRewardOnModule && stakerTotalSharesOnModule) {
+      if(stakerRewardOnModule.toString() === stakerTotalSharesOnModule.toString()) {
+        return priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)
+      } else if(sharesIssuedAgainstSelectionLP) {
+        let percentage = new BigNumber(sharesIssuedAgainstSelectionLP.toString()).dividedBy(stakerTotalSharesOnModule.toString()).toString();
+        return priceFormat(new BigNumber(utils.formatUnits(stakerRewardOnModule.toString(), 8)).multipliedBy(percentage).toNumber(), 2, 'PRO', false, true)
+      }
+    }
+    return '0.00 PRO';
+  }, [
+    stakerTotalSharesOnModule,
+    stakerRewardOnModule,
+    sharesIssuedAgainstSelectionLP,
+  ])
 
   return (
     <>
@@ -1303,7 +1330,7 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                                   {`sharesIssuedAgainstSelectionLP: ${sharesIssuedAgainstSelectionLP}`}
                                 </Typography> */}
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Estimated Reward: {priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)}
+                                  Estimated {Number(stakerUnlockTimeLP) * 1000 > new Date().getTime() ? 'Forfeited' : ''} Reward: {pendingRewardEstimate}
                                   {/* <Tooltip placement="top" title={`Unstaking t.`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip> */}
@@ -1334,7 +1361,7 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                                             inputProps={{ 'aria-label': 'controlled' }}
                                           />
                                         } 
-                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
+                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({pendingRewardEstimate})</strong> due to being in an active lockup period</>}
                                       />
                                     </FormGroup>
                                     <FloatingActionButton
