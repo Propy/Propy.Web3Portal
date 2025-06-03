@@ -163,8 +163,13 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
       {openSeasonEndTime &&
         <div className={classes.personalStatsSpacer}>
           <Grid container spacing={2} columns={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+            {/* <Grid item xs={12} md={12} lg={12}>
+                <div style={{width: '100%', marginTop: '16px'}}>
+                  <StakeSeasonsTimelineV3 activeSeason={currentSeason} />
+                </div>
+            </Grid> */}
             <Grid item xs={12} md={12} lg={12}>
-              <Card className={classes.card} style={{paddingTop: '24px', paddingBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+              <Card className={classes.card} style={{paddingTop: '24px', paddingBottom: '0px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                 {(Number(openSeasonEndTime) > Math.floor(new Date().getTime() / 1000)) 
                   ?
                     <>
@@ -194,7 +199,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                     </>
                 }
                 <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400', marginTop: '24px'}}>
-                  <strong>Seasons Timeline:</strong>
+                  <strong>Season Schedule (NOT FINAL):</strong>
                 </Typography>
                 <div style={{width: '100%', marginTop: '16px'}}>
                   <StakeSeasonsTimelineV3 activeSeason={currentSeason} />
