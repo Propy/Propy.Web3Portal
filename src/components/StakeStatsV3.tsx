@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { utils } from 'ethers';
 
@@ -14,6 +14,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
 import { useAccount } from 'wagmi';
 
 import { PropsFromRedux } from '../containers/StakeStatsV3Container';
@@ -27,6 +29,7 @@ import {
   STAKING_V3_PROPYKEYS_ADDRESS,
   STAKING_V3_PROPYOG_ADDRESS,
   STAKING_V3_CORE_CONTRACT_ADDRESS,
+  PROPY_LIGHT_BLUE,
 } from '../utils/constants';
 
 import StakeStatsV3ConnectedWalletContainer from '../containers/StakeStatsV3ConnectedWalletContainer';
@@ -82,6 +85,8 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
     version,
     isConsideredMobile,
   } = props;
+
+  const [expandMobileView, setExpandMobileView] = useState(false);
 
   let currentSeason = 1;
 
@@ -233,114 +238,125 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
             </div>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {isLoadingTotalStakedPRO && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingTotalStakedPRO && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staked PRO</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {isLoadingTotalVirtualStakedPRO && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingTotalVirtualStakedPRO && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Virtual Staked PRO</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalVirtualStakedPRO ? totalVirtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {isLoadingTotalStakingBalancePRO && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingTotalStakingBalancePRO && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total PRO Balance</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakingBalancePRO ? totalStakingBalancePRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {(isLoadingTotalStakingBalancePRO || isLoadingTotalStakedPRO) && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {(!isLoadingTotalStakingBalancePRO && !isLoadingTotalStakedPRO) && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Unclaimed Rewards</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number((totalStakingBalancePRO && totalStakedPRO) ? new BigNumber(totalStakingBalancePRO.toString()).minus(new BigNumber(totalStakedPRO.toString())).toString() : 0), 8)), 2, 'PRO', false, true)}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {isLoadingStakedPropyKeysCount && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingStakedPropyKeysCount && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyKeys</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {isLoadingStakedOGCount && (
-                <>
-                  <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
-                  <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
-                </>
-              )}
-              {!isLoadingStakedOGCount && (
-                <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyOG</Typography>
-                  <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
-                </>
-              )}
-            </div>
-          </Card>
-        </Grid>
+        {(isConsideredMobile && !expandMobileView) &&
+          <Grid item xs={12} md={12} lg={12}>
+            <Typography style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '8px', fontWeight: 'bold', cursor: 'pointer', color: PROPY_LIGHT_BLUE}} onClick={() => setExpandMobileView(true)}>
+              <KeyboardArrowDownIcon/>&nbsp;&nbsp;Show More Stats&nbsp;&nbsp;<KeyboardArrowDownIcon/>
+            </Typography>
+          </Grid>
+        }
+        {(!isConsideredMobile || (isConsideredMobile && expandMobileView)) &&
+          <>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {isLoadingTotalStakedPRO && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {!isLoadingTotalStakedPRO && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staked PRO</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {isLoadingTotalVirtualStakedPRO && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {!isLoadingTotalVirtualStakedPRO && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Virtual Staked PRO</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalVirtualStakedPRO ? totalVirtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {isLoadingTotalStakingBalancePRO && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {!isLoadingTotalStakingBalancePRO && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total PRO Balance</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakingBalancePRO ? totalStakingBalancePRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {(isLoadingTotalStakingBalancePRO || isLoadingTotalStakedPRO) && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {(!isLoadingTotalStakingBalancePRO && !isLoadingTotalStakedPRO) && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Unclaimed Rewards</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number((totalStakingBalancePRO && totalStakedPRO) ? new BigNumber(totalStakingBalancePRO.toString()).minus(new BigNumber(totalStakedPRO.toString())).toString() : 0), 8)), 2, 'PRO', false, true)}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {isLoadingStakedPropyKeysCount && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {!isLoadingStakedPropyKeysCount && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyKeys</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card className={classes.card}>
+                <div className={classes.cardInner}>
+                  {isLoadingStakedOGCount && (
+                    <>
+                      <CircularProgress color="inherit" style={{height: '24px', width: '24px', marginBottom: '16px'}} />
+                      <Typography style={{fontWeight: 400}} variant="subtitle1">Loading...</Typography>
+                    </>
+                  )}
+                  {!isLoadingStakedOGCount && (
+                    <>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyOG</Typography>
+                      <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
+                    </>
+                  )}
+                </div>
+              </Card>
+            </Grid> 
+          </>
+        }
         <Grid item xs={12} lg={12}>
           <StakingEventsV3 />
         </Grid>
