@@ -13,6 +13,9 @@ import createStyles from '@mui/styles/createStyles';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { useAccount } from 'wagmi';
 
@@ -136,6 +139,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
     rightTextFormatValueFn: (value: any) => string,
     formatValueFn: (value: any) => string,
   }[]>([])
+  const [expandMobileView, setExpandMobileView] = useState(false);
 
   const { 
     data: {
@@ -371,24 +375,34 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               </div>
             </Card>
           </Grid>
-          {timeseriesData.map((entry, index) => 
-            <Grid key={`staking-v3-timeseries-chart-${index}`} item xs={12} sm={12} md={12} lg={6} xl={6}>
-              <BasicAreaChartContainer
-                chartData={entry.data}
-                loading={false}
-                leftTextTitle={entry.title}
-                leftTextSubtitle={entry.subtitle}
-                rightTextFormatValueFn={entry.rightTextFormatValueFn}
-                showChange={false}
-                changeType={"up-good"}
-                height={250}
-                formatValueFn={entry.formatValueFn}
-                hideLogSwitch={true}
-                backgroundColor={'#FFFFFF'}
-                backgroundColor2={'#FFFFFF'}
-              />
-            </Grid>
-          )}
+          {timeseriesData.map((entry, index) => {
+            if(index > 0 && isConsideredMobile && !expandMobileView) {
+              return <div key={`staking-v3-timeseries-chart-${index}-empty`}></div>
+            }
+            return (
+              <Grid key={`staking-v3-timeseries-chart-${index}`} item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <BasicAreaChartContainer
+                  chartData={entry.data}
+                  loading={false}
+                  leftTextTitle={entry.title}
+                  leftTextSubtitle={entry.subtitle}
+                  rightTextFormatValueFn={entry.rightTextFormatValueFn}
+                  showChange={false}
+                  changeType={"up-good"}
+                  height={250}
+                  formatValueFn={entry.formatValueFn}
+                  hideLogSwitch={true}
+                  backgroundColor={'#FFFFFF'}
+                  backgroundColor2={'#FFFFFF'}
+                />
+                {(index === 0 && isConsideredMobile && !expandMobileView) &&
+                  <Typography style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px', fontWeight: 'bold', cursor: 'pointer', color: PROPY_LIGHT_BLUE}} onClick={() => setExpandMobileView(true)}>
+                    <KeyboardArrowDownIcon/>&nbsp;&nbsp;Show More Charts&nbsp;&nbsp;<KeyboardArrowDownIcon/>
+                  </Typography>
+                }
+              </Grid>
+            )
+          })}
         </Grid>
       {/* </Grid> */}
     </>
