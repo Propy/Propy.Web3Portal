@@ -353,6 +353,9 @@ export const StakeService = {
   },
   async getStakingEventsV3Paginated(page: number, perPage: number, mode?: string) : Promise<AxiosResponse["data"]> {
     return ApiService.get(`/stake/v3`, `staking-events?page=${page}&perPage=${perPage}${mode ? `&mode=${mode}` : ''}`)
+  },
+  async getStakingEventsV3Timeseries(mode?: string) : Promise<AxiosResponse["data"]> {
+    return ApiService.get(`/stake/v3`, `cumulative-timeseries${mode ? `?mode=${mode}` : ''}`)
   }
 }
 

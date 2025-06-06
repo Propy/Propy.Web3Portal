@@ -60,6 +60,8 @@ export type AreaProps = {
   isLoadingPlaceholder?: boolean
   utc?: boolean
   scaleType?: string
+  backgroundColor?: string
+  backgroundColor2?: string
 };
 
 export default withTooltip<AreaProps, ITimeseries>(
@@ -78,6 +80,8 @@ export default withTooltip<AreaProps, ITimeseries>(
     isLoadingPlaceholder = false,
     utc = false,
     scaleType = 'linear',
+    backgroundColor = '#f7f7f7',
+    backgroundColor2 = '#f7f7f7',
   }: AreaProps & WithTooltipProvidedProps<ITimeseries>) => {
     if (width < 10) return null;
 
@@ -220,7 +224,7 @@ export default withTooltip<AreaProps, ITimeseries>(
               className={"monospace"}
             />
           }
-          <LinearGradient id="area-background-gradient" from={background} to={background2} />
+          <LinearGradient id="area-background-gradient" from={backgroundColor} to={backgroundColor2} />
           <LinearGradient id="area-gradient" from={accentColor} to={accentColor} fromOpacity={0.4} toOpacity={0} />
           {!isLoadingPlaceholder && 
             <PatternLines
