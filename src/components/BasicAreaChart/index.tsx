@@ -69,6 +69,9 @@ interface IBasicAreaChartProps {
   hideTime?: boolean,
   isConsideredMobile: boolean
   utc?: boolean
+  hideLogSwitch?: boolean
+  backgroundColor?: string
+  backgroundColor2?: string
 }
 
 const neutralColor = "#ff14fc";
@@ -92,6 +95,9 @@ const BasicAreaChart = (props: IBasicAreaChartProps) => {
       hideTime,
       loading,
       utc = false,
+      hideLogSwitch = false,
+      backgroundColor = '#f7f7f7',
+      backgroundColor2 = '#f7f7f7',
     } = props;
 
     const classes = useStyles();
@@ -164,12 +170,12 @@ const BasicAreaChart = (props: IBasicAreaChartProps) => {
     }
 
     return (
-      <div className="graph-zone-container" style={{minHeight: height, width: '100%', position: 'relative', borderRadius: 8, backgroundColor: '#f7f7f7', paddingBottom: 6, border: '1px solid #d3d3d3'}}>
+      <div className="graph-zone-container" style={{minHeight: height, width: '100%', position: 'relative', borderRadius: 8, backgroundColor, paddingBottom: 6, border: '1px solid #d3d3d3'}}>
         <div
           style={{
             height: 76,
             width: '100%',
-            backgroundColor: '#f7f7f7',
+            backgroundColor,
             borderTopRightRadius: 10,
             borderTopLeftRadius: 10,
             display: 'flex',
@@ -196,15 +202,19 @@ const BasicAreaChart = (props: IBasicAreaChartProps) => {
               {!rightText && ((rightTextFormatValueFn && (filteredChartData.length > 0)) ? rightTextFormatValueFn(filteredChartData[filteredChartData.length - 1].value) : 'Loading...')}
               {(!rightTextFormatValueFn && (rightText || 'Loading...'))}
             </Typography>
-            {(showChange && filteredChartData?.length > 0) 
-              ?
-                <Typography variant="subtitle1" style={{lineHeight: 1, alignSelf: 'end', color: getChangeColor(filteredChartData[0].value, filteredChartData[filteredChartData.length - 1].value)}}>
-                  {getChange(filteredChartData[0].value, filteredChartData[filteredChartData.length - 1].value)}
-                </Typography>
-              :
-              <Typography variant="subtitle1" style={{lineHeight: 1, alignSelf: 'end'}}>
-                Loading...
-              </Typography>
+            {showChange && 
+              <>
+                {filteredChartData?.length > 0
+                  ?
+                    <Typography variant="subtitle1" style={{lineHeight: 1, alignSelf: 'end', color: getChangeColor(filteredChartData[0].value, filteredChartData[filteredChartData.length - 1].value)}}>
+                      {getChange(filteredChartData[0].value, filteredChartData[filteredChartData.length - 1].value)}
+                    </Typography>
+                  :
+                  <Typography variant="subtitle1" style={{lineHeight: 1, alignSelf: 'end'}}>
+                    Loading...
+                  </Typography>
+                }
+              </>
             }
           </div>
         </div>
@@ -226,15 +236,19 @@ const BasicAreaChart = (props: IBasicAreaChartProps) => {
                     hideTime={hideTime}
                     utc={utc}
                     scaleType={scaleType}
+                    backgroundColor={backgroundColor}
+                    backgroundColor2={backgroundColor2}
                 />
               </>
             )
           }}
         </ParentSize>
-        <div style={{marginRight: 16, marginLeft: 16, marginTop: 6, marginBottom: 8, textAlign: 'right'}}>
-          <Button onClick={() => setScaleType('log')} style={{paddingTop:0,paddingBottom:0,marginRight:4}} size="small" className={scaleType === 'linear' ? 'transparent-border' : ''} variant={'outlined'}>Log</Button>
-          <Button onClick={() => setScaleType('linear')} style={{paddingTop:0,paddingBottom:0}} size="small" className={scaleType === 'log' ? 'transparent-border' : ''} variant={'outlined'}>Linear</Button>
-        </div>
+        {!hideLogSwitch &&
+          <div style={{marginRight: 16, marginLeft: 16, marginTop: 6, marginBottom: 8, textAlign: 'right'}}>
+            <Button onClick={() => setScaleType('log')} style={{paddingTop:0,paddingBottom:0,marginRight:4}} size="small" className={scaleType === 'linear' ? 'transparent-border' : ''} variant={'outlined'}>Log</Button>
+            <Button onClick={() => setScaleType('linear')} style={{paddingTop:0,paddingBottom:0}} size="small" className={scaleType === 'log' ? 'transparent-border' : ''} variant={'outlined'}>Linear</Button>
+          </div>
+        }
         {/* {!isConsideredMobile &&
           <div style={{padding: 10, paddingTop: 0}}>
             <ParentSize debounceTime={10}>

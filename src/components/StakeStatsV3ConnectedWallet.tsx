@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import { utils } from 'ethers';
+
 import { PieChart } from '@mui/x-charts/PieChart';
 
 import BigNumber from 'bignumber.js';
@@ -11,6 +13,9 @@ import createStyles from '@mui/styles/createStyles';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { useAccount } from 'wagmi';
 
@@ -19,6 +24,7 @@ import { PropsFromRedux } from '../containers/StakeStatsV3ConnectedWalletContain
 import {
   STAKING_V3_CORE_CONTRACT_ADDRESS,
   PROPY_LIGHT_BLUE,
+  ENV,
 } from '../utils/constants';
 
 import { 
@@ -28,6 +34,20 @@ import {
 import StakeV3LPModuleStakingPosition from './StakeV3LPModuleStakingPosition';
 import StakeV3PKModuleStakingPosition from './StakeV3PKModuleStakingPosition';
 import StakeV3ERC20ModuleStakingPosition from './StakeV3ERC20ModuleStakingPosition';
+
+import BasicAreaChartContainer from '../containers/BasicAreaChartContainer';
+
+import {
+  StakeService,
+} from '../services/api';
+
+import {
+  priceFormat,
+} from '../utils';
+
+import {
+  ITimeseries,
+} from '../interfaces';
 
 BigNumber.config({ EXPONENTIAL_AT: [-1e+9, 1e+9] });
 
@@ -112,6 +132,14 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
   } = useAccount();
 
   const [pieChartData, setPieChartData] = useState<false | IPieChartEntry[]>(false);
+  const [timeseriesData, setTimeseriesData] = useState<{
+    title: string,
+    subtitle: string,
+    data: ITimeseries[]
+    rightTextFormatValueFn: (value: any) => string,
+    formatValueFn: (value: any) => string,
+  }[]>([])
+  const [expandMobileView, setExpandMobileView] = useState(false);
 
   const { 
     data: {
@@ -147,16 +175,83 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
 
   }, [address, stakerSharesTotal, totalShares])
 
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAndSetTimeseriesData = async () => {
+      let fetchedData = await StakeService.getStakingEventsV3Timeseries(ENV !== 'prod' ? 'testnet' : undefined);
+      console.log({fetchedData});
+      let pStakeData : ITimeseries[] = [];
+      let combinedProValueStakedData : ITimeseries[] = [];
+      let proValueStakedData : ITimeseries[] = [];
+      let virtualProValueStakedData : ITimeseries[] = [];
+      for(let entry of fetchedData.data?.data) {
+        pStakeData.push({
+          date: entry.utc_date,
+          value: Number(utils.formatUnits(entry.present_pstake_supply, 8)),
+        })
+        combinedProValueStakedData.push({
+          date: entry.utc_date,
+          value: Number(utils.formatUnits(entry.present_effective_pro_amount, 8)),
+        })
+        proValueStakedData.push({
+          date: entry.utc_date,
+          value: Number(utils.formatUnits(entry.present_pro_amount, 8)),
+        })
+        virtualProValueStakedData.push({
+          date: entry.utc_date,
+          value: Number(utils.formatUnits(entry.present_virtual_pro_amount, 8)),
+        })
+      }
+      if(isMounted && fetchedData.data?.data) {
+        // setTransactionData(fetchedData.data);
+        setTimeseriesData([
+          {
+            title: "Circulating pSTAKE",
+            subtitle: "Total Staking Power Supply",
+            data: pStakeData,
+            rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'pSTAKE', false),
+            formatValueFn: (value: any) => priceFormat(value, 2, 'pSTAKE', false),
+          },
+          {
+            title: "Estimated Total Staked PRO",
+            subtitle: "Combined PRO + Virtual Staked PRO",
+            data: combinedProValueStakedData,
+            rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+            formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+          },
+          {
+            title: "Total Staked PRO",
+            subtitle: "Staked via PRO Staking Module",
+            data: proValueStakedData,
+            rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+            formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+          },
+          {
+            title: "Total Virtual Staked PRO",
+            subtitle: "Staked via PropyKeys & LP Module",
+            data: virtualProValueStakedData,
+            rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+            formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
+          },
+        ])
+      }
+    }
+    fetchAndSetTimeseriesData();
+    return () => {
+      isMounted = false;
+    }
+  }, [])
+
   return (
     <>
       <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>
-        <Grid item xs={4} sm={8} md={12} lg={30} xl={10}>
+        <Grid style={{marginBottom: '16px'}} item xs={4} sm={8} md={12} lg={30} xl={10}>
           <StakeV3LPModuleStakingPosition totalShares={totalShares} />
         </Grid>
-        <Grid item xs={4} sm={8} md={6} lg={15} xl={10}>
+        <Grid style={{marginBottom: '16px'}} item xs={4} sm={8} md={6} lg={15} xl={10}>
           <StakeV3ERC20ModuleStakingPosition totalShares={totalShares} />
         </Grid>
-        <Grid item xs={4} sm={8} md={6} lg={15} xl={10}>
+        <Grid style={{marginBottom: '16px'}} item xs={4} sm={8} md={6} lg={15} xl={10}>
           <StakeV3PKModuleStakingPosition totalShares={totalShares} />
         </Grid>
       </Grid>
@@ -259,25 +354,55 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
             </div>
           </Card>
         </Grid> */}
-        <Grid item xs={12} lg={12}>
-          <Card className={classes.card}>
-            <div className={classes.cardInner}>
-              {pieChartData && 
-                <PieChart
-                colors={["#80c8ff", PROPY_LIGHT_BLUE]}
-                  series={[
-                    {
-                      data: pieChartData,
-                      innerRadius: 50,
-                      valueFormatter: (entry) => `${entry.value.toFixed(2)} %`
-                    },
-                  ]}
-                  width={isConsideredMobile ? 400 : 700}
-                  height={isConsideredMobile ? 200 : 400}
+        <Grid container spacing={2} columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <Grid item xs={12} lg={12}>
+            <Card className={classes.card}>
+              <div className={classes.cardInner}>
+                {pieChartData && 
+                  <PieChart
+                  colors={["#80c8ff", PROPY_LIGHT_BLUE]}
+                    series={[
+                      {
+                        data: pieChartData,
+                        innerRadius: 50,
+                        valueFormatter: (entry) => `${entry.value.toFixed(2)} %`
+                      },
+                    ]}
+                    width={isConsideredMobile ? 400 : 700}
+                    height={isConsideredMobile ? 200 : 400}
+                  />
+                }
+              </div>
+            </Card>
+          </Grid>
+          {timeseriesData.map((entry, index) => {
+            if(index > 0 && isConsideredMobile && !expandMobileView) {
+              return <div key={`staking-v3-timeseries-chart-${index}-empty`}></div>
+            }
+            return (
+              <Grid key={`staking-v3-timeseries-chart-${index}`} item xs={12} sm={12} md={12} lg={6} xl={6}>
+                <BasicAreaChartContainer
+                  chartData={entry.data}
+                  loading={false}
+                  leftTextTitle={entry.title}
+                  leftTextSubtitle={entry.subtitle}
+                  rightTextFormatValueFn={entry.rightTextFormatValueFn}
+                  showChange={false}
+                  changeType={"up-good"}
+                  height={250}
+                  formatValueFn={entry.formatValueFn}
+                  hideLogSwitch={true}
+                  backgroundColor={'#FFFFFF'}
+                  backgroundColor2={'#FFFFFF'}
                 />
-              }
-            </div>
-          </Card>
+                {(index === 0 && isConsideredMobile && !expandMobileView) &&
+                  <Typography style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px', fontWeight: 'bold', cursor: 'pointer', color: PROPY_LIGHT_BLUE}} onClick={() => setExpandMobileView(true)}>
+                    <KeyboardArrowDownIcon/>&nbsp;&nbsp;Show More Charts&nbsp;&nbsp;<KeyboardArrowDownIcon/>
+                  </Typography>
+                }
+              </Grid>
+            )
+          })}
         </Grid>
       {/* </Grid> */}
     </>

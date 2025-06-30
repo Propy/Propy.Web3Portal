@@ -12,6 +12,7 @@ import { PropsFromRedux } from '../containers/NetworkSelectDropdownContainer';
 import EthLogo from '../assets/img/ethereum-web3-modal.png';
 import ArbitrumLogo from '../assets/img/arbitrum.png';
 import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
+import BnbLogo from '../assets/img/bnb-logo-transparent-bg.webp';
 
 import { SupportedNetworks } from '../interfaces';
 
@@ -70,6 +71,9 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
         break;
       case 'sepolia':
         networkImage = EthLogo;
+        break;
+      case 'bnb':
+        networkImage = BnbLogo;
         break;
       case 'arbitrum':
         networkImage = ArbitrumLogo;
