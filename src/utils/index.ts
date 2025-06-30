@@ -45,7 +45,7 @@ const ETHERSCAN_PREFIXES_CHAIN_ID: { [chainId in ChainId | ExtraChainId]?: strin
 	42: 'kovan.etherscan.io',
 	100: '',
 	1337: '',
-	56: '',
+	56: 'bscscan.com',
 	97: '',
 	137: '',
 	361: '',
