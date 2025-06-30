@@ -28,7 +28,7 @@ export interface ISelectedPopupConfig {
     token_id: string | false;
 }
 
-export type L1Networks = 'ethereum' | 'goerli' | 'sepolia'
+export type L1Networks = 'ethereum' | 'goerli' | 'sepolia' | 'bnb'
 export type L2Networks = 'arbitrum' | 'base' | 'base-sepolia' | 'base-goerli'
 
 export type SupportedNetworks = L1Networks | L2Networks | 'unsupported';
@@ -43,8 +43,14 @@ export enum NetworkName {
     sepolia = "sepolia",
     optimism = "optimism",
     arbitrum = "arbitrum",
+    bnb = 'bnb',
     base = "base",
     'base-sepolia' = 'base-sepolia',
+}
+
+export interface IAgentApiConfig {
+    provider: 'OpenAI';
+    key: string;
 }
 
 export interface ITransferEventERC721Record {

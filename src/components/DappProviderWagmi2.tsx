@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // import { base, mainnet, sepolia, baseSepolia } from 'wagmi/chains'
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { base, mainnet, sepolia, baseSepolia } from '@reown/appkit/networks';
+import { base, mainnet, sepolia, baseSepolia, bsc } from '@reown/appkit/networks';
 
 import AppContainer from '../containers/AppContainer';
 
@@ -29,10 +29,12 @@ const networks =
   process?.env?.REACT_APP_ENV === 'prod' ? [
     mainnet,
     base,
+    bsc,
   ] as const :
   [
     mainnet,
     base,
+    bsc,
     sepolia,
     baseSepolia,
   ] as const;

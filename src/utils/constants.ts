@@ -65,6 +65,8 @@ export const PROPY_LIGHT_GREY = "#f6f6f6";
 
 export const PROPY_LIGHT_BLUE = "#38A6FB";
 
+export const PROPY_DARK_BLUE = "#0072cb";
+
 export const VALID_PROPYKEYS_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "propy-home-nft-dev-base-testnet", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
 
 export const VALID_HOME_LISTING_COLLECTION_NAMES_OR_ADDRESSES = ["propykeys-base-sepolia", "propykeys", "0xa239b9b3E00637F29f6c7C416ac95127290b950E", "0x45C395851c9BfBd3b7313B35E6Ee460D461d585c"];
@@ -188,6 +190,7 @@ export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
 	1: 'ethereum',
 	42161: 'arbitrum',
   8453: 'base',
+  56: 'bnb',
   ...(process?.env?.REACT_APP_ENV !== 'prod' && {
     84532: 'base-sepolia',
     84531: 'base-goerli',
@@ -204,8 +207,9 @@ export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
 
 export const NETWORK_ID_TO_RPC : {[key: number]: string | undefined} = {
   1: process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET ? process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET : "",
-  42161: process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM ? process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM : "",
+  56: process.env.REACT_APP_QUICKNODE_RPC_URL_BNB ? process.env.REACT_APP_QUICKNODE_RPC_URL_BNB : "",
   8453: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE : "",
+  42161: process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM ? process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM : "",
   ...(process?.env?.REACT_APP_ENV !== 'prod' && {
     84532: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA : "",
     11155111: process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA : "",
@@ -216,6 +220,7 @@ export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
 	'ethereum': 'Ethereum',
 	'arbitrum': 'Arbitrum',
   'base': 'Base',
+  'bnb': 'BNB Smart Chain',
   ...(process?.env?.REACT_APP_ENV !== 'prod' && {
     'base-sepolia': 'Base Sepolia',
     'base-goerli': 'Base Goerli',
@@ -228,6 +233,7 @@ export const NETWORK_NAME_TO_ID : {[key: string]: number} = {
 	'ethereum': 1,
 	'arbitrum': 42161,
   'base': 8453,
+  'bnb': 56,
   ...(process?.env?.REACT_APP_ENV !== 'prod' && {
     'base-sepolia': 84532,
     'base-goerli': 84531,
