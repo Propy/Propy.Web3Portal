@@ -9,6 +9,7 @@
     "@emotion/styled": "^11.6.0",
     "@eth-optimism/contracts-ts": "^0.17.0",
     "@eth-optimism/sdk": "^3.1.6",
+    "@layerzerolabs/lz-definitions": "^3.0.111",
     "@metamask/jazzicon": "^2.0.0",
     "@mui/icons-material": "^5.1.1",
     "@mui/material": "^5.1.1",

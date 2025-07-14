@@ -225,7 +225,8 @@ export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
     'base-sepolia': 'Base Sepolia',
     'base-goerli': 'Base Goerli',
     'goerli': "Goerli",
-    'sepolia': 'Sepolia'
+    'sepolia': 'Sepolia',
+    'bnb-testnet': 'BNB Testnet',
   })
 }
 
