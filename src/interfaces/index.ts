@@ -71,6 +71,54 @@ export interface ITransferEventERC721Record {
     value?: string;
 }
 
+export interface IONFTReceivedEventRecord {
+    network_name: NetworkName;
+    block_number: string;
+    block_hash: string;
+    transaction_index: string;
+    removed: boolean;
+    contract_address: string;
+    data: string;
+    topic: string;
+    type: string;
+    onft_address: string;
+    nft_address: string;
+    source_nft_address: string;
+    source_nft_network_name: string;
+    src_eid: string;
+    token_id: string;
+    to_address: string;
+    guid: string;
+    transaction_hash: string;
+    log_index: number;
+    evm_transaction?: IEVMTransactionRecord;
+    value?: string;
+}
+
+export interface IONFTSentEventRecord {
+    network_name: NetworkName;
+    block_number: string;
+    block_hash: string;
+    transaction_index: string;
+    removed: boolean;
+    contract_address: string;
+    data: string;
+    topic: string;
+    type: string;
+    onft_address: string;
+    nft_address: string;
+    source_nft_address: string;
+    source_nft_network_name: string;
+    dst_eid: string;
+    token_id: string;
+    from_address: string;
+    guid: string;
+    transaction_hash: string;
+    log_index: number;
+    evm_transaction?: IEVMTransactionRecord;
+    value?: string;
+}
+
 export interface ITransferEventERC20Record {
     network_name: NetworkName;
     block_number: string;

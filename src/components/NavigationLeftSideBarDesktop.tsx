@@ -12,7 +12,7 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ProfileIcon from '@mui/icons-material/AccountCircle';
 import TokenIcon from '@mui/icons-material/LocalActivity';
-import GovernanceIcon from '@mui/icons-material/Gavel';
+// import GovernanceIcon from '@mui/icons-material/Gavel';
 import StakingIcon from '@mui/icons-material/Diversity2';
 import BridgeIcon from '@mui/icons-material/CompareArrows';
 import LiquidityIcon from '@mui/icons-material/AccountBalance';
@@ -110,12 +110,12 @@ const navigationMenu : IMenuEntry[] = [
     path: '/collections',
     icon: <TokenIcon />
   },
-  {
-    text: 'Governance',
-    path: '/governance',
-    externalLink: 'https://snapshot.org/#/propy-gov.eth',
-    icon: <GovernanceIcon />
-  },
+  // {
+  //   text: 'Governance',
+  //   path: '/governance',
+  //   externalLink: 'https://snapshot.org/#/propy-gov.eth',
+  //   icon: <GovernanceIcon />
+  // },
   {
     text: 'Liquidity',
     path: '/liquidity',

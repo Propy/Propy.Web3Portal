@@ -44,6 +44,8 @@ import {
   IOfferRecord,
   TokenStandard,
   IPropyKeysHomeListingRecord,
+  IONFTReceivedEventRecord,
+  IONFTSentEventRecord,
 } from '../interfaces';
 
 import {
@@ -164,7 +166,7 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
         let tokenRecord : IAssetRecord | null = null;
         let tokenStandard : TokenStandard | null = null;
         let tokenMetadata : ITokenMetadata | null =null;
-        let tokenEventRecord : ITransferEventERC721Record[] | ITransferEventERC20Record[] | null = null;
+        let tokenEventRecord : ITransferEventERC721Record[] | ITransferEventERC20Record[] | IONFTReceivedEventRecord[] | IONFTSentEventRecord[] | [] = [];
         let tokenOfferList : IOfferRecord[] | null = null;
         let listingRecord : IPropyKeysHomeListingRecord | null = null;
         if(tokenRecordQueryResponse?.status && tokenRecordQueryResponse?.data) {
@@ -177,7 +179,13 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
           //   })
           // }
           if(tokenRecordQueryResponse?.data?.transfer_events_erc721) {
-            tokenEventRecord = tokenRecordQueryResponse?.data?.transfer_events_erc721;
+            tokenEventRecord = tokenRecordQueryResponse?.data?.transfer_events_erc721 || [];
+            if(tokenRecordQueryResponse?.data?.onft_received_events) {
+              tokenEventRecord = [...tokenEventRecord, ...tokenRecordQueryResponse?.data?.onft_received_events];
+            }
+            if(tokenRecordQueryResponse?.data?.onft_sent_events) {
+              tokenEventRecord = [...tokenEventRecord, ...tokenRecordQueryResponse?.data?.onft_sent_events];
+            }
           } else if(tokenRecordQueryResponse?.data?.transfer_events_erc20) {
             tokenEventRecord = tokenRecordQueryResponse?.data?.transfer_events_erc20;
           }
@@ -304,7 +312,7 @@ const SingleTokenPage = (props: ISingleTokenPage) => {
                       </>
                     }
                     <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="History"/>
-                    {tokenDataTanstack?.tokenEventRecord && <EventHistoryContainer eventRecords={tokenDataTanstack?.tokenEventRecord} assetRecord={tokenDataTanstack?.tokenRecord} />}
+                    {tokenDataTanstack?.tokenEventRecord?.length > 0 && <EventHistoryContainer eventRecords={tokenDataTanstack?.tokenEventRecord} assetRecord={tokenDataTanstack?.tokenRecord} />}
                     {allowSignalInterest && tokenId && tokenAddress && network && 
                       <>
                         <GenericTitleContainer variant={"h5"} paddingBottom={8} marginTop={24} marginBottom={12} title="Offers" actionComponent={<SignalInterestContainer onSuccess={() => setFetchIndex(fetchIndex + 1)} tokenId={tokenId} tokenAddress={tokenAddress} tokenNetwork={network} />}/>

@@ -2,6 +2,7 @@ import { ChainId, shortenAddress } from '@usedapp/core'
 import numeral from "numeral";
 import * as isIPFS from 'is-ipfs';
 import { utils } from "ethers";
+import { EndpointId } from '@layerzerolabs/lz-definitions'
 
 import {
 	NetworkName,
@@ -403,3 +404,23 @@ export const decodeSVGImage = (metadata: UniswapNFTMetadata): string | null => {
     throw new Error(`Failed to decode SVG image: ${(error as Error).message}`);
   }
 };
+
+export const lzEidToNetworkName = (lzEid: number) => {
+	console.log({'EndpointId[lzEid]': EndpointId[lzEid]})
+	if(EndpointId[lzEid]) {
+		if(EndpointId[lzEid] === 'ETHEREUM_V2_MAINNET') {
+			return 'ethereum';
+		}
+		if(EndpointId[lzEid] === 'SEPOLIA_V2_TESTNET') {
+			return 'sepolia';
+		}
+		if(EndpointId[lzEid] === 'BSC_V2_TESTNET') {
+			return 'bnb-testnet';
+		}
+		if(EndpointId[lzEid] === 'BSC_V2_MAINNET') {
+			return 'bnb';
+		}
+		return EndpointId[lzEid];
+	}
+	return 'Unknown';
+}
