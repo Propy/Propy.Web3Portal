@@ -24,6 +24,7 @@ import Chip from '@mui/material/Chip';
 import V1Icon from '@mui/icons-material/LooksOne';
 import V2Icon from '@mui/icons-material/LooksTwo';
 // import V3Icon from '@mui/icons-material/Looks3';
+import Web3AgentIcon from '@mui/icons-material/AutoAwesome';
 
 import { PropsFromRedux } from '../containers/NavigationLeftSideBarContainer';
 
@@ -66,6 +67,11 @@ const navigationMenu : IMenuEntry[] = [
     path: '/my-assets',
     icon: <AccountBalanceWalletIcon />,
     onlyConnected: true,
+  },
+  {
+    text: 'Web3 Agent',
+    path: '/web3-agent',
+    icon: <Web3AgentIcon/>,
   },
   // {
   //   text: 'Analytics',

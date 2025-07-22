@@ -25,6 +25,10 @@ import {
   NETWORK_NAME_TO_ID,
 } from '../utils/constants';
 
+import {
+  SupportedNetworks,
+} from '../interfaces';
+
 import { PropsFromRedux } from '../containers/NetworkSelectDropdownContainer';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -51,15 +55,35 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 250,
       opacity: 0.15
     },
+    multiNetworkSwitchContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    multiNetworkSwitchEntry: {
+      marginRight: theme.spacing(1),
+      marginLeft: theme.spacing(1),
+    }
   }),
 );
 
-interface INetworkGate {
-  children: React.ReactElement,
-  requiredNetwork: string,
-  onlyGateConnected?: boolean,
-  requireConnected?: boolean,
+interface INetworkGateBase {
+  children: React.ReactElement;
+  onlyGateConnected?: boolean;
+  requireConnected?: boolean;
 }
+
+interface INetworkGateSingle extends INetworkGateBase {
+  requiredNetwork: string;
+  requiredNetworks?: never;
+}
+
+interface INetworkGateMultiple extends INetworkGateBase {
+  requiredNetwork?: never;
+  requiredNetworks: SupportedNetworks[];
+}
+
+type INetworkGate = INetworkGateSingle | INetworkGateMultiple;
 
 export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
 
@@ -67,6 +91,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
     children,
     activeNetwork,
     requiredNetwork,
+    requiredNetworks,
     onlyGateConnected,
     requireConnected,
   } = props;
@@ -131,7 +156,7 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <Button variant={'outlined'} color={"primary"} onClick={() => open()}>{"Connect Wallet"}</Button>
         </div>
       }
-      {(requiredNetwork !== activeNetwork) && ((onlyGateConnected && address) || (!onlyGateConnected && address)) &&
+      {requiredNetwork && (requiredNetwork !== activeNetwork) && ((onlyGateConnected && address) || (!onlyGateConnected && address)) &&
         <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT, width: '100%'}}>
           <animated.div className={classes.sectionSpacer} style={chainSpring}>
             <img className={classes.mainGraphic} src={NetworkGraphic} alt="Network Graphic"/>
@@ -145,7 +170,41 @@ export const NetworkGate = (props: PropsFromRedux & INetworkGate) => {
           <NetworkSelectDropdownContainer color={"primary"} switchMode={true} isLoading={isPending} onClickOverride={() => switchChain && switchChain({chainId: NETWORK_NAME_TO_ID[requiredNetwork]})} />
         </div>
       }
-      {((requiredNetwork === activeNetwork) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address) || (onlyGateConnected && address)) &&
+      {requiredNetworks && (requiredNetworks.indexOf(activeNetwork) === -1) && ((onlyGateConnected && address) || (!onlyGateConnected && address)) &&
+        <div className={classes.root} style={{minHeight: GLOBAL_PAGE_HEIGHT, width: '100%'}}>
+          <animated.div className={classes.sectionSpacer} style={chainSpring}>
+            <img className={classes.mainGraphic} src={NetworkGraphic} alt="Network Graphic"/>
+          </animated.div>
+          <Typography style={{textAlign: 'center'}} variant="h4" className={classes.title}>
+            Network Checkpoint
+          </Typography>
+          <Typography style={{textAlign: 'center'}} variant="h6" className={[classes.sectionSpacerSmall, "secondary-text-light-mode", "light-text"].join(" ")}>
+            Please switch to {
+              requiredNetworks.map((requiredNetworkEntry, index) => {
+                if(index === 0) {
+                  return NETWORK_NAME_TO_DISPLAY_NAME[requiredNetworkEntry]
+                } else if ((index > 0) && (index < (requiredNetworks.length - 1))) {
+                  return `, ${NETWORK_NAME_TO_DISPLAY_NAME[requiredNetworkEntry]}`
+                } else {
+                  return ` or ${NETWORK_NAME_TO_DISPLAY_NAME[requiredNetworkEntry]}`
+                }
+              })
+            } to continue
+          </Typography>
+          <div className={classes.multiNetworkSwitchContainer}>
+            {
+              requiredNetworks.map((requiredNetworkEntry) => {
+                return (
+                  <div className={classes.multiNetworkSwitchEntry}>
+                    <NetworkSelectDropdownContainer switchMode={false} overrideActiveNetwork={requiredNetworkEntry} isLoading={isPending} onClickOverride={() => switchChain && switchChain({chainId: NETWORK_NAME_TO_ID[requiredNetworkEntry]})} />
+                  </div>
+                )
+              })
+            }
+          </div>
+        </div>
+      }
+      {((requiredNetwork === activeNetwork || (requiredNetworks && requiredNetworks.indexOf(activeNetwork) > -1)) || (onlyGateConnected && !address)) && ((requireConnected && address) || (!requireConnected && !address) || (onlyGateConnected && address)) &&
         <>
           {children}
         </>
