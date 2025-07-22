@@ -89,8 +89,6 @@ export const AgentApiKeyGate = (props: PropsFromRedux & IAgentApiConfigGate) => 
     .min(40)
   });
 
-  console.log({agentApiConfig})
-
   return (
     <>
       {(!agentApiConfig?.key || !agentApiConfig?.provider) &&
