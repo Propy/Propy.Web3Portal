@@ -28,6 +28,7 @@ import PropyKeyRepossessionPage from '../pages/PropyKeyRepossessionPage';
 import PropyProfilePage from '../pages/PropyProfilePage';
 import PaymasterTestUnifiedPage from '../pages/PaymasterTestUnifiedPage';
 import TestBuyCryptoPage from '../pages/TestBuyCryptoPage';
+import Web3AgentPage from '../pages/Web3AgentPage';
 
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -105,6 +106,7 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/collections" element={<CollectionsPage/>} />
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
+                      <Route path="/web3-agent" element={<Web3AgentPage />} />
                       <Route path="/stake/v1" element={<StakePage version={1} />} />
                       <Route path="/stake/v2" element={<StakePage version={2} />} />
                       <Route path="/stake/v3" element={<StakePage version={3} />} />

@@ -2,6 +2,7 @@ import {
     SupportedNetworks,
     IPropyKeysMapFilterOptions,
     IFullScreenGalleryConfig,
+    IAgentApiConfig,
 } from '../../interfaces';
 
 export const setShowLeftMenu = (visible: boolean) => ({
@@ -47,4 +48,9 @@ export const setFullScreenGalleryConfig = (fullScreenGalleryConfig: IFullScreenG
 export const setSupportAddressToWalletAddressToLastPushChatDismissedTimestampUNIX = (supportAddressToWalletToTimestamp: {[key: string]: {[key: string]: number}}) => ({
     type: "SET_SUPPORT_ADDRESS_TO_WALLET_ADDRESS_TO_LAST_PUSH_CHAT_DISMISSED_TIMESTAMP_UNIX",
     supportAddressToWalletToTimestamp,
+})
+
+export const setAgentApiConfig = (agentApiConfig: IAgentApiConfig) => ({
+    type: "SET_AGENT_API_CONFIG",
+    agentApiConfig,
 })

@@ -230,6 +230,17 @@ export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
   })
 }
 
+export const WEB3_AGENT_NETWORKS : SupportedNetworks[] = [
+  'ethereum',
+  // 'base',
+  // 'bnb',
+  ...(process?.env?.REACT_APP_ENV !== 'prod' ? [
+    // 'base-sepolia',
+    'sepolia',
+    // 'bnb-testnet',
+  ] as SupportedNetworks[] : [])
+]
+
 export const NETWORK_NAME_TO_ID : {[key: string]: number} = {
 	'ethereum': 1,
 	'arbitrum': 42161,

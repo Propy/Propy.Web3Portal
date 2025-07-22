@@ -3,6 +3,7 @@ import { matchRoutes, useLocation } from "react-router-dom"
 const routes = [
   { path: "/" },
   { path: "/my-assets" },
+  { path: "/web3-agent" },
   { path: "/collections" },
   { path: "/stake" },
   { path: "/stake/v1" },
