@@ -27,7 +27,8 @@ interface INetworkSelectButton {
   isLoading?: boolean
   color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined
   width?: string
-  showCompactNetworkSwitch?: boolean
+  showCompactNetworkSwitch?: boolean,
+  overrideActiveNetwork?: SupportedNetworks,
 }
 
 const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => {
@@ -41,6 +42,7 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
     color = "inherit",
     width = "auto",
     showCompactNetworkSwitch = false,
+    overrideActiveNetwork,
   } = props;
 
   const { chainId, address } = useAccount();
@@ -145,13 +147,13 @@ const NetworkSelectDropdown = (props: PropsFromRedux & INetworkSelectButton) => 
       }
       {!switchMode && 
         <>
-          {NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork, showCompactNetworkSwitch) &&
+          {NETWORK_NAME_TO_DISPLAY_NAME[overrideActiveNetwork ? overrideActiveNetwork : activeNetwork] && activeNetworkToImage(overrideActiveNetwork ? overrideActiveNetwork : activeNetwork, showCompactNetworkSwitch) &&
             <>
-              {activeNetworkToImage(activeNetwork, showCompactNetworkSwitch)}
-              {showCompactNetworkSwitch ? '' : NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork]}
+              {activeNetworkToImage(overrideActiveNetwork ? overrideActiveNetwork : activeNetwork, showCompactNetworkSwitch)}
+              {showCompactNetworkSwitch ? '' : NETWORK_NAME_TO_DISPLAY_NAME[overrideActiveNetwork ? overrideActiveNetwork : activeNetwork]}
             </>
           }
-          {!(NETWORK_NAME_TO_DISPLAY_NAME[activeNetwork] && activeNetworkToImage(activeNetwork, showCompactNetworkSwitch)) &&
+          {!(NETWORK_NAME_TO_DISPLAY_NAME[overrideActiveNetwork ? overrideActiveNetwork : activeNetwork] && activeNetworkToImage(overrideActiveNetwork ? overrideActiveNetwork : activeNetwork, showCompactNetworkSwitch)) &&
             <>
               Unsupported Network
             </>
