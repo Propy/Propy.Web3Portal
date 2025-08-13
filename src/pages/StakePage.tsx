@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-// import { Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import {
   BASE_L2_NETWORK,
@@ -47,6 +47,8 @@ const StakePage = (props: IStakePage) => {
   const navigate = useNavigate();
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
+
+  const showV3Pending = true;
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTabIndex(newValue);
@@ -114,37 +116,45 @@ const StakePage = (props: IStakePage) => {
         }
         {Number(version) === 3 &&
           <>
-            <KYCWalletGateContainer
-              privacyPolicyLink='https://propy.com/browse/privacy-policy/'
-              termsLink='https://propy.com/browse/staking-terms/'
-            >
+            {showV3Pending ? 
               <GenericPageContainer>
-                <>
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
-                    <Tabs 
-                      value={selectedTabIndex}
-                      onChange={handleChangeV3}
-                      aria-label="basic tabs example"
-                      variant="scrollable"
-                      scrollButtons="auto"
-                    >
-                      <Tab label="Stats" {...a11yProps(0)} />
-                      <Tab label="Stake" {...a11yProps(1)} />
-                      <Tab label="Unstake" {...a11yProps(2)} />
-                    </Tabs>
-                  </Box>
-                  {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
-                    <StakeStatsV3Container version={version} />
-                  }
-                  {(mode === "stake") &&
-                    <StakePortalV3Container mode="enter" version={version} />
-                  }
-                  {(mode === "unstake") &&
-                    <StakePortalV3Container mode="leave" version={version} />
-                  }
-                </>
+                <Typography variant="h5" align="center">
+                  V3 of staking has not yet launched, please come back in the future.
+                </Typography>
               </GenericPageContainer>
-            </KYCWalletGateContainer>
+            :
+              <KYCWalletGateContainer
+                privacyPolicyLink='https://propy.com/browse/privacy-policy/'
+                termsLink='https://propy.com/browse/staking-terms/'
+              >
+                <GenericPageContainer>
+                  <>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
+                      <Tabs 
+                        value={selectedTabIndex}
+                        onChange={handleChangeV3}
+                        aria-label="basic tabs example"
+                        variant="scrollable"
+                        scrollButtons="auto"
+                      >
+                        <Tab label="Stats" {...a11yProps(0)} />
+                        <Tab label="Stake" {...a11yProps(1)} />
+                        <Tab label="Unstake" {...a11yProps(2)} />
+                      </Tabs>
+                    </Box>
+                    {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
+                      <StakeStatsV3Container version={version} />
+                    }
+                    {(mode === "stake") &&
+                      <StakePortalV3Container mode="enter" version={version} />
+                    }
+                    {(mode === "unstake") &&
+                      <StakePortalV3Container mode="leave" version={version} />
+                    }
+                  </>
+                </GenericPageContainer>
+              </KYCWalletGateContainer>
+            }
           </>
         }
       </>
