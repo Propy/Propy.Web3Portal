@@ -48,7 +48,7 @@ const StakePage = (props: IStakePage) => {
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
 
-  const showV3Pending = true;
+  const showV3Pending = false;
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTabIndex(newValue);
