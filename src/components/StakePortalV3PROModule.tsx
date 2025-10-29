@@ -714,7 +714,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       functionName: 'enterWithOnlyERC20',
       args: [utils.parseUnits(Number(proStakeAmount) > 0 ? proStakeAmount : "0", 8), selectedLockupPeriodDays],
     },
-    successToastMessage: `Stake success!`,
+    successToastMessage: `Entrance success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
@@ -765,7 +765,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       functionName: 'leaveWithOnlyERC20',
       args: [],
     },
-    successToastMessage: `Unstake PRO success!`,
+    successToastMessage: `Withdraw PRO success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {

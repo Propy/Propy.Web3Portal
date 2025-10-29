@@ -803,7 +803,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       functionName: 'enterWithOnlyPropyKeys',
       args: [selectedTokenAddress, selectedTokenIds],
     },
-    successToastMessage: `Stake success!`,
+    successToastMessage: `Entry success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
@@ -855,7 +855,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       functionName: 'leaveWithPropyKeys',
       args: [selectedTokenAddress, selectedTokenIds],
     },
-    successToastMessage: `Unstake success!`,
+    successToastMessage: `Withdrawal success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
