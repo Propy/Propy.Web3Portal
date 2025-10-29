@@ -225,7 +225,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
         <div className={classes.actionArea}>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
             <Typography variant="h5" className={classes.cardSubtitle}>
-              {Number(moduleShares) > 0 ? 'Active' : 'No'} Stake
+              {Number(moduleShares) > 0 ? 'Active' : 'No'} Position
             </Typography>
           </div>
           <div className={classes.moduleIconContainer}>
@@ -267,7 +267,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
                   </Box>
                   <span className='flex-center' style={{marginLeft: '16px'}}>
                     {priceFormat(lockupProgress, 3, "%", false)}
-                    <Tooltip placement="top" title={`Once lockup progress reaches 100%, you may claim any allocated rewards! Unstaking before your lockup progress is at 100% will forfeit any rewards which you may have been granted via this staking position.`}>
+                    <Tooltip placement="top" title={`Once lockup progress reaches 100%, you may claim any allocated rewards! Unstaking before your lockup progress is at 100% will forfeit any rewards which you may have been granted via this earning position.`}>
                       <HelpIcon className={'tooltip-helper-icon'} />
                     </Tooltip>
                   </span>
@@ -285,7 +285,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
             }
             {/* <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2"><strong>Current Position Details:</strong></Typography> */}
             <Typography className={[classes.buttonTitle, 'flex-center', 'space-between'].join(" ")} variant="subtitle2">
-              <span>Staking Power:</span>
+              <span>Earning Power:</span>
               <span className='flex-center' style={{marginLeft: '16px'}}>
                 {priceFormat(Number(utils.formatUnits(Number(moduleShares ? moduleShares : 0), 8)), 2, 'pSTAKE', false, true)} 
                 <Tooltip placement="top" title={`pSTAKE value can be used to derive your percentage share of how much of an incoming reward will be allocated to your wallet (pending lockup completion).`}>
@@ -297,7 +297,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
               <span>Reward Share:</span>
               <span className='flex-center' style={{marginLeft: '16px'}}>
                 {priceFormat(stakeShare, 2, '%', false, true)} 
-                <Tooltip placement="top" title={`This value is derived from your staking power (pSTAKE) and represents the share of incoming rewards which will be allocated to your staking position`}>
+                <Tooltip placement="top" title={`This value is derived from your earning power (pSTAKE) and represents the share of incoming rewards which will be allocated to your earning position`}>
                   <HelpIcon className={'tooltip-helper-icon'} />
                 </Tooltip>
               </span>
@@ -309,7 +309,7 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
                     <span>Allocated Reward:</span>
                     <span className='flex-center' style={{marginLeft: '16px'}}>
                       {priceFormat(Number(utils.formatUnits(Number(stakerRewardOnModule ? stakerRewardOnModule : 0), 8)), 2, 'PRO', false, true)} 
-                      <Tooltip placement="top" title={`An "allocated reward" refers to a PRO reward which will only become claimable once the position's lockup timer reaches maturity, so this value effectively shows how much PRO can be claimed against this staking position once the position's lockup timer ends.`}>
+                      <Tooltip placement="top" title={`An "allocated reward" refers to a PRO reward which will only become claimable once the position's lockup timer reaches maturity, so this value effectively shows how much PRO can be claimed against this earning position once the position's lockup timer ends.`}>
                         <HelpIcon className={'tooltip-helper-icon'} />
                       </Tooltip>
                     </span>
@@ -340,22 +340,22 @@ const StakeV3LPModuleStakingPosition = (props: IStakeV3LPModuleStakingPosition) 
           </div>
           <div className={classes.stakingButtonContainer}>
             <LinkWrapper
-              link={"/staking/v3/stake/lp"}
+              link={"/earn/v3/enter/lp"}
             >
               <ActionButton
                 className={[classes.stakingButton, classes.stakingButtonSpacer].join(" ")}
                 buttonColor="secondary"
-                text={"Stake"}
+                text={"Enter"}
               />
             </LinkWrapper>
             {Number(moduleShares) > 0 &&
               <LinkWrapper
-                link={"/staking/v3/unstake/lp"}
+                link={"/earn/v3/leave/lp"}
               >
                 <ActionButton
                   className={classes.stakingButton}
                   buttonColor="secondary"
-                  text={"Unstake"}
+                  text={"Leave"}
                 />
               </LinkWrapper>
             }

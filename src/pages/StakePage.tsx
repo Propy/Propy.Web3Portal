@@ -56,9 +56,9 @@ const StakePage = (props: IStakePage) => {
 
   useEffect(() => {
     if(Number(version) === 3) {
-      if(mode === "stake") {
+      if(mode === "enter") {
         setSelectedTabIndex(1);
-      } else if(mode === "unstake") {
+      } else if(mode === "leave") {
         setSelectedTabIndex(2);
       } else {
         setSelectedTabIndex(0);
@@ -68,11 +68,11 @@ const StakePage = (props: IStakePage) => {
 
   const handleChangeV3 = (event: React.SyntheticEvent, newValue: number) => {
     if(newValue === 0) {
-      navigate(`/staking/v3`)
+      navigate(`/earn/v3`)
     } else if (newValue === 1) {
-      navigate(`/staking/v3/stake`)
+      navigate(`/earn/v3/enter`)
     } else if (newValue === 2) {
-      navigate(`/staking/v3/unstake`)
+      navigate(`/earn/v3/leave`)
     }
   };
 
@@ -138,17 +138,17 @@ const StakePage = (props: IStakePage) => {
                         scrollButtons="auto"
                       >
                         <Tab label="Stats" {...a11yProps(0)} />
-                        <Tab label="Stake" {...a11yProps(1)} />
-                        <Tab label="Unstake" {...a11yProps(2)} />
+                        <Tab label="Enter" {...a11yProps(1)} />
+                        <Tab label="Leave" {...a11yProps(2)} />
                       </Tabs>
                     </Box>
-                    {(!mode || ["stake", "unstake"].indexOf(mode) === -1) &&
+                    {(!mode || ["enter", "leave"].indexOf(mode) === -1) &&
                       <StakeStatsV3Container version={version} />
                     }
-                    {(mode === "stake") &&
+                    {(mode === "enter") &&
                       <StakePortalV3Container mode="enter" version={version} />
                     }
-                    {(mode === "unstake") &&
+                    {(mode === "leave") &&
                       <StakePortalV3Container mode="leave" version={version} />
                     }
                   </>

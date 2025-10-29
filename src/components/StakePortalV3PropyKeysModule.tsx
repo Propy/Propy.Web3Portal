@@ -269,14 +269,14 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
               <>
                 {(Number(stakerRewardOnModule ? stakerRewardOnModule : 0) > 0) 
                 ? 
-                  <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with unclaimed rewards on this staking module, if you would like to stake more PropyKeys, please first claim your current rewards by unstaking, or alternatively stake the additional PropyKeys from a different wallet address.</Typography>
+                  <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your deposit using a wallet address with unclaimed rewards on this earning module, if you would like to deposit more PropyKeys, please first claim your current rewards by withdrawing, or alternatively stake the additional PropyKeys from a different wallet address.</Typography>
                 :
-                  <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all staked tokens, including tokens that are already staked.</Typography>
+                  <Typography className={classes.buttonSubtitle} variant="subtitle2">Staking causes a 3-day lockup period on all deposited tokens, including tokens that are already staked.</Typography>
                 }
               </>
             : 
               <>
-                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for staking has ended, the next staking entry period will begin at the start of the next season.</Typography>
+                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for earning has ended, the next entry period will begin at the start of the next season.</Typography>
               </>
           }
         </>
@@ -286,7 +286,7 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
           {(secondsRemainingUnlockTime > 0) &&
             <Typography style={{marginTop: '8px'}} className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
               Active Lockup Remaining: {formattedCountdownUnlockTime} 
-              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PropyKeys staking module.`}>
+              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PropyKeys earning module.`}>
                 <HelpIcon className={'tooltip-helper-icon'} />
               </Tooltip>
             </Typography>
@@ -294,7 +294,7 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
           {(secondsRemainingOpenSeason > 0) &&
             <Typography style={{marginTop: (secondsRemainingUnlockTime <= 0) ? '8px' : '0px'}} className={['flex-center'].join(" ")} variant="subtitle2">
               Entry Time Remaining: {formattedCountdownRemainingOpenSeason} 
-              <Tooltip placement="top" title={`This is how much time is left to create a staking position in the latest season`}>
+              <Tooltip placement="top" title={`This is how much time is left to create an earning position in the latest season`}>
                 <HelpIcon className={'tooltip-helper-icon'} />
               </Tooltip>
             </Typography>
@@ -335,14 +335,14 @@ const getUnstakeButtonText = (
   }
 
   if(isAwaitingUnstakeTx) {
-    return "Unstaking...";
+    return "Withdrawing...";
   }
 
   if(isSyncingStaking) {
     return "Syncing...";
   }
   
-  return "Unstake";
+  return "Withdraw";
 }
 
 const getStakeButtonText = (
@@ -357,7 +357,7 @@ const getStakeButtonText = (
   }
 
   if(isAwaitingStakeTx) {
-    return "Staking...";
+    return "Entering...";
   }
 
   if(isSyncingStaking) {
@@ -365,14 +365,14 @@ const getStakeButtonText = (
   }
 
   if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
-    return "Staking Entry Closed"
+    return "Earning Entry Closed"
   }
 
   if(stakerRewardOnModule > 0) {
     return "Pending Unclaimed Rewards"
   }
   
-  return "Stake";
+  return "Enter";
 }
 
 const getActiveStep = (
@@ -759,7 +759,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       functionName: 'setApprovalForAll',
       args: [STAKING_V3_PROPYKEYS_MODULE_ADDRESS, true],
     },
-    successToastMessage: `PropyKeys NFT Approval granted to staking contract!`,
+    successToastMessage: `PropyKeys NFT Approval granted to earning contract!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
   });
 
@@ -781,7 +781,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       functionName: 'setApprovalForAll',
       args: [STAKING_V3_PROPYKEYS_MODULE_ADDRESS, true],
     },
-    successToastMessage: `PropyKeys NFT Approval granted to staking contract!`,
+    successToastMessage: `PropyKeys NFT Approval granted to earning contract!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
   });
 
@@ -822,13 +822,13 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     onError: (error: any) => {
       let errorMessage : string | false = false;
       if (error === 'NotOpenSeason') {
-        errorMessage = `Entry has closed for the current staking season, please wait for the entry period at the beginning of the next season to enter.`
+        errorMessage = `Entry has closed for the current earning season, please wait for the entry period at the beginning of the next season to enter.`
       } else if (error === 'NotFullRangePosition') {
         errorMessage = `Only full range position NFTs are eligible (-887200 to 887200)`
       } else if (error === 'StakerNotApproved') {
-        errorMessage = `Your wallet address has not been approved to enter the staking protocol, please ensure you have completed the KYC process.`
+        errorMessage = `Your wallet address has not been approved to enter the earning protocol, please ensure you have completed the KYC process.`
       } else if (error === 'UnstakeAllBeforeAddingMore') {
-        errorMessage = `You have pending rewards, please unstake all staked tokens to claim all pending rewards before staking more tokens.`
+        errorMessage = `You have pending rewards, please withdraw all deposited tokens to claim all pending rewards before entering more tokens.`
       } else {
         errorMessage = error?.details ? error.details : `Unable to complete transaction, please try again or contact support (error: ${error}).`
       }
@@ -923,8 +923,8 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
     let balance = selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? Number(propyKeysNFT ? propyKeysNFT.length : 0) : Number(ogKeysNFT ? ogKeysNFT?.length : 0);
     let isBalanceMoreThanMaxSelection = balance > maxSelection;
     let relevantTokenName = selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? "PropyKey" : "PropyOG";
-    let actionName = mode === "enter" ? "stake" : "unstake";
-    let currentTokenState = mode === "enter" ? "unstaked" : "staked";
+    let actionName = mode === "enter" ? "enter" : "leave";
+    let currentTokenState = mode === "enter" ? "unentered" : "entered";
     return (
       <>
         Maximum {maxSelection} tokens per transaction, you have <strong>{balance} {currentTokenState} {relevantTokenName}{balance === 1 ? "" : "s"}</strong>, therefore you {isBalanceMoreThanMaxSelection ? <>would need to perform <strong>{Math.ceil(balance / maxSelection)} separate {actionName} transactions</strong> to {actionName} all of your {currentTokenState} tokens</> : <>can {actionName} all of your {currentTokenState} tokens in a single transaction</>}
@@ -935,10 +935,10 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
   return (
     <>
       {selectedStakingModule &&
-        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedTokenIds([]);setSelectedTokenAddress(false);navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}`)}}>
+        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedTokenIds([]);setSelectedTokenAddress(false);navigate(`/earn/v3/${mode === "enter" ? "enter" : "leave"}`)}}>
           <BackIcon style={{marginRight: '8px'}} />
           <Typography variant="body1" style={{fontWeight: 'bold'}}>
-            Back to staking options
+            Back to options
           </Typography>
         </div>
       }
@@ -961,7 +961,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                             {`Found ${ogKeysNFTPaginationData && ogKeysNFTPaginationData?.total > 0 ? ogKeysNFTPaginationData.total : 0} PropyOG tokens`}<br/>
                           </>
                         }
-                        Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
+                        Please click on the token(s) that you would like to {mode === "enter" ? "deposit" : "withdraw"}
                       </Typography>
                     </Grid>
                   }
@@ -1026,7 +1026,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                   {!(isLoading) && (ogKeysNFT && ogKeysNFT.length === 0) && (propyKeysNFT && propyKeysNFT.length === 0) &&
                     <Grid key={`${uniqueId}-single-token-card-loading-unfound`} item xs={4} sm={8} md={12} lg={20} xl={30}>
                       <Typography variant="h6" style={{textAlign: 'left'}}>
-                          {mode === "enter" ? "No unstaked tokens found" : "No staked tokens found"}
+                          {mode === "enter" ? "No unentered tokens found" : "No entered tokens found"}
                       </Typography>
                     </Grid>
                   }
@@ -1057,7 +1057,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                         />
                       </div>
                       <Typography variant="h6">
-                        {mode === "enter" ? "Stake " : "Unstake "}{selectedTokenIds.length}{selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
+                        {mode === "enter" ? "Enter " : "Withdraw "}{selectedTokenIds.length}{selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
                       </Typography>
                       <Typography variant="caption" style={{lineHeight: 1.6}}>
                         {getMaxHelperText()}
@@ -1114,7 +1114,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                           </Box>
                           <Typography style={{marginTop: '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
                             pSTAKE estimate: {(isLoadingProValueOfSelection || !proValueOfSelection) ? "Loading..." : priceFormat((utils.formatUnits(new BigNumber(proValueOfSelection.toString()).multipliedBy(100).toString(), 8)).toString(), 2, "pSTAKE")}
-                            <Tooltip placement="top" title={`This pSTAKE estimate represents how much staking power you would receive from creating this staking position.`}>
+                            <Tooltip placement="top" title={`This pSTAKE estimate represents how much earning power you would receive from creating this earning position.`}>
                               <HelpIcon className={'tooltip-helper-icon'} />
                             </Tooltip>
                           </Typography>
@@ -1204,7 +1204,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                                 <StepLabel>{"Approve pSTAKE"}</StepLabel>
                               </Step> */}
                               <Step key={`${uniqueId}-Unstake`}>
-                                <StepLabel>{"Unstake"}</StepLabel>
+                                <StepLabel>{"Withdraw"}</StepLabel>
                               </Step>
                             </Stepper>
                           </Box>
@@ -1255,7 +1255,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                 <animated.div className={classes.floatingActionZone} style={actionZoneSyncingSpring}>
                   <Card className={classes.floatingActionZoneCard} elevation={6}>
                       <Typography variant="h6">
-                        Syncing Staking Contract
+                        Syncing Earning Contract
                       </Typography>
                       <>
                         <div className={classes.submitButtonContainer}>
@@ -1265,7 +1265,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                                 buttonColor="secondary"
                                 disabled={true}
                                 showLoadingIcon={true}
-                                text={'Syncing Staking Contract...'}
+                                text={'Syncing Earning Contract...'}
                               />
                             </div>
                         </div>

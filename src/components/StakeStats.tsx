@@ -150,7 +150,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staking Power</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Earning Power</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
@@ -168,7 +168,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Staked PRO</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Total Deposited PRO</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
@@ -204,7 +204,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakedPropyKeysCount && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyKeys</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Deposited PropyKeys</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
                 </>
               )}
@@ -222,7 +222,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakedOGCount && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Staked PropyOG</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Deposited PropyOG</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
                 </>
               )}
