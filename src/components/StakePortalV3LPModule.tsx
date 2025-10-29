@@ -413,7 +413,7 @@ const getStakeButtonTextLP = (
   }
 
   if(isAwaitingStakeTx) {
-    return "Staking...";
+    return "Entering...";
   }
 
   if(isSyncingStaking) {
@@ -426,7 +426,7 @@ const getStakeButtonTextLP = (
   }
 
   if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
-    return "Staking Entry Closed"
+    return "Entry Closed"
   }
 
   if(stakerRewardOnModule > 0) {
@@ -437,7 +437,7 @@ const getStakeButtonTextLP = (
     return "Boosted Lockup Detected"
   }
   
-  return "Stake";
+  return "Enter";
 }
 
 const getLpPositionDetailsError = (
