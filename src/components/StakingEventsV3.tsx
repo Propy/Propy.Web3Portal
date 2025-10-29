@@ -100,28 +100,28 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
           let icon;
           if (value === 'EnteredStakingERC20') {
             icon = <StakeIcon style={{marginRight: '8px'}} />
-            result = 'Stake (PRO)';
+            result = 'Enter (PRO)';
           } else if(value === 'EarlyLeftStakingERC20') {
             icon = <EarlyUnstakeIcon style={{marginRight: '8px'}} />
-            result = 'Early Unstake (PRO)';
+            result = 'Early Leave (PRO)';
           } else if (value === 'LeftStakingERC20') {
             icon = <UnstakeIcon style={{marginRight: '8px'}} />
-            result = 'Unstake (PRO)';
+            result = 'Leave (PRO)';
           } else if (value === 'EnteredStakingLP') {
             icon = <StakeIcon style={{marginRight: '8px'}} />
-            result = 'Stake (LP NFT)'
+            result = 'Enter (LP NFT)'
           } else if (value === 'LeftStakingLP') {
             icon = <UnstakeIcon style={{marginRight: '8px'}} />
-            result = 'Unstake (LP NFT)'
+            result = 'Leave (LP NFT)'
           } else if (value === 'EarlyLeftStakingLP') {
             icon = <EarlyUnstakeIcon style={{marginRight: '8px'}} />
-            result = 'Early Unstake (LP NFT)'
+            result = 'Early Leave (LP NFT)'
           } else if (value === 'EnteredStakingPropyKeys') {
             icon = <StakeIcon style={{marginRight: '8px'}} />
-            result = 'Stake (PropyKey)';
+            result = 'Enter (PropyKey)';
           } else if (value === 'LeftStakingPropyKeys') {
             icon = <UnstakeIcon style={{marginRight: '8px'}} />
-            result = 'Unstake (PropyKey)';
+            result = 'Leave (PropyKey)';
           }
           if(result) {
             return (
@@ -137,8 +137,8 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
         },
       },
       {
-        id: 'staker',
-        label: 'Staker',
+        id: 'earner',
+        label: 'Earner',
         valueKey: 'staker',
         numeric: false,
         disablePadding: false,
@@ -153,7 +153,7 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
       },
       {
         id: 'pro_amount_entered',
-        label: 'Staked Asset Value',
+        label: 'Entered Asset Value',
         valueKey: 'pro_amount_entered',
         numeric: true,
         disablePadding: false,
@@ -235,7 +235,7 @@ const StakingEventsV3 = (props: IStakingEventsV3) => {
       },
       {
         id: 'staking_power_issued',
-        label: 'Staking Power',
+        label: 'Earning Power',
         valueKey: 'staking_power_issued',
         numeric: true,
         disablePadding: false,

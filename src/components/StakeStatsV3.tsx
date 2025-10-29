@@ -179,7 +179,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   ?
                     <>
                       <Typography variant='h4' style={{marginBottom: '16px', fontSize: isConsideredMobile ? '1.5rem' : 'auto', textAlign: 'center'}}>
-                        🎉 Staking Season {currentSeason} Entry Open 🎉
+                        🎉 Earning Season {currentSeason} Entry Open 🎉
                       </Typography>
                       <Typography variant='h6' style={{textAlign: 'center'}}>
                         Closing In:
@@ -189,13 +189,13 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                       </Typography>
                       <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
                         <strong>Please Note:</strong><br/>
-                        Once the entry period closes, it will not be possible to enter the staking protocol until the next season begins. Each season lasts ~ 4 months.
+                        Once the entry period closes, it will not be possible to enter the earning protocol until the next season begins. Each season lasts ~ 4 months.
                       </Typography>
                     </>
                   :
                     <>
                       <Typography variant='h4' style={{marginBottom: '16px', fontSize: isConsideredMobile ? '1.5rem' : 'auto', textAlign: 'center'}}>
-                        🔒 Staking Season {currentSeason} Entry Closed 🔒
+                        🔒 Earning Season {currentSeason} Entry Closed 🔒
                       </Typography>
                       <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
                         <strong>Please Note:</strong><br/>
@@ -231,7 +231,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staking Power</Typography>
+                  <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Earning Power</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}
@@ -258,7 +258,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   )}
                   {!isLoadingTotalStakedPRO && (
                     <>
-                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Staked PRO</Typography>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Deposited PRO</Typography>
                       <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalStakedPRO ? totalStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
                     </>
                   )}
@@ -276,7 +276,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   )}
                   {!isLoadingTotalVirtualStakedPRO && (
                     <>
-                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Virtual Staked PRO</Typography>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Total Virtual Deposited PRO</Typography>
                       <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(totalVirtualStakedPRO ? totalVirtualStakedPRO : 0), 8)), 2, 'PRO', false, true)}</Typography>
                     </>
                   )}
@@ -330,7 +330,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   )}
                   {!isLoadingStakedPropyKeysCount && (
                     <>
-                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyKeys</Typography>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Deposited PropyKeys</Typography>
                       <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedPropyKeysCount ? stakedPropyKeysCount : 0), 0, 'pKEYs')}</Typography>
                     </>
                   )}
@@ -348,7 +348,7 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                   )}
                   {!isLoadingStakedOGCount && (
                     <>
-                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Staked PropyOG</Typography>
+                      <Typography style={{marginBottom: '4px', textAlign: 'center'}} variant="h6">Deposited PropyOG</Typography>
                       <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(stakedOGCount ? stakedOGCount : 0), 0, 'pOGs')}</Typography>
                     </>
                   )}
