@@ -32,7 +32,7 @@ import {
 } from '../utils/constants'
 
 const getTableHeading = (mode?: string) => {
-  let heading = "Staking Event History";
+  let heading = "Earning Contract Event History";
   if(mode === "withdrawals") {
     heading = "Withdrawal History";
   }

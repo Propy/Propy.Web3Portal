@@ -254,7 +254,7 @@ const getApprovePROButtonText = (
   }
 
   if(proStakeAmount === "" || Number(proStakeAmount) <= 0) {
-    return "Enter PRO Stake Amount"
+    return "Enter PRO Deposit Amount"
   }
 
   return "Grant PRO Allowance";
@@ -1015,7 +1015,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                         />
                       </div>
                       <Typography variant="h6">
-                        {mode === "enter" ? "Stake " : "Unstake "} PRO
+                        {mode === "enter" ? "Enter " : "Withdraw "} PRO
                       </Typography>
                       {selectedTokenAddress !== STAKING_V3_PRO_ADDRESS &&
                         <Typography variant="caption" style={{lineHeight: 1.6}}>
@@ -1036,7 +1036,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                     <StepLabel>{"Select Lockup"}</StepLabel>
                                   </Step>
                                   <Step key={`${uniqueId}-Enter Staking`}>
-                                    <StepLabel>{"Enter Staking"}</StepLabel>
+                                    <StepLabel>{"Enter"}</StepLabel>
                                   </Step>
                                 </Stepper>
                               </div>
@@ -1055,7 +1055,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                               <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
                                 <TextField
                                   id="pro-stake-amount"
-                                  label="PRO Stake Amount"
+                                  label="PRO Deposit Amount"
                                   sx={{ width: 'calc(100%)' }}
                                   value={Number(proStakeAmount) ? proStakeAmount : ""}
                                   onChange={(event) => setProStakeAmount(event.target.value)}
@@ -1251,7 +1251,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                   </Tooltip>
                                 </Typography>
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Original PRO Staked: {priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPRO ? stakerToPureStakedPRO : 0), 8)), 2, 'PRO', false, true)} 
+                                  Original PRO Deposited: {priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPRO ? stakerToPureStakedPRO : 0), 8)), 2, 'PRO', false, true)} 
                                   <Tooltip placement="top" title={`This is the amount of PRO associated with your stake (before accounting for rewards).`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip>
