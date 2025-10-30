@@ -42,6 +42,7 @@ import SingleTokenCard from './SingleTokenCard';
 import SingleTokenCardLoading from './SingleTokenCardLoading';
 
 import FloatingActionButton from './FloatingActionButton';
+import LinkWrapper from './LinkWrapper';
 
 import {
   priceFormat,
@@ -150,7 +151,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
-      maxHeight: '90vh',
+      maxHeight: 'calc(90vh - 80px)',
       overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
@@ -533,7 +534,7 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
       transform: 'translateY(100%)',
     },
     to: {
-      bottom: (selectedTokenIds.length > 0 && !isSyncingStaking) ? '100px' : '0px',
+      bottom: (selectedTokenIds.length > 0 && !isSyncingStaking) ? '80px' : '0px',
       transform: `translateY(${(selectedTokenIds.length > 0 && !isSyncingStaking) ? '0%' : '100%'})`,
     },
   })
@@ -1047,6 +1048,9 @@ const StakePortalV3LPModule = (props: IStakeEnter) => {
                           </>
                         }
                         Please click on the token(s) that you would like to {mode === "enter" ? "deposit" : "withdraw"}
+                      </Typography>
+                      <Typography variant="body1" style={{textAlign: 'left', display: 'flex'}}>
+                        <strong>Please note:</strong>&nbsp;only&nbsp;<strong>full-range</strong>&nbsp;liquidity positions on the&nbsp;<LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link="https://app.uniswap.org/explore/pools/base/0xb0e962D88daE312F030771D19868EB4901E0F709" external>1% fee PRO/WETH Uniswap V3 pool</LinkWrapper>&nbsp;are supported
                       </Typography>
                     </Grid>
                   }

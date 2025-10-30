@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
-      maxHeight: '90vh',
+      maxHeight: 'calc(90vh - 80px)',
       overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
@@ -497,7 +497,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       transform: 'translateY(100%)',
     },
     to: {
-      bottom: (selectedTokenAddress && !isSyncingStaking) ? '100px' : '0px',
+      bottom: (selectedTokenAddress && !isSyncingStaking) ? '80px' : '0px',
       transform: `translateY(${(selectedTokenAddress && !isSyncingStaking) ? '0%' : '100%'})`,
     },
   })
@@ -1015,7 +1015,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                         />
                       </div>
                       <Typography variant="h6">
-                        {mode === "enter" ? "Enter " : "Withdraw "} PRO
+                        {mode === "enter" ? "Deposit " : "Withdraw "} PRO
                       </Typography>
                       {selectedTokenAddress !== STAKING_V3_PRO_ADDRESS &&
                         <Typography variant="caption" style={{lineHeight: 1.6}}>
