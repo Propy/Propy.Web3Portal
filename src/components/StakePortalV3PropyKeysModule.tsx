@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
-      maxHeight: '90vh',
+      maxHeight: 'calc(90vh - 80px)',
       overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
@@ -469,7 +469,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
       transform: 'translateY(100%)',
     },
     to: {
-      bottom: (selectedTokenIds.length > 0 && !isSyncingStaking) ? '100px' : '0px',
+      bottom: (selectedTokenIds.length > 0 && !isSyncingStaking) ? '80px' : '0px',
       transform: `translateY(${(selectedTokenIds.length > 0 && !isSyncingStaking) ? '0%' : '100%'})`,
     },
   })
@@ -1057,7 +1057,7 @@ const StakePortalV3PropyKeysModule = (props: IStakeEnter) => {
                         />
                       </div>
                       <Typography variant="h6">
-                        {mode === "enter" ? "Enter " : "Withdraw "}{selectedTokenIds.length}{selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
+                        {mode === "enter" ? "Deposit " : "Withdraw "}{selectedTokenIds.length}{selectedTokenAddress === STAKING_V3_PROPYKEYS_ADDRESS ? " PropyKey" : " PropyOG"}{selectedTokenIds.length === 1 ? "" : "s"}
                       </Typography>
                       <Typography variant="caption" style={{lineHeight: 1.6}}>
                         {getMaxHelperText()}
