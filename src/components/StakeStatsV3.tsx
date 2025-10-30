@@ -199,12 +199,12 @@ const StakeStats = (props: PropsFromRedux & IStakeStats) => {
                       </Typography>
                       <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400'}}>
                         <strong>Please Note:</strong><br/>
-                        Staking entry will open for 7 days once the next season starts
+                        Entry will open for 7 days once the next season starts
                       </Typography>
                     </>
                 }
                 <Typography variant='subtitle2' style={{textAlign: 'center', fontWeight: '400', marginTop: '24px'}}>
-                  <strong>Season Schedule (NOT FINAL):</strong>
+                  <strong>Season Schedule:</strong>
                 </Typography>
                 <div style={{width: '100%', marginTop: '16px'}}>
                   <StakeSeasonsTimelineV3 activeSeason={currentSeason} />
