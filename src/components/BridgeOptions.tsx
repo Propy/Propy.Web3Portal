@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import { useAccount } from 'wagmi';
-
 import { animated, useSpring } from '@react-spring/web';
 
 import { Theme } from '@mui/material/styles';
@@ -97,8 +95,6 @@ const useStyles = makeStyles((theme: Theme) =>
 const BridgingPage = (props: PropsFromRedux) => {
 
     const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
-    
-    const { address } = useAccount();
 
     const classes = useStyles();
 
