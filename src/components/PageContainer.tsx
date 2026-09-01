@@ -1,5 +1,5 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {Routes, Route, useLocation} from 'react-router-dom';
+import {Routes, Route, Navigate, useLocation} from 'react-router-dom';
 
 import { Theme } from '@mui/material/styles';
 
@@ -20,8 +20,9 @@ import CollectionsPage from '../pages/CollectionsPage';
 import ListingCollectionPage from '../pages/ListingCollectionPage';
 import StakePage from '../pages/StakePage';
 import BridgeOptionsPage from '../pages/BridgeOptionsPage';
-import BridgePage from '../pages/BridgePage';
-import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
+// BridgePage & BridgeTransactionActionPage are currently unused since bridging is handled by Superbridge
+// import BridgePage from '../pages/BridgePage';
+// import BridgeTransactionActionPage from '../pages/BridgeTransactionActionPage';
 import PropyKeysMapPage from '../pages/PropyKeysMapPage';
 import AnalyticsPage from '../pages/AnalyticsPage';
 import PropyKeyRepossessionPage from '../pages/PropyKeyRepossessionPage';
@@ -116,8 +117,8 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/earning/v3/:mode" element={<StakePage version={3} />} />
                       <Route path="/earning/v3/:mode/:module" element={<StakePage version={3} />} />
                       <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
-                      <Route path="/bridge/:bridgeSelection" element={<BridgePage />} />
-                      <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<BridgeTransactionActionPage />} />
+                      <Route path="/bridge/:bridgeSelection" element={<Navigate to="/bridge" replace />} />
+                      <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<Navigate to="/bridge" replace />} />
                       {/* <Route path="/map/propykeys" element={<PropyKeysMapPage mode="normal" />} /> */}
                       <Route path="/map/:collectionName" element={<PropyKeysMapPage mode="gis" />} />
                       <Route path="/propykey-og-claim/:propyKeyTokenId" element={<PropyKeyRepossessionPage />} />
