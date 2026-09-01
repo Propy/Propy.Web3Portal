@@ -29,6 +29,8 @@ import {
   PRO_BASE_L2_ADDRESS,
   BASE_BRIDGE_L1_NETWORK,
   BASE_BRIDGE_L2_NETWORK,
+  SUPERBRIDGE_ETHEREUM_TO_BASE_LINK,
+  SUPERBRIDGE_BASE_TO_ETHEREUM_LINK,
 } from '../utils/constants';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -153,7 +155,7 @@ const BridgingPage = (props: PropsFromRedux) => {
           columns={{ xs: 4, sm: 8, md: 10, lg: 12, xl: 12 }}
         >
           <Grid item xs={4} sm={8} md={10} lg={6} xl={6}>
-            <LinkWrapper link="bridge/ethereum-to-base">
+            <LinkWrapper external={true} style={{display: 'block'}} link={SUPERBRIDGE_ETHEREUM_TO_BASE_LINK}>
               <Card>
                 <CardActionArea>
                   <div className={classes.cardInner}>
@@ -173,7 +175,7 @@ const BridgingPage = (props: PropsFromRedux) => {
             </LinkWrapper>
           </Grid>
           <Grid item xs={4} sm={8} md={10} lg={6} xl={6}>
-            <LinkWrapper link="bridge/base-to-ethereum">
+            <LinkWrapper external={true} style={{display: 'block'}} link={SUPERBRIDGE_BASE_TO_ETHEREUM_LINK}>
               <Card>
                 <CardActionArea>
                   <div className={classes.cardInner}>
