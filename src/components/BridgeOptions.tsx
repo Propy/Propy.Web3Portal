@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import { useAccount } from 'wagmi';
-
 import { animated, useSpring } from '@react-spring/web';
 
 import { Theme } from '@mui/material/styles';
@@ -22,13 +20,13 @@ import BaseLogo from '../assets/img/base-logo-transparent-bg.png';
 import { PropsFromRedux } from '../containers/BridgeOptionsContainer';
 import LinkWrapper from '../components/LinkWrapper';
 
-import BridgeTransactionHistoryContainer from '../containers/BridgeTransactionHistoryContainer';
+// import BridgeTransactionHistoryContainer from '../containers/BridgeTransactionHistoryContainer';
 
 import {
-  PRO_ETHEREUM_L1_ADDRESS,
-  PRO_BASE_L2_ADDRESS,
-  BASE_BRIDGE_L1_NETWORK,
-  BASE_BRIDGE_L2_NETWORK,
+  // PRO_ETHEREUM_L1_ADDRESS,
+  // PRO_BASE_L2_ADDRESS,
+  // BASE_BRIDGE_L1_NETWORK,
+  // BASE_BRIDGE_L2_NETWORK,
   SUPERBRIDGE_ETHEREUM_TO_BASE_LINK,
   SUPERBRIDGE_BASE_TO_ETHEREUM_LINK,
 } from '../utils/constants';
@@ -97,8 +95,6 @@ const useStyles = makeStyles((theme: Theme) =>
 const BridgingPage = (props: PropsFromRedux) => {
 
     const [triggerUpdateIndex, setTriggerUpdateIndex] = useState(0);
-    
-    const { address } = useAccount();
 
     const classes = useStyles();
 
@@ -205,7 +201,7 @@ const BridgingPage = (props: PropsFromRedux) => {
               l2TokenAddress={PRO_BASE_L2_ADDRESS}
             />
           </Grid> */}
-          {address &&
+          {/* {address &&
             <Grid item xs={4} sm={8} md={10} lg={12} xl={12}>
               <BridgeTransactionHistoryContainer
                 mode={"all"}
@@ -216,7 +212,7 @@ const BridgingPage = (props: PropsFromRedux) => {
                 triggerUpdateIndex={triggerUpdateIndex}
               />
             </Grid>
-          }
+          } */}
         </Grid>
       </>
     )
