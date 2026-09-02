@@ -248,7 +248,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
           <Grid className={(isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
             <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="h6" style={{textAlign: 'left'}}>
-                    This version of the staking contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`stake/v${latestStakingVersion}`}>here</LinkWrapper>.
+                    This version of the earning contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`earn/v${latestStakingVersion}`}>here</LinkWrapper>.
                 </Typography>
               </Grid>
           </Grid>
@@ -257,13 +257,13 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
           <Grid className={(isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }}>
             <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
                 <Typography variant="h6" style={{textAlign: 'left'}}>
-                    For regulatory reasons, entering the staking protocol is not allowed from your location.
+                    For regulatory reasons, entering the earning protocol is not allowed from your location.
                 </Typography>
               </Grid>
           </Grid>
         }
         {!selectedStakingModule &&
-          <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {navigate(`/staking/v3`)}}>
+          <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {navigate(`/earn/v3`)}}>
             <BackIcon style={{marginRight: '8px'}} />
             <Typography variant="body1" style={{fontWeight: 'bold'}}>
               Back to stats
@@ -274,7 +274,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
           <Grid className={(isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 30, xl: 30 }}>
             <Grid item xs={4} sm={8} md={12} lg={30} xl={30}>
               <Typography variant="h5" style={{textAlign: 'center'}}>
-                What would you like to {mode === "leave" ? 'unstake' : 'stake'}?
+                What would you like to {mode === "leave" ? 'withdraw' : 'enter'}?
               </Typography>
             </Grid>
             <Grid item xs={4} sm={8} md={12} lg={30} xl={10}>
@@ -284,7 +284,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/lp`)
+                  navigate(`/earn/v3/${mode === "enter" ? "enter" : "leave"}/lp`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
@@ -302,7 +302,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                     <FireIcon style={{color: '#ff6f00', height: 35, width: 35, marginBottom: '16px', marginLeft: '8px'}} />
                   </div>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Get the <strong>highest possible staking rewards</strong> by providing liquidity to the specified PRO-WETH liquidity pool.
+                    Get the <strong>highest possible rewards</strong> by providing liquidity to the specified PRO-WETH liquidity pool & depositing your Uniswap LP NFT.
                   </Typography>
                 </CardActionArea>
               </Card>
@@ -314,7 +314,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/pro`)
+                  navigate(`/earn/v3/${mode === "enter" ? "enter" : "leave"}/pro`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
@@ -328,7 +328,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                     <strong>100%</strong> Base Rewards
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Straightforward PRO token staking without any additional steps to acquire PropyKey NFTs or provide liquidity to Uniswap.
+                    Straightforward PRO token deposit without any additional steps to acquire PropyKey NFTs or provide liquidity to Uniswap.
                   </Typography>
                 </CardActionArea>
               </Card>
@@ -340,7 +340,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                   height: '100%',
                 }}
                 onClick={() => {
-                  navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}/propykeys`)
+                  navigate(`/earn/v3/${mode === "enter" ? "enter" : "leave"}/propykeys`)
                 }}
               >
                 <CardActionArea className={classes.actionArea}>
@@ -354,7 +354,7 @@ const StakePortalV3 = (props: PropsFromRedux & IStakeEnter) => {
                     <strong>100%</strong> Base Rewards
                   </Typography>
                   <Typography variant="subtitle1" className={classes.cardDescription}>
-                    Stake your PropyKeys to get rewarded for being part of the community! Rewards scale according to PropyKey token tiers.
+                    Deposit your PropyKeys to get rewarded for being part of the community! Rewards scale according to PropyKey token tiers.
                   </Typography>
                 </CardActionArea>
               </Card>

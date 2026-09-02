@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     floatingActionZoneCard: {
       padding: theme.spacing(2),
-      maxHeight: '90vh',
+      maxHeight: 'calc(90vh - 80px)',
       overflowY: 'auto',
       // border: `2px solid ${PROPY_LIGHT_BLUE}`,
     },
@@ -254,7 +254,7 @@ const getApprovePROButtonText = (
   }
 
   if(proStakeAmount === "" || Number(proStakeAmount) <= 0) {
-    return "Enter PRO Stake Amount"
+    return "Enter PRO Deposit Amount"
   }
 
   return "Grant PRO Allowance";
@@ -271,14 +271,14 @@ const getUnstakeButtonText = (
   }
 
   if(isAwaitingUnstakeTx) {
-    return "Unstaking...";
+    return "Withdrawing...";
   }
 
   if(isSyncingStaking) {
     return "Syncing...";
   }
   
-  return "Unstake";
+  return "Withdraw";
 }
 
 const getEarlyUnstakeButtonText = (
@@ -292,14 +292,14 @@ const getEarlyUnstakeButtonText = (
   }
 
   if(isAwaitingUnstakeTx) {
-    return "Unstaking...";
+    return "Withdrawing...";
   }
 
   if(isSyncingStaking) {
     return "Syncing...";
   }
   
-  return "Early Unstake";
+  return "Early Withdraw";
 }
 
 const getStakeButtonTextPRO = (
@@ -316,7 +316,7 @@ const getStakeButtonTextPRO = (
   }
 
   if(isAwaitingStakeTx) {
-    return "Staking...";
+    return "Entering...";
   }
 
   if(isSyncingStaking) {
@@ -328,7 +328,7 @@ const getStakeButtonTextPRO = (
   }
 
   if(openSeasonEndTime < Math.floor(new Date().getTime() / 1000)) {
-    return "Staking Entry Closed"
+    return "Earning Entry Closed"
   }
 
   if(stakerRewardOnModule > 0) {
@@ -339,7 +339,7 @@ const getStakeButtonTextPRO = (
     return "Boosted Lockup Detected"
   }
   
-  return "Stake";
+  return "Enter";
 }
 
 const getActiveStep = (
@@ -410,20 +410,20 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
                 {(Number(stakerRewardOnModule ? stakerRewardOnModule : 0) > 0) 
                   ?
                     <>
-                      <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with unclaimed rewards on this staking module. {secondsRemainingUnlockTime > 0 ? `Since you are in an active lockup period, it is recommended to use an ` : `Since your lockup period has ended, you can either unstake to claim your unclaimed rewards (at which point you can restake with a new amount of PRO) or use an `} <strong>alternative wallet address</strong> to stake additional PRO.</Typography>
+                      <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Unclaimed rewards detected:</strong><br/>You <strong>may not</strong> increase your deposit using a wallet address with unclaimed rewards on this earning module. {secondsRemainingUnlockTime > 0 ? `Since you are in an active lockup period, it is recommended to use an ` : `Since your lockup period has ended, you can either unstake to claim your unclaimed rewards (at which point you can redeposit with a new amount of PRO) or use an `} <strong>alternative wallet address</strong> to deposit additional PRO.</Typography>
                     </>
                   :
                     <>
                       {isLockupBoosted && 
-                        <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Boosted position detected:</strong><br/>You <strong>may not</strong> increase your stake using a wallet address with an actively boosted position. Please use an <strong>alternative wallet address</strong> to stake additional PRO.</Typography>
+                        <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Boosted position detected:</strong><br/>You <strong>may not</strong> increase your deposit using a wallet address with an actively boosted position. Please use an <strong>alternative wallet address</strong> to deposit additional PRO.</Typography>
                       }
                     </>
                 }
-                {((selectedLockupPeriodDays > 0 && Number(stakerRewardOnModule ? stakerRewardOnModule : 0) === 0) && !isLockupBoosted) && <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Lockup periods can't be modified once created.</strong> Staking now would create a <strong>{selectedLockupPeriodDays}-day lockup</strong> period on all staked PRO tokens, including PRO that is already staked on this staking module. You can remove your staked PRO at any time, but <strong>if you unstake during your lockup period, you will forfeit all rewards associated with your stake.</strong>.</Typography>}
+                {((selectedLockupPeriodDays > 0 && Number(stakerRewardOnModule ? stakerRewardOnModule : 0) === 0) && !isLockupBoosted) && <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Lockup periods can't be modified once created.</strong> Staking now would create a <strong>{selectedLockupPeriodDays}-day lockup</strong> period on all staked PRO tokens, including PRO that is already staked on this earning module. You can remove your staked PRO at any time, but <strong>if you unstake during your lockup period, you will forfeit all rewards associated with your stake.</strong>.</Typography>}
               </>
             : 
               <>
-                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for staking has ended, the next staking entry period will begin at the start of the next season.</Typography>
+                <Typography className={classes.buttonSubtitleBottomSpacer} variant="subtitle2"><strong>Entry not open:</strong><br/>The entry period for earning has ended, the next entry period will begin at the start of the next season.</Typography>
               </>
           }
         </>
@@ -433,7 +433,7 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
           {(secondsRemainingUnlockTime > 0) &&
             <Typography style={{marginTop: '8px'}} className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
               Active Lockup Remaining: {formattedCountdownUnlockTime} 
-              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PRO staking module.`}>
+              <Tooltip placement="top" title={`Time remaining on your currently-active lockup on this PRO earning module.`}>
                 <HelpIcon className={'tooltip-helper-icon'} />
               </Tooltip>
             </Typography>
@@ -441,7 +441,7 @@ const RealTimeCountdownZone = (props: IRealTimeCountdownZone) => {
           {(secondsRemainingOpenSeason > 0) &&
             <Typography style={{marginTop: (secondsRemainingUnlockTime <= 0) ? '8px' : '0px'}} className={['flex-center'].join(" ")} variant="subtitle2">
               Entry Time Remaining: {formattedCountdownRemainingOpenSeason} 
-              <Tooltip placement="top" title={`This is how much time is left to create a staking position in the latest season`}>
+              <Tooltip placement="top" title={`This is how much time is left to create an earning position in the latest season`}>
                 <HelpIcon className={'tooltip-helper-icon'} />
               </Tooltip>
             </Typography>
@@ -497,7 +497,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       transform: 'translateY(100%)',
     },
     to: {
-      bottom: (selectedTokenAddress && !isSyncingStaking) ? '100px' : '0px',
+      bottom: (selectedTokenAddress && !isSyncingStaking) ? '80px' : '0px',
       transform: `translateY(${(selectedTokenAddress && !isSyncingStaking) ? '0%' : '100%'})`,
     },
   })
@@ -714,7 +714,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       functionName: 'enterWithOnlyERC20',
       args: [utils.parseUnits(Number(proStakeAmount) > 0 ? proStakeAmount : "0", 8), selectedLockupPeriodDays],
     },
-    successToastMessage: `Stake success!`,
+    successToastMessage: `Entrance success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
@@ -734,11 +734,11 @@ const StakePortalV3 = (props: IStakeEnter) => {
       console.log({error})
       let errorMessage : string | false = false;
       if (error === 'NotOpenSeason') {
-        errorMessage = `Entry has closed for the current staking season, please wait for the entry period at the beginning of the next season to enter.`
+        errorMessage = `Entry has closed for the current earning season, please wait for the entry period at the beginning of the next season to enter.`
       } else if (error === 'StakerNotApproved') {
-        errorMessage = `Your wallet address has not been approved to enter the staking protocol, please ensure you have completed the KYC process.`
+        errorMessage = `Your wallet address has not been approved to enter the earning protocol, please ensure you have completed the KYC process.`
       } else if (error === 'UnstakeAllBeforeAddingMore') {
-        errorMessage = `You have pending rewards, please unstake all staked tokens to claim all pending rewards before staking more tokens.`
+        errorMessage = `You have pending rewards, please withdraw all deposited tokens to claim all pending rewards before entering more tokens.`
       } else {
         errorMessage = error?.details ? error.details : `Unable to complete transaction, please try again or contact support (error: ${error}).`
       }
@@ -765,7 +765,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       functionName: 'leaveWithOnlyERC20',
       args: [],
     },
-    successToastMessage: `Unstake PRO success!`,
+    successToastMessage: `Withdraw PRO success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
@@ -795,7 +795,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
       functionName: 'earlyLeaveWithOnlyERC20',
       args: [],
     },
-    successToastMessage: `Early unstake PRO success!`,
+    successToastMessage: `Early withdraw PRO success!`,
     fallbackErrorMessage: "Unable to complete transaction, please try again or contact support.",
     onSuccess: () => {
       const syncStaking = async () => {
@@ -871,13 +871,13 @@ const StakePortalV3 = (props: IStakeEnter) => {
       if(selectedTokenAddress === STAKING_V3_PRO_ADDRESS) {
         return (
           <>
-            There is no limit to how much PRO you can stake in a single transaction, you have <strong>{priceFormat(Number(utils.formatUnits(Number(balanceDataPRO?.value ? balanceDataPRO?.value?.toString() : 0), 8)), 2, 'PRO', false, true)}</strong>.
+            There is no limit to how much PRO you can deposit in a single transaction, you have <strong>{priceFormat(Number(utils.formatUnits(Number(balanceDataPRO?.value ? balanceDataPRO?.value?.toString() : 0), 8)), 2, 'PRO', false, true)}</strong>.
           </>
         )
       } else {
         return (
           <>
-            <strong>This PRO balance exists on Ethereum (L1), in order to stake this PRO, you need to first bridge your PRO to Base (L2) via a Base-recommended bridge such as <a href="https://superbridge.app/base" target="_blank" rel="noopener noreferrer">Superbridge</a></strong>.
+            <strong>This PRO balance exists on Ethereum (L1), in order to deposit this PRO, you need to first bridge your PRO to Base (L2) via a Base-recommended bridge such as <a href="https://superbridge.app/base" target="_blank" rel="noopener noreferrer">Superbridge</a></strong>.
           </>
         )
       }
@@ -893,10 +893,10 @@ const StakePortalV3 = (props: IStakeEnter) => {
   return (
     <>
       {selectedStakingModule &&
-        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedTokenIds([]);setSelectedTokenAddress(false);navigate(`/staking/v3/${mode === "enter" ? "stake" : "unstake"}`)}}>
+        <div style={{cursor: 'pointer', color: PROPY_LIGHT_BLUE, textAlign: 'left', marginBottom: 16, display: 'flex', alignItems: 'center'}} onClick={() => {setSelectedTokenIds([]);setSelectedTokenAddress(false);navigate(`/earn/v3/${mode === "enter" ? "enter" : "leave"}`)}}>
           <BackIcon style={{marginRight: '8px'}} />
           <Typography variant="body1" style={{fontWeight: 'bold'}}>
-            Back to staking options
+            Back to options
           </Typography>
         </div>
       }
@@ -909,7 +909,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                   {!(isLoading) &&
                     <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
                       <Typography variant="body1" style={{textAlign: 'left'}}>
-                        Please click on the token(s) that you would like to {mode === "enter" ? "stake" : "unstake"}
+                        Please click on the token(s) that you would like to {mode === "enter" ? "deposit" : "withdraw"}
                       </Typography>
                     </Grid>
                   }
@@ -1015,7 +1015,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                         />
                       </div>
                       <Typography variant="h6">
-                        {mode === "enter" ? "Stake " : "Unstake "} PRO
+                        {mode === "enter" ? "Deposit " : "Withdraw "} PRO
                       </Typography>
                       {selectedTokenAddress !== STAKING_V3_PRO_ADDRESS &&
                         <Typography variant="caption" style={{lineHeight: 1.6}}>
@@ -1036,7 +1036,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                     <StepLabel>{"Select Lockup"}</StepLabel>
                                   </Step>
                                   <Step key={`${uniqueId}-Enter Staking`}>
-                                    <StepLabel>{"Enter Staking"}</StepLabel>
+                                    <StepLabel>{"Enter"}</StepLabel>
                                   </Step>
                                 </Stepper>
                               </div>
@@ -1047,7 +1047,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                               <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
                                   Current Allowance: {priceFormat(Number(utils.formatUnits(Number(stakingContractPROAllowance ? stakingContractPROAllowance : 0), 8)), 2, 'PRO', false, true)} 
-                                  {/* <Tooltip placement="top" title={`Unstaking would burn ${priceFormat(Number(utils.formatUnits(Number(sharesIssuedAgainstSelectionLP ? sharesIssuedAgainstSelectionLP : 0), 8)), 2, 'pSTAKE', false, true)} from your total pSTAKE balance (${priceFormat(Number(utils.formatUnits(Number(balancePStake ? balancePStake : 0), 8)), 2, 'pSTAKE', false, true)}) to withdraw your original LP token along with any pending rewards.`}>
+                                  {/* <Tooltip placement="top" title={`Withdrawing would burn ${priceFormat(Number(utils.formatUnits(Number(sharesIssuedAgainstSelectionLP ? sharesIssuedAgainstSelectionLP : 0), 8)), 2, 'pSTAKE', false, true)} from your total pSTAKE balance (${priceFormat(Number(utils.formatUnits(Number(balancePStake ? balancePStake : 0), 8)), 2, 'pSTAKE', false, true)}) to withdraw your original LP token along with any pending rewards.`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip> */}
                                 </Typography>
@@ -1055,7 +1055,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                               <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
                                 <TextField
                                   id="pro-stake-amount"
-                                  label="PRO Stake Amount"
+                                  label="PRO Deposit Amount"
                                   sx={{ width: 'calc(100%)' }}
                                   value={Number(proStakeAmount) ? proStakeAmount : ""}
                                   onChange={(event) => setProStakeAmount(event.target.value)}
@@ -1113,7 +1113,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                 <>
                                   <Typography style={{marginTop: '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
                                     Lockup Bonus: {lockupDaysToBonus[selectedLockupPeriodDays]}%
-                                    <Tooltip placement="top" title={`You will receive ${lockupDaysToBonus[selectedLockupPeriodDays]}% more pSTAKE tokens for each unit of PRO staked (reward allocations effectively increased by ${lockupDaysToBonus[selectedLockupPeriodDays]}%)`}>
+                                    <Tooltip placement="top" title={`You will receive ${lockupDaysToBonus[selectedLockupPeriodDays]}% more pSTAKE tokens for each unit of PRO value deposited (reward allocations effectively increased by ${lockupDaysToBonus[selectedLockupPeriodDays]}%)`}>
                                       <HelpIcon className={'tooltip-helper-icon'} />
                                     </Tooltip>
                                   </Typography>
@@ -1130,7 +1130,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                               }
                               <Typography style={{marginTop: (selectedLockupPeriodDays !== 0) ? '8px' : '16px'}} className={['flex-center'].join(" ")} variant="subtitle2">
                                 pSTAKE estimate: {priceFormat((new BigNumber(proStakeAmount).multipliedBy(1 + (lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3] / 100)).multipliedBy(100)).toString(), 2, "pSTAKE")}
-                                <Tooltip placement="top" title={`This pSTAKE estimate represents how much staking power you would receive from creating this staking position${selectedLockupPeriodDays > 3 ? `, your selected lockup period would cause you to receive ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}% more pSTAKE tokens for each unit of PRO staked (reward allocations effectively increased by ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}%), this results in a bonus of ~ ${priceFormat((new BigNumber(proStakeAmount).multipliedBy(1 + (lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3] / 100)).multipliedBy(100).minus(new BigNumber(proStakeAmount).multipliedBy(100))).toString(), 2, "pSTAKE")}` : '.'}`}>
+                                <Tooltip placement="top" title={`This pSTAKE estimate represents how much earning power you would receive from creating this earning position${selectedLockupPeriodDays > 3 ? `, your selected lockup period would cause you to receive ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}% more pSTAKE tokens for each unit of PRO value deposited (reward allocations effectively increased by ${lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3]}%), this results in a bonus of ~ ${priceFormat((new BigNumber(proStakeAmount).multipliedBy(1 + (lockupDaysToBonus[selectedLockupPeriodDays ? selectedLockupPeriodDays : 3] / 100)).multipliedBy(100).minus(new BigNumber(proStakeAmount).multipliedBy(100))).toString(), 2, "pSTAKE")}` : '.'}`}>
                                   <HelpIcon className={'tooltip-helper-icon'} />
                                 </Tooltip>
                               </Typography>
@@ -1243,15 +1243,15 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                 activeStep === 0
                               ) &&
                               <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
-                                <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">Unstaking Details:</Typography>
+                                <Typography className={classes.buttonTitleSmallSpacing} variant="subtitle2">Withdrawal Details:</Typography>
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
                                   pSTAKE Burn: {priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPROShares ? stakerToPureStakedPROShares : 0), 8)), 2, 'pSTAKE', false, true)} 
-                                  <Tooltip placement="top" title={`Unstaking would burn ${priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPROShares ? stakerToPureStakedPROShares : 0), 8)), 2, 'pSTAKE', false, true)} from your total pSTAKE balance (${priceFormat(Number(utils.formatUnits(Number(balancePStake ? balancePStake : 0), 8)), 2, 'pSTAKE', false, true)}) to withdraw your original LP token along with any pending rewards.`}>
+                                  <Tooltip placement="top" title={`Withdrawing would burn ${priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPROShares ? stakerToPureStakedPROShares : 0), 8)), 2, 'pSTAKE', false, true)} from your total pSTAKE balance (${priceFormat(Number(utils.formatUnits(Number(balancePStake ? balancePStake : 0), 8)), 2, 'pSTAKE', false, true)}) to withdraw your original LP token along with any pending rewards.`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip>
                                 </Typography>
                                 <Typography className={[classes.buttonTitle, 'flex-center'].join(" ")} variant="subtitle2">
-                                  Original PRO Staked: {priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPRO ? stakerToPureStakedPRO : 0), 8)), 2, 'PRO', false, true)} 
+                                  Original PRO Deposited: {priceFormat(Number(utils.formatUnits(Number(stakerToPureStakedPRO ? stakerToPureStakedPRO : 0), 8)), 2, 'PRO', false, true)} 
                                   <Tooltip placement="top" title={`This is the amount of PRO associated with your stake (before accounting for rewards).`}>
                                     <HelpIcon className={'tooltip-helper-icon'} />
                                   </Tooltip>
@@ -1293,7 +1293,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                             inputProps={{ 'aria-label': 'controlled' }}
                                           />
                                         } 
-                                        label={<>I accept that unstaking now would <strong>forfeit any rewards</strong> associated with my stake on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
+                                        label={<>I accept that withdrawing now would <strong>forfeit any rewards</strong> associated with my deposit on this module <strong>({priceFormat(Number(utils.formatUnits(stakerRewardOnModule ? stakerRewardOnModule.toString() : 0, 8)), 2, 'PRO', false, true)})</strong> due to being in an active lockup period</>}
                                       />
                                     </FormGroup>
                                     <FloatingActionButton
@@ -1319,7 +1319,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                 <animated.div className={classes.floatingActionZone} style={actionZoneSyncingSpring}>
                   <Card className={classes.floatingActionZoneCard} elevation={6}>
                       <Typography variant="h6">
-                        Syncing Staking Contract
+                        Syncing Earning Contract
                       </Typography>
                       <>
                         <div className={classes.submitButtonContainer}>
@@ -1329,7 +1329,7 @@ const StakePortalV3 = (props: IStakeEnter) => {
                                 buttonColor="secondary"
                                 disabled={true}
                                 showLoadingIcon={true}
-                                text={'Syncing Staking Contract...'}
+                                text={'Syncing Earning Contract...'}
                               />
                             </div>
                         </div>
