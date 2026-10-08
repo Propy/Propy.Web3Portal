@@ -1,10 +1,10 @@
-import React, { memo, useId } from 'react';
+import React, { memo, useId, Suspense, lazy } from 'react';
 
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
 import { latLngBounds, latLng } from 'leaflet';
 import { animated, useSpring, config } from '@react-spring/web'
@@ -29,6 +29,9 @@ import {
 } from '../interfaces';
 
 import { PropsFromRedux } from '../containers/GenericPageContainer';
+
+// MapLibre is large, so it's split into its own chunk that only loads when a map renders
+const LeafletMapLibreLayer = lazy(() => import('./LeafletMapLibreLayer'));
 
 interface ILeafletMap {
   zoom?: number
@@ -151,6 +154,8 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
       boundsOptions={{padding: [50, 50]}}
       maxBounds={bounds}
       minZoom={2}
+      // marker clustering needs a maxZoom, which the old raster TileLayer used to provide (18)
+      maxZoom={18}
       maxBoundsViscosity={0.7}
       zoomDelta={2}
       zoomSnap={2}
@@ -171,10 +176,9 @@ const LeafletMap = memo((props: PropsFromRedux & ILeafletMap) => {
         </div>
       }
       <LeafletMapTrackBounds onBoundsUpdate={onBoundsUpdate} onZoomUpdate={onZoomUpdate} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-      />
+      <Suspense fallback={null}>
+        <LeafletMapLibreLayer styleUrl="https://tiles.openfreemap.org/styles/positron" />
+      </Suspense>
       {!disableClustering &&
         <MarkerClusterGroup
           chunkedLoading
