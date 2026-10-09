@@ -162,13 +162,13 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
         individualPercent = ((Number(stakerSharesTotal) * 100) / Number(totalShares));
         totalPercent = totalPercent - individualPercent;
       }
-      newPieChartData.push({ id: 0, value: totalPercent, label: address ? 'Other\'s Stake' : 'Network Stake' });
+      newPieChartData.push({ id: 0, value: totalPercent, label: address ? 'Other\'s pSTAKE' : 'Network pSTAKE' });
     } else {
-      newPieChartData.push({ id: 0, value: 1, label: 'Network Stake' });
+      newPieChartData.push({ id: 0, value: 1, label: 'Network pSTAKE' });
     }
 
     if(address && stakerSharesTotal && (Number(stakerSharesTotal) > 0)) {
-      newPieChartData.push({ id: 1, value: individualPercent, label: 'Your Stake' });
+      newPieChartData.push({ id: 1, value: individualPercent, label: 'Your pSTAKE' });
     }
 
     setPieChartData(newPieChartData);
@@ -207,28 +207,28 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
         setTimeseriesData([
           {
             title: "Circulating pSTAKE",
-            subtitle: "Total Staking Power Supply",
+            subtitle: "Total Earning Power Supply",
             data: pStakeData,
             rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'pSTAKE', false),
             formatValueFn: (value: any) => priceFormat(value, 2, 'pSTAKE', false),
           },
           {
-            title: "Estimated Total Staked PRO",
-            subtitle: "Combined PRO + Virtual Staked PRO",
+            title: "Estimated Total Deposited PRO",
+            subtitle: "Combined PRO + Virtual Deposited PRO",
             data: combinedProValueStakedData,
             rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
             formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
           },
           {
-            title: "Total Staked PRO",
-            subtitle: "Staked via PRO Staking Module",
+            title: "Total Deposited PRO",
+            subtitle: "Deposited via PRO Earning Module",
             data: proValueStakedData,
             rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
             formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
           },
           {
-            title: "Total Virtual Staked PRO",
-            subtitle: "Staked via PropyKeys & LP Module",
+            title: "Total Virtual Deposited PRO",
+            subtitle: "Deposited via PropyKeys & LP Module",
             data: virtualProValueStakedData,
             rightTextFormatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
             formatValueFn: (value: any) => priceFormat(value, 2, 'PRO', false),
@@ -311,7 +311,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Staking Power</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Earning Power</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerSharesTotal ? stakerSharesTotal : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}
