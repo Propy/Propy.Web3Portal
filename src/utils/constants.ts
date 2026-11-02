@@ -199,23 +199,6 @@ export const NETWORK_ID_TO_NAME : {[key: number]: string | undefined} = {
   })
 }
 
-// REACT_APP_QUICKNODE_RPC_URL_MAINNET="https://fittest-cosmological-grass.quiknode.pro/9cf41930fbbefb9874249ef10b64e4f311847524/"
-// REACT_APP_QUICKNODE_RPC_URL_ARBITRUM="https://methodical-cosmological-county.arbitrum-mainnet.quiknode.pro/0338e1b5f17fa07a19974e2943651afe27114da1/"
-// REACT_APP_QUICKNODE_RPC_URL_BASE="https://black-stylish-film.base-mainnet.quiknode.pro/485c59e4fe0210ea66a56ad320b0cd7de255a93b/"
-// REACT_APP_QUICKNODE_RPC_URL_SEPOLIA="https://wandering-light-lambo.ethereum-sepolia.quiknode.pro/619fe77ab58eeca41650532e19818572938ec8f7"
-// REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA="https://bold-ancient-card.base-sepolia.quiknode.pro/be656259bcf0f5ca0de9302aa1b5c09be5a428a5"
-
-export const NETWORK_ID_TO_RPC : {[key: number]: string | undefined} = {
-  1: process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET ? process.env.REACT_APP_QUICKNODE_RPC_URL_MAINNET : "",
-  56: process.env.REACT_APP_QUICKNODE_RPC_URL_BNB ? process.env.REACT_APP_QUICKNODE_RPC_URL_BNB : "",
-  8453: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE : "",
-  42161: process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM ? process.env.REACT_APP_QUICKNODE_RPC_URL_ARBITRUM : "",
-  ...(process?.env?.REACT_APP_ENV !== 'prod' && {
-    84532: process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_BASE_SEPOLIA : "",
-    11155111: process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA ? process.env.REACT_APP_QUICKNODE_RPC_URL_SEPOLIA : "",
-  })
-}
-
 export const NETWORK_NAME_TO_DISPLAY_NAME : {[key: string]: string} = {
 	'ethereum': 'Ethereum',
 	'arbitrum': 'Arbitrum',
