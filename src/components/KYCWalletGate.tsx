@@ -190,10 +190,10 @@ export const KYCWalletGate = (props: PropsFromRedux & IKYCWalletGate) => {
   
   // Update auth header when signature is received
   useEffect(() => {
-    if (signatureData && messageToSign && address && chainId) {
+    if (signatureData && messageToSign && address && chainId && !authHeader) {
       setAuthHeader(`${messageToSign}::${signatureData}::${address}::${chainId}`);
     }
-  }, [signatureData, messageToSign, address, chainId]);
+  }, [signatureData, authHeader, messageToSign, address, chainId]);
   
   // Start polling when needed
   useEffect(() => {

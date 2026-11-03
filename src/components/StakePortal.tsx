@@ -226,14 +226,14 @@ const getUnstakeButtonText = (
   }
 
   if(isAwaitingUnstakeTx) {
-    return "Unstaking...";
+    return "Exiting...";
   }
 
   if(isSyncingStaking) {
     return "Syncing...";
   }
   
-  return "Unstake";
+  return "Exit";
 }
 
 const getStakeButtonText = (
@@ -246,14 +246,14 @@ const getStakeButtonText = (
   }
 
   if(isAwaitingStakeTx) {
-    return "Staking...";
+    return "Entering...";
   }
 
   if(isSyncingStaking) {
     return "Syncing...";
   }
   
-  return "Stake";
+  return "Enter";
 }
 
 const getActiveStep = (
@@ -937,7 +937,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
     if(dataPerformStakeReceipt?.status === "success") {
       // handle successful block inclusion + no error
       setIsAwaitingStakeTx(false);
-      toast.success(`Stake success!`);
+      toast.success(`Lock success!`);
       const syncStaking = async () => {
         setIsSyncingStaking(true);
         StakeService.triggerStakeOptimisticSync();
@@ -1092,7 +1092,7 @@ const StakeEnter = (props: PropsFromRedux & IStakeEnter) => {
         <Grid className={(isLoading || isLoadingGeoLocation) ? classes.loadingZone : ''} container spacing={2} columns={{ xs: 4, sm: 8, md: 12, lg: 20, xl: 30 }} style={disableSelectionAdjustments ? {pointerEvents: 'none', opacity: 0.7} : {}}>
           <Grid item xs={4} sm={8} md={12} lg={20} xl={30}>
               <Typography variant="h6" style={{textAlign: 'left'}}>
-                  This version of the staking contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`stake/v${latestStakingVersion}`}>here</LinkWrapper>.
+                  This version of the staking contract has been deprecated, the latest version can be found <LinkWrapper style={{color: PROPY_LIGHT_BLUE}} link={`earn/v${latestStakingVersion}`}>here</LinkWrapper>.
               </Typography>
             </Grid>
         </Grid>

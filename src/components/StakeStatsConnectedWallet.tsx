@@ -149,13 +149,13 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
         individualPercent = ((Number(stakerShares) * 100) / Number(totalShares));
         totalPercent = totalPercent - individualPercent;
       }
-      newPieChartData.push({ id: 0, value: totalPercent, label: address ? 'Other\'s Stake' : 'Network Stake' });
+      newPieChartData.push({ id: 0, value: totalPercent, label: address ? 'Other\'s pSTAKE Share' : 'Network pSTAKE' });
     } else {
-      newPieChartData.push({ id: 0, value: 1, label: 'Network Stake' });
+      newPieChartData.push({ id: 0, value: 1, label: 'Network pSTAKE' });
     }
 
     if(address && stakerShares && (Number(stakerShares) > 0)) {
-      newPieChartData.push({ id: 1, value: individualPercent, label: 'Your Stake' });
+      newPieChartData.push({ id: 1, value: individualPercent, label: 'Your pSTAKE Share' });
     }
 
     setPieChartData(newPieChartData);
@@ -177,7 +177,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
           <Grid item xs={12} md={12} lg={12}>
             <Card className={classes.card}>
               <div className={classes.cardInner}>
-                <Typography style={{marginBottom: '4px'}} variant="subtitle1"><span style={{fontWeight: 'bold'}}>Please Note:</span> This staking contract will not be used for futher distributions (the last distribution received by this contract was on the 13th of April 2024). The PropyKeys team is working on <span style={{fontWeight: 'bold'}}>V2</span> of the staking protocol (undergoing audit) which will be more suitable for continuous and long-term use in comparison to V1. Any stakers who are currently staked in the V1 contract who wish to move over to the V2 contract will need to unstake from the V1 contract in order to move over to the V2 contract. Tokens staked in the V1 protocol are not at risk but there won't be any more PRO distributed to V1, therefore it is advised to unstake and await V2.</Typography>
+                <Typography style={{marginBottom: '4px'}} variant="subtitle1"><span style={{fontWeight: 'bold'}}>Please Note:</span> This earning contract will not be used for futher distributions (the last distribution received by this contract was on the 13th of April 2024). The PropyKeys team is working on <span style={{fontWeight: 'bold'}}>V2</span> of the earning protocol (undergoing audit) which will be more suitable for continuous and long-term use in comparison to V1. Any stakers who are currently staked in the V1 contract who wish to move over to the V2 contract will need to unstake from the V1 contract in order to move over to the V2 contract. Tokens entered in the V1 protocol are not at risk but there won't be any more PRO distributed to V1, therefore it is advised to withdraw and await V2.</Typography>
               </div>
             </Card>
           </Grid>
@@ -217,7 +217,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               )}
               {!isLoadingStakedPROByStaker && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Staked PRO</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Deposited PRO</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakedPROByStaker ? stakedPROByStaker : 0), 8)), 2, 'PRO', false, true)}</Typography>
                 </>
               )}
@@ -235,7 +235,7 @@ const StakeStatsConnectedWallet = (props: PropsFromRedux & IStakeStatsConnectedW
               )}
               {!isLoadingStakerShares && (
                 <>
-                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Staking Power</Typography>
+                  <Typography style={{marginBottom: '4px'}} variant="h6">Your Earning Power</Typography>
                   <Typography style={{fontWeight: 400}} variant="h6">{priceFormat(Number(utils.formatUnits(Number(stakerShares ? stakerShares : 0), 8)), 2, 'pSTAKE', false, true)}</Typography>
                 </>
               )}

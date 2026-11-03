@@ -108,14 +108,14 @@ const PageContainer = (props: PropsFromRedux) => {
                       <Route path="/collection/:network/:contractNameOrCollectionNameOrAddress" element={<CollectionPage/>} />
                       <Route path="/recently-minted" element={<RecentlyMintedPage/>} />
                       <Route path="/web3-agent" element={<Web3AgentPage />} />
-                      <Route path="/stake/v1" element={<StakePage version={1} />} />
-                      <Route path="/stake/v2" element={<StakePage version={2} />} />
-                      <Route path="/stake/v3" element={<StakePage version={3} />} />
-                      <Route path="/stake/v3/:mode" element={<StakePage version={3} />} />
-                      <Route path="/stake/v3/:mode/:module" element={<StakePage version={3} />} />
-                      <Route path="/staking/v3" element={<StakePage version={3} />} />
-                      <Route path="/staking/v3/:mode" element={<StakePage version={3} />} />
-                      <Route path="/staking/v3/:mode/:module" element={<StakePage version={3} />} />
+                      <Route path="/earn/v1" element={<StakePage version={1} />} />
+                      <Route path="/earn/v2" element={<StakePage version={2} />} />
+                      <Route path="/earn/v3" element={<StakePage version={3} />} />
+                      <Route path="/earn/v3/:mode" element={<StakePage version={3} />} />
+                      <Route path="/earn/v3/:mode/:module" element={<StakePage version={3} />} />
+                      <Route path="/earning/v3" element={<StakePage version={3} />} />
+                      <Route path="/earning/v3/:mode" element={<StakePage version={3} />} />
+                      <Route path="/earning/v3/:mode/:module" element={<StakePage version={3} />} />
                       <Route path="/bridge" element={<BridgeOptionsPage isConsideredMobile={isConsideredMobile} />} />
                       <Route path="/bridge/:bridgeSelection" element={<Navigate to="/bridge" replace />} />
                       <Route path="/bridge/:bridgeSelection/:bridgeAction/:transactionHash" element={<Navigate to="/bridge" replace />} />
